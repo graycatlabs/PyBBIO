@@ -4,6 +4,7 @@
 # Apache 2.0 license
 # 
 # Beaglebone pinmux driver
+# For Beaglebone's with 3.2 kernel
 
 from config import *
 

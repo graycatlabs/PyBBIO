@@ -365,34 +365,6 @@ HEX = 'HEX'
 ##############################
 ##--- Start PWM config: ----##
 
-PWM_CTRL_DIR = "/sys/class/pwm/"
-
-# EHRPWM pinmux config dict in form:
-#  [mux_file, mux_mode, pwm_ctrl_dir]
-
-PWM_PINS = {
-  'PWM1A' : [ 'gpmc_a2', 0x06, 'ehrpwm.1:0/'],
-  'PWM1B' : [ 'gpmc_a3', 0x06, 'ehrpwm.1:1/']
-}
-PWM1A = 'PWM1A'
-PWM1B = 'PWM1B'
-
-
-import os
-if (os.path.exists(PWM_CTRL_DIR+'ehrpwm.2:0/')):
-  PWM_PINS['PWM2A'] = ['gpmc_ad8', 0x04, 'ehrpwm.2:0/']
-  PWM_PINS['PWM2B'] = ['gpmc_ad9', 0x04, 'ehrpwm.2:1/']
-  PWM2A = 'PWM2A'
-  PWM2B = 'PWM2B'
-
-
-PWM_FILES = dict(\
-  (i, [open(PWM_CTRL_DIR+PWM_PINS[i][2]+'request', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'run', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'duty_ns', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'period_freq', 'r+') ])\
-  for i in PWM_PINS.keys())
-
 # Indexes in PWM_FILES lists:
 PWM_REQUEST = 0
 PWM_ENABLE  = 1

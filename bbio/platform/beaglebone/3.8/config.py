@@ -7,3 +7,12 @@
 
 # Load the common beaglebone configuration:
 from config_common import *
+
+
+########################################
+##--- Start control module config: ---##
+
+PINMUX_PATH = '/sys/kernel/debug/omap_mux/'
+
+##--- End control module config ------##
+########################################

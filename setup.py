@@ -99,7 +99,22 @@ try:
   driver_packages = []
   driver_data = []
 
-  platform = 'BeagleBone Black'
+
+  # detect platform:
+  platform = ''
+  with open('/proc/cpuinfo', 'rb') as f:
+    cpuinfo = f.read().lower() 
+  if ('armv7' in cpuinfo and 
+      ('am335x' in cpuinfo or 'am33xx' in cpuinfo)):
+    platform = 'BeagleBone'
+
+  import commands
+  uname_status, uname = commands.getstatusoutput('uname -a')
+  if uname_status > 0:
+    exit('*uname failed, cannot detect kernel version! uname output:\n %s' % uname)
+  if ('3.8' in uname):
+    platform += ' Black'
+  
 
   if (platform == 'BeagleBone Black'):
     # BeagleBone or BeagleBone Black with kernel >= 3.8
@@ -110,7 +125,9 @@ try:
     driver_packages = ['bbio.platform.beaglebone']
     driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
                    ('bbio/platform/beaglebone', 
-                    ['bbio/platform/beaglebone/3.8/config.py'])]
+                    ['bbio/platform/beaglebone/3.8/config.py',
+                     'bbio/platform/beaglebone/3.8/pinmux.py'])]
+
 
   elif (platform == 'BeagleBone'):
     # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
