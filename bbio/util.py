@@ -23,4 +23,3 @@ def millis():
 def micros():
   """ Returns roughly the number of microsoconds since program start. """
   return time.time()*1000000 - START_TIME_MS*1000
-

@@ -1,4 +1,4 @@
-# serial.py 
+# uart.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
