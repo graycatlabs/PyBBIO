@@ -37,8 +37,6 @@ IDLEST_MASK = 0x03<<16
 ########################################
 ##--- Start control module config: ---##
 
-PINMUX_PATH = '/sys/kernel/debug/omap_mux/'
-
 CONF_SLEW_SLOW    = 1<<6
 CONF_RX_ACTIVE    = 1<<5
 CONF_PULLUP       = 1<<4
@@ -58,9 +56,6 @@ CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
 
 ##############################
 ##--- Start GPIO config: ---##
-GPIO_FILE_BASE = '/sys/class/gpio/'
-EXPORT_FILE = GPIO_FILE_BASE + 'export'
-UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
 
 GPIO0 = 0x44e07000-MMAP_OFFSET
 GPIO1 = 0x4804c000-MMAP_OFFSET
@@ -356,17 +351,6 @@ AIN7 = A7 = VSYS = 'AIN7'
 
 ##############################
 ##--- Start UART config: ---##
-
-# UART ports must be in form: 
-#    [port, tx_pinmux_filename, tx_pinmux_mode, 
-#           rx_pinmux_filename, rx_pinmux_mode]
-
-UART = {
-  'UART1' : ['/dev/ttyO1', 'uart1_txd', 0,  'uart1_rxd', 0],
-  'UART2' : ['/dev/ttyO2',   'spi0_d0', 1,  'spi0_sclk', 1],
-  'UART4' : ['/dev/ttyO4',  'gpmc_wpn', 6, 'gpmc_wait0', 6],
-  'UART5' : ['/dev/ttyO5', 'lcd_data8', 4,  'lcd_data9', 4]
-}
 
 # Formatting constants to mimic Arduino's serial.print() formatting:
 DEC = 'DEC'

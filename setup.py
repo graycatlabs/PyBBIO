@@ -99,14 +99,30 @@ try:
   driver_packages = []
   driver_data = []
 
-  platform = 'beaglebone'
-  if (platform == 'beaglebone'):
+  platform = 'BeagleBone Black'
+
+  if (platform == 'BeagleBone Black'):
+    # BeagleBone or BeagleBone Black with kernel >= 3.8
     driver_extensions = [Extension('bbio.platform.beaglebone.driver', 
                                    ['bbio/platform/beaglebone/src/beaglebone.c', 
                                     'bbio/platform/util/mmap_util.c'],
                                    include_dirs=['bbio/platform/util'])]
     driver_packages = ['bbio.platform.beaglebone']
-    driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
+    driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
+                   ('bbio/platform/beaglebone', 
+                    ['bbio/platform/beaglebone/3.8/config.py'])]
+
+  elif (platform == 'BeagleBone'):
+    # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
+    driver_extensions = [Extension('bbio.platform.beaglebone.driver', 
+                                   ['bbio/platform/beaglebone/src/beaglebone.c', 
+                                    'bbio/platform/util/mmap_util.c'],
+                                   include_dirs=['bbio/platform/util'])]
+    driver_packages = ['bbio.platform.beaglebone']
+    driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
+                   ('bbio/platform/beaglebone', 
+                    ['bbio/platform/beaglebone/3.2/config.py', 
+                     'bbio/platform/beaglebone/3.2/pinmux.py'])]
 
     # Older Angstrom images only included support for one of the PWM modules
     # broken out on the headers, check and warn if no support for PWM2 module:
