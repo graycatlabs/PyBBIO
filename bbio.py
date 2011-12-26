@@ -100,7 +100,9 @@ def digitalWrite(gpio_pin, state):
 def digitalRead(gpio_pin):
   """ Returns pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  return _getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]
+  if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
+    return 1
+  return 0
 
 def toggle(gpio_pin):
   """ Toggles the state of the given digital pin. """
