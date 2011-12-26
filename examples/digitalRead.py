@@ -6,7 +6,7 @@ from bbio import *
 
 # Create a setup function:
 def setup():
-  # Set the two LEDs as outputs:
+  # Set the GPIO pins:
   pinMode('USR3', OUTPUT)
   pinMode('GPIO1_6', INPUT)
 
