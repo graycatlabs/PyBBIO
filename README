@@ -1,0 +1,63 @@
+************************************************************************
+PyBBIO
+Created: 12/2011
+Author: Alexander Hiam - ahiam@marlboro.edu - http://www.alexanderhiam.com
+Website: https://github.com/alexanderhiam/PyBBIO
+
+A Python library for hardware IO support on the TI Beaglebone.
+
+Copyright (c) 2012 - Alexander Hiam 
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+************************************************************************
+
+This is a very barebones library at the moment, only supporting basic
+digital IO. It should eventually include support for all the peripheral
+functions provided on the two BeagleBone expansion headers, so keep 
+checking the github page for updates.  
+
+To install PyBBIO:
+ -Get the PyBBIO/ directory onto your BeagleBone, either using git clone,
+  or simply by downloading it and scp-ing it.
+ -cd into PyBBIO/ directory and run:
+    # sh install.sh
+ -cd into PyBBIO/examples and run:
+    # python simple_test.py
+  If all is well you should see two of the LEDs next to the Ethernet jack
+  blinking back and forth for about 10 seconds.
+
+The python-mmap module is required and was not installed on my BeagleBone,
+despite it being part of the standard Python modules. 
+It can easily be installed on the BeagleBone by running:
+ # opkg update; opkg install python-mmap
+
+I am using the same pin names as are assigned to the BeagleBone's two
+female expansion headers in the schematic, which can be found here:
+ http://beagleboard.org/hardware/design/
+
+I am trying to emulate the Arduino API as much as possible.
+
+Full API documentation found here:
+ http://www.alexanderhiam.com/code/pybbio/
+
+Note: For any changes made to PyBBIO to take effect you must run intall.sh.
+
+
+Hardware access is acheived using a memory map of the special file
+/dev/mem, which is a map of the entire physical memory of the AM3358
+ARM processor. 
+The addresses of all the processor's memory registers as well as details
+on how to properly use them can be found in the AM335x Technical Reference 
+Manual (TI document spruh73c.pdf) which can be found here:
+ http://www.ti.com/dsp/docs/dspsupporttechdocs.tsp?sectionId=3&tabId=409&docCategoryId=6&viewType=mostuseful&rootFamilyId=44&familyId=2920
