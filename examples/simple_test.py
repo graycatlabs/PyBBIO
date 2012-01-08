@@ -1,4 +1,4 @@
-# simple_test.py - Alexander Hiam - 12/2012
+# simple_test.py - Alexander Hiam - 1/2012
 # Flip-flops between two of the Beagleboard's on-board LEDs for 10 seconds.
 
 import time
