@@ -61,6 +61,10 @@ class BeagleBone(object):
     reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
     self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg & ~gpio_pin[1])
 
+  def digitalRead(self, gpio_pin):
+    """ Returns pin state as 1 or 0. """
+    return self._getReg(gpio_pin[0]+GPIO_DATAIN) & gpio_pin[1]
+
   def toggle(self, gpio_pin):
     """ Toggles the state of the given digital pin. """
     reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
