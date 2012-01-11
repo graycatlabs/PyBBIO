@@ -30,18 +30,18 @@ from mmap import mmap
 
 CONFIG_FILE="%s/.pybbio/bbio.cfg" % os.environ['HOME']
 
-config = open(CONFIG_FILE, 'r').read()
-assert ('MMAP_OFFSET' in config) and ('MMAP_SIZE' in config),\
-      "*Config file '%s' must contain values MMAP_OFFSET and MMAP_SIZE" %\
-                                                                config_file
-exec(config)
-
+_configuration = open(CONFIG_FILE, 'r').read()
+assert ('MMAP_OFFSET' in _configuration) and ('MMAP_SIZE' in _configuration),\
+           "*Config file '%s' must contain values MMAP_OFFSET and MMAP_SIZE" %\
+                                                                     CONFIG_FILE
+exec(_configuration)
 
 class BeagleBone(object):
   def __init__(self):
     f = open("/dev/mem", "r+b")
     self.mem = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET) 
     f.close() # Only needed to make map
+    self._analog_init()
 
   def pinMode(self, gpio_pin, direction):
     """ Sets given digital pin to input if direction=1, output otherwise. """
@@ -52,6 +52,11 @@ class BeagleBone(object):
     reg = self._getReg(gpio_pin[0]+GPIO_OE)
     self._setReg(gpio_pin[0]+GPIO_OE, reg & ~gpio_pin[1])
 
+  def analogRead(self, analog_pin):
+    """ Returns analog value read on given analog input pin. """
+    assert ((analog_pin >= 0) and (analog_pin <= 7)), "*Invalid analog pin" 
+    return self._getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
+
   def digitalWrite(self, gpio_pin, state):
     """ Writes given digital pin low if state=0, high otherwise.  """
     if (state):
@@ -61,10 +66,26 @@ class BeagleBone(object):
     reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
     self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg & ~gpio_pin[1])
 
+  def digitalRead(self, gpio_pin):
+    """ Returns pin state as 1 or 0. """
+    return self._getReg(gpio_pin[0]+GPIO_DATAIN) & gpio_pin[1]
+
   def toggle(self, gpio_pin):
     """ Toggles the state of the given digital pin. """
     reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
     self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg ^ gpio_pin[1])
+
+  def _andReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value AND mask. """
+    self._setReg(address, self,_getReg(address)&mask)
+
+  def _orReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value OR mask. """
+    self._setReg(address, self,_getReg(address)|mask)
+
+  def _xorReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value XOR mask. """
+    self._setReg(address, self,_getReg(address)^mask)
 
   def _getReg(self, address):
     """ Returns unpacked 32 bit register value starting from address. """
@@ -74,3 +95,12 @@ class BeagleBone(object):
     """ Sets 32 bits at given address to given value. """
     self.mem[address:address+4] = struct.pack("<L", new_value)
 
+  def _analog_init(self):
+    """ Initializes the on-board 8ch 12bit ADC. """
+    step_config = 'ADCSTEPCONFIG%i'
+    #step_delay = 'ADCSTEPDELAY%i'
+    ain = 'AIN%i' 
+    for i in xrange(8):
+      config = SEL_INP(ain % i) | ADC_AVG4
+      self._setReg(step_config % i+1, config)
+      
