@@ -70,6 +70,18 @@ class BeagleBone(object):
     reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
     self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg ^ gpio_pin[1])
 
+  def _andReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value AND mask. """
+    self._setReg(address, self._getReg(address)&mask)
+
+  def _orReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value OR mask. """
+    self._setReg(address, self._getReg(address)|mask)
+
+  def _xorReg(self, address, mask):
+    """ Sets 32-bit Register at address to its current value XOR mask. """
+    self._setReg(address, self._getReg(address)^mask)
+
   def _getReg(self, address):
     """ Returns unpacked 32 bit register value starting from address. """
     return struct.unpack("<L", self.mem[address:address+4])[0]
