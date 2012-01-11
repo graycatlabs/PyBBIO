@@ -77,15 +77,15 @@ class BeagleBone(object):
 
   def _andReg(self, address, mask):
     """ Sets 32-bit Register at address to its current value AND mask. """
-    self._setReg(address, self,_getReg(address)&mask)
+    self._setReg(address, self._getReg(address)&mask)
 
   def _orReg(self, address, mask):
     """ Sets 32-bit Register at address to its current value OR mask. """
-    self._setReg(address, self,_getReg(address)|mask)
+    self._setReg(address, self._getReg(address)|mask)
 
   def _xorReg(self, address, mask):
     """ Sets 32-bit Register at address to its current value XOR mask. """
-    self._setReg(address, self,_getReg(address)^mask)
+    self._setReg(address, self._getReg(address)^mask)
 
   def _getReg(self, address):
     """ Returns unpacked 32 bit register value starting from address. """
