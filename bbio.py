@@ -101,6 +101,6 @@ class BeagleBone(object):
     #step_delay = 'ADCSTEPDELAY%i'
     ain = 'AIN%i' 
     for i in xrange(8):
-      config = SEL_INP(ain % i) | ADC_AVG4
-      self._setReg(step_config % i+1, config)
+      config = SEL_INP(eval(ain % i)) | ADC_AVG4
+      self._setReg(eval(step_config % i+1), config)
       
