@@ -93,7 +93,7 @@ class BeagleBone(object):
 
   def _setReg(self, address, new_value):
     """ Sets 32 bits at given address to given value. """
-    print "_setReg got:\n addres: %i\n new_value: %i" % (address,new_value)
+    print "_setReg got:\n addres: %i\n new_value: %i" % (hex(address),new_value)
     self.mem[address:address+4] = struct.pack("<L", new_value)
 
   def _analog_init(self):
