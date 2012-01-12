@@ -100,10 +100,11 @@ class BeagleBone(object):
     step_config = 'ADCSTEPCONFIG%i'
     #step_delay = 'ADCSTEPDELAY%i'
     ain = 'AIN%i' 
+    # Must turn off write protect:
+    self._setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
     for i in xrange(8):
       config = SEL_INP(eval(ain % i)) | ADC_AVG4
       print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
       print "ADC step config: %s" % bin(config)
-      print " packed: %s" % struct.pack("<L", config)
-      #self._setReg(eval(step_config % (i+1)), config)
+      self._setReg(eval(step_config % (i+1)), config)
       
