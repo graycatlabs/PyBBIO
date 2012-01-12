@@ -89,7 +89,7 @@ class BeagleBone(object):
 
   def _getReg(self, address):
     """ Returns unpacked 32 bit register value starting from address. """
-    print "_setReg got:\n addres: %s" % (hex(address+MMAP_OFFSET))
+    print "_setReg got:\n addres: %s\n offset: %s" % (hex(address+MMAP_OFFSET), hex(address))
     return struct.unpack("<L", self.mem[address:address+4])[0]
 
   def _setReg(self, address, new_value):
