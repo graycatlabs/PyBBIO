@@ -41,7 +41,7 @@ class BeagleBone(object):
     f = open("/dev/mem", "r+b")
     self.mem = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET) 
     f.close() # Only needed to make map
-    self._analog_init()
+    #self._analog_init()
 
   def pinMode(self, gpio_pin, direction):
     """ Sets given digital pin to input if direction=1, output otherwise. """
