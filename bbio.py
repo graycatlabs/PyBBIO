@@ -102,7 +102,7 @@ class BeagleBone(object):
     ain = 'AIN%i' 
     for i in xrange(8):
       config = SEL_INP(eval(ain % i)) | ADC_AVG4
-      print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))))
+      print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
       print "ADC step config: %s" % bin(config)
       #self._setReg(eval(step_config % (i+1)), config)
       
