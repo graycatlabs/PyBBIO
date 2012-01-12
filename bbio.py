@@ -104,5 +104,6 @@ class BeagleBone(object):
       config = SEL_INP(eval(ain % i)) | ADC_AVG4
       print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
       print "ADC step config: %s" % bin(config)
+      print " packed: %s" % struct.pack("<L", config)
       #self._setReg(eval(step_config % (i+1)), config)
       
