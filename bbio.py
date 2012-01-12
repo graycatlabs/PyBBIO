@@ -93,6 +93,7 @@ class BeagleBone(object):
 
   def _setReg(self, address, new_value):
     """ Sets 32 bits at given address to given value. """
+    print "_setReg got:\n addres: %i\n new_value: %i" % (address,new_value)
     self.mem[address:address+4] = struct.pack("<L", new_value)
 
   def _analog_init(self):
@@ -103,7 +104,6 @@ class BeagleBone(object):
     # Must turn off write protect:
     self._setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
     for i in xrange(8):
-      time.sleep(0.1)
       config = SEL_INP(eval(ain % i)) | ADC_AVG4
       print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
       print "ADC step config: %s" % bin(config)
