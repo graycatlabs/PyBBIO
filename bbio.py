@@ -25,7 +25,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
 """
 
-import struct, os, sys
+import struct, os, sys, time
 from mmap import mmap
 
 CONFIG_FILE="%s/.pybbio/bbio.cfg" % os.environ['HOME']
@@ -103,6 +103,7 @@ class BeagleBone(object):
     # Must turn off write protect:
     self._setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
     for i in xrange(8):
+      time.sleep(0.1)
       config = SEL_INP(eval(ain % i)) | ADC_AVG4
       print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
       print "ADC step config: %s" % bin(config)
