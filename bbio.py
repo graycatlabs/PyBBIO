@@ -23,6 +23,13 @@
 
  You should have received a copy of the GNU General Public License
  along with this program.  If not, see <http://www.gnu.org/licenses/>. 
+
+ ************************************************************************
+ * Having trouble reading/writing analog registers; getting bus errors. *
+ * Running Python verbosely gives no additional details.                *
+ * Able to read/write the GPIO0 registers just fine, which are at a     *
+ * lower address than the ADC, and other GPIOs are at higher addresses. *
+ ************************************************************************ 
 """
 
 import struct, os, sys, time
