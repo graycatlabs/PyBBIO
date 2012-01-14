@@ -112,21 +112,28 @@ class BeagleBone(object):
     #step_delay = 'ADCSTEPDELAY%i'
     ain = 'AIN%i' 
     
-    # Enable ADC module
+    # Enable ADC module clock:
     self._setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
     # Wait for enable complete:
     while (self._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
     
-    print "ADC_CTRL: %s" % bin(self._getReg(ADC_CTRL))
-    
-    # Disable module:
-    self._andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
-
     # Must turn off write protect:
-    #self._andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
-    #for i in xrange(8):
-    #  config = SEL_INP(eval(ain % i)) | ADC_AVG4
-    #  print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
-    #  print "ADC step config: %s" % bin(config)
-    #  self._andReg(eval(step_config % (i+1)), config)
+    self._andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
+    # Write STEPCONFIG registers:
+    for i in xrange(8):
+      config = SEL_INP(eval(ain % i)) | ADC_AVG4
+      print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
+      print "ADC step config: %s" % bin(config)
+      self._andReg(eval(step_config % (i+1)), config)
+    # Now we can enable ADC subsystem:
+    self._setReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
+
       
+  def cleanup(self):
+    """ Temporarty function for memory cleanup; to be called before program exit.
+        Will be more integrated soon. """
+    # Disable ADC subsystem:
+    self._andReg(ADC_CTRL, ~TSC_ADC_SS_ENABLE)
+    # Disable ADC module clock:
+    self._andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
+    self.mem.close()
