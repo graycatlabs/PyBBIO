@@ -15,3 +15,4 @@ for i in range(20):
   print bb.analogRead(AIN7)
   time.sleep(0.5)
 
+bb.cleanup()
