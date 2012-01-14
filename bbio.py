@@ -111,15 +111,16 @@ class BeagleBone(object):
     step_config = 'ADCSTEPCONFIG%i'
     #step_delay = 'ADCSTEPDELAY%i'
     ain = 'AIN%i' 
+    self._getReg(CM_WKUP_ADC_TSC_CLKCTRL)
     # Enable ADC module
-    self._setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
+    #self._setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
     # Wait for enable complete:
-    while (self._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
+    #while (self._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
     
-    print "ADC_CTRL: %s" % bin(self._getReg(ADC_CTRL))
+    #print "ADC_CTRL: %s" % bin(self._getReg(ADC_CTRL))
     
     # Disable module:
-    self._andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
+    #self._andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
 
     # Must turn off write protect:
     #self._andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
