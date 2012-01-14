@@ -29,7 +29,9 @@
  * Running Python verbosely gives no additional details.                *
  * Able to read/write the GPIO0 registers just fine, which are at a     *
  * lower address than the ADC, and other GPIOs are at higher addresses. *
- ************************************************************************ 
+ * Output of dmseg after trying to read ADC_CTRL register:              *********************
+ *  [128816.761898] Unhandled fault: external abort on non-linefetch (0x1018) at 0x40785040 *
+ ********************************************************************************************
 """
 
 import struct, os, sys, time
@@ -109,7 +111,16 @@ class BeagleBone(object):
     step_config = 'ADCSTEPCONFIG%i'
     #step_delay = 'ADCSTEPDELAY%i'
     ain = 'AIN%i' 
+    # Enable ADC module
+    self._setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
+    # Wait for enable complete:
+    while (BeagleBone._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK
+    
     print "ADC_CTRL: %s" % bin(self._getReg(ADC_CTRL))
+    
+    # Disable module:
+    self._andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
+
     # Must turn off write protect:
     #self._andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
     #for i in xrange(8):
