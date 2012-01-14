@@ -11,7 +11,7 @@ from bbio import *
 bb = BeagleBone()
 bb._analog_init()
 
-#for i in range(20):
-#  print bb.analogRead(AIN7)
-#  time.sleep(0.5)
+for i in range(20):
+  print bb.analogRead(AIN7)
+  time.sleep(0.5)
 
