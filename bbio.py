@@ -114,7 +114,7 @@ class BeagleBone(object):
     # Enable ADC module
     self._setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
     # Wait for enable complete:
-    while (BeagleBone._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK
+    while (BeagleBone._getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK)
     
     print "ADC_CTRL: %s" % bin(self._getReg(ADC_CTRL))
     
