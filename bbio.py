@@ -28,7 +28,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 import struct, os, sys
 from mmap import mmap
 
-CONFIG_FILE="%s/.pybbio/bbio.cfg" % os.environ['HOME']
+CONFIG_FILE="%s/.pybbio/beaglebone.cfg" % os.environ['HOME']
 
 config = open(CONFIG_FILE, 'r').read()
 assert ('MMAP_OFFSET' in config) and ('MMAP_SIZE' in config),\
@@ -45,30 +45,34 @@ class BeagleBone(object):
 
   def pinMode(self, gpio_pin, direction):
     """ Sets given digital pin to input if direction=1, output otherwise. """
+    assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
     if (direction):
-      reg = self._getReg(gpio_pin[0]+GPIO_OE)
-      self._setReg(gpio_pin[0]+GPIO_OE, reg | gpio_pin[1])
+      reg = self._getReg(GPIO[gpio_pin][0]+GPIO_OE)
+      self._setReg(GPIO[gpio_pin][0]+GPIO_OE, reg | GPIO[gpio_pin][1])
       return
-    reg = self._getReg(gpio_pin[0]+GPIO_OE)
-    self._setReg(gpio_pin[0]+GPIO_OE, reg & ~gpio_pin[1])
+    reg = self._getReg(GPIO[gpio_pin][0]+GPIO_OE)
+    self._setReg(GPIO[gpio_pin][0]+GPIO_OE, reg & ~GPIO[gpio_pin][1])
 
   def digitalWrite(self, gpio_pin, state):
     """ Writes given digital pin low if state=0, high otherwise. """
+    assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
     if (state):
-      reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
-      self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg | gpio_pin[1])
+      reg = self._getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
+      self._setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg | GPIO[gpio_pin][1])
       return
-    reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
-    self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg & ~gpio_pin[1])
+    reg = self._getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
+    self._setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg & ~GPIO[gpio_pin][1])
 
   def digitalRead(self, gpio_pin):
     """ Returns pin state as 1 or 0. """
-    return self._getReg(gpio_pin[0]+GPIO_DATAIN) & gpio_pin[1]
+    assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
+    return self._getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]
 
   def toggle(self, gpio_pin):
     """ Toggles the state of the given digital pin. """
-    reg = self._getReg(gpio_pin[0]+GPIO_DATAOUT)
-    self._setReg(gpio_pin[0]+GPIO_DATAOUT, reg ^ gpio_pin[1])
+    assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
+    reg = self._getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
+    self._setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg ^ GPIO[gpio_pin][1])
 
   def _andReg(self, address, mask):
     """ Sets 32-bit Register at address to its current value AND mask. """
