@@ -1,7 +1,7 @@
 ************************************************************************
-PyBBIO
+PyBBIO - v0.2
 Created: 12/2011
-Author: Alexander Hiam - ahiam@marlboro.edu - http://www.alexanderhiam.com
+Author: Alexander Hiam - ahiam@marlboro.edu - www.alexanderhiam.com
 Website: https://github.com/alexanderhiam/PyBBIO
 
 A Python library for hardware IO support on the TI Beaglebone.
@@ -57,7 +57,7 @@ Installing PyBBIO:
         # cd examples/
         # python blink.py
       If all is well you should see two of the LEDs next to the Ethernet jack
-      blinking back and forth for about 10 seconds.
+      blinking back and forth. Press CTRL-C to stop.
 
  -Without GIT:
    Requirements: 

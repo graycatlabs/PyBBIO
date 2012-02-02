@@ -1,5 +1,5 @@
 #!/bin/sh
-# Install script for PyBBIO
+# Install script for PyBBIO v0.2
 # May require root priveledges.
 
 PYTHON_PATH="/usr/lib/python2.7"
