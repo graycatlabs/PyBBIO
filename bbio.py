@@ -45,7 +45,11 @@ f.close() # Only needed to make map
 
 
 def run(setup, main):
-  """  """
+  """ The main loop; must be passed a setup and a main function.
+      First the setup function will be called once, then the main
+      function wil be continuously until a stop signal is raised, 
+      e.g. CTRL-C or a call to the stop() function from within the
+      main function. """
   try:
     _init()
     setup()
