@@ -1,24 +1,25 @@
-# blink.py - Alexander Hiam - 1/2012
-# Blinks two of the Beagleboard's on-board LEDs for 10 seconds.
+# blink.py - Alexander Hiam - 2/2012
+# Blinks two of the Beagleboard's on-board LEDs until CTRL-C is pressed.
 
-import time
-
-# Must 'import *' to get all the needed constants,
-# simply importing bbio won't do:
+# Import PyBBIO library:
 from bbio import *
 
-# Create a BeagleBoard instance:
-bb = BeagleBone()
-# Set the two LEDs as outputs:
-bb.pinMode('USR2', OUTPUT)
-bb.pinMode('USR3', OUTPUT)
+# Create a setup function:
+def setup():
+  # Set the two LEDs as outputs: 
+  pinMode('USR2', OUTPUT)
+  pinMode('USR3', OUTPUT)
 
-# Start one high and one low:
-bb.digitalWrite('USR2', HIGH)
-bb.digitalWrite('USR3', LOW)
+  # Start one high and one low:
+  digitalWrite('USR2', HIGH)
+  digitalWrite('USR3', LOW)
 
-# Toggle the two for a few seconds:
-for i in range(20):
-  bb.toggle('USR2')
-  bb.toggle('USR3')
-  time.sleep(0.5)
+# Create a main function:
+def main():
+  # Toggle the two LEDs and sleep a few seconds:
+  toggle('USR2')
+  toggle('USR3')
+  sleep(0.5)
+
+# Start the loop:
+run(setup, main)
