@@ -71,7 +71,17 @@ Installing PyBBIO:
       Angstrom-Cloud9- and copy PyBBIO/ to home/root/. Then unmount the card
       and place it back in the BeagleBone.
    Complete steps 3 and 4 above.
- 
+
+Uninstalling PyBBIO:
+  1. On BeagleBone, cd into PyBBIO folder, e.g.:
+       # cd ~/PyBBIO
+  2. Runinstaller with uninstall flag:
+       # sh install.sh -u
+  PyBBIO configurationdirectory and Python module will be uninstalled,
+  3. PyBBIO folder can then be deleted,e.g.:
+       # cd ..
+       # rm -rf PyBBIO
+  
 Note:
  If you've installed PyBBIO with 'git clone' and then update it with 
  'git pull', you'll have to run 'sh install -i' again for the changes to
