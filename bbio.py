@@ -22,15 +22,7 @@
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
-
- ************************************************************************
- * Having trouble reading/writing analog registers; getting bus errors. *
- * Running Python verbosely gives no additional details.                *
- * Able to read/write the GPIO0 registers just fine, which are at a     *
- * lower address than the ADC, and other GPIOs are at higher addresses. *
- * Output of dmseg after trying to read ADC_CTRL register:              *********************
- *  [128816.761898] Unhandled fault: external abort on non-linefetch (0x1018) at 0x40785040 *
- ********************************************************************************************
+ along with this program. If not, see <http://www.gnu.org/licenses/>.
 """
 
 import struct, os, sys
