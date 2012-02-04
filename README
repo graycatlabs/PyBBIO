@@ -1,7 +1,7 @@
 ************************************************************************
-PyBBIO
+PyBBIO - v0.2
 Created: 12/2011
-Author: Alexander Hiam - ahiam@marlboro.edu - http://www.alexanderhiam.com
+Author: Alexander Hiam - ahiam@marlboro.edu - www.alexanderhiam.com
 Website: https://github.com/alexanderhiam/PyBBIO
 
 A Python library for hardware IO support on the TI Beaglebone.
@@ -27,37 +27,60 @@ digital IO. It should eventually include support for all the peripheral
 functions provided on the two BeagleBone expansion headers, so keep 
 checking the github page for updates.  
 
-To install PyBBIO:
- -Get the PyBBIO/ directory onto your BeagleBone, either using git clone,
-  or simply by downloading it and scp-ing it.
- -cd into PyBBIO/ directory and run:
-    # sh install.sh
- -cd into PyBBIO/examples and run:
-    # python simple_test.py
-  If all is well you should see two of the LEDs next to the Ethernet jack
-  blinking back and forth for about 10 seconds.
-
-The python-mmap module is required and was not installed on my BeagleBone,
-despite it being part of the standard Python modules. 
-It can easily be installed on the BeagleBone by running:
- # opkg update; opkg install python-mmap
-
 I am using the same pin names as are assigned to the BeagleBone's two
 female expansion headers in the schematic, which can be found here:
- http://beagleboard.org/hardware/design/
+  http://beagleboard.org/hardware/design/
 
 I am trying to emulate the Arduino API as much as possible.
 
 Full API documentation found here:
- http://www.alexanderhiam.com/code/pybbio/
+  http://www.alexanderhiam.com/code/pybbio/
 
-Note: For any changes made to PyBBIO to take effect you must run intall.sh.
+The python-mmap module is required and was not installed on my BeagleBone,
+despite it usually being part of the standard Python modules. 
+It can easily be installed by running at the BeagleBone shell:
+  # opkg update; opkg install python-mmap
+
+Installing PyBBIO:
+ -With GIT:
+   Requirements: 
+    -BeagleBone connected to the internet.
+    -BeagleBone shell access, either through serial port or ssh.   
+   1. On BeagleBone, cd to the location you want to download PyBBIO in, e.g.:
+        # cd ~
+   2. Clone the git repository:
+        # git clone git://github.com/alexanderhiam/PyBBIO.git
+   3. Run installer:
+        # cd PyBBIO/
+        # sh install.sh -i
+   4. Test PyBBIO:
+        # cd examples/
+        # python blink.py
+      If all is well you should see two of the LEDs next to the Ethernet jack
+      blinking back and forth. Press CTRL-C to stop.
+
+ -Without GIT:
+   Requirements: 
+    -BeagleBone shell access, either through serial port or ssh.   
+   1. Download PyBBBIO from:
+        https://github.com/alexanderhiam/PyBBIO/downloads
+   2. Unpack PyBBIO directory and cp onto BeagleBone. The simplest way
+      to do this is just to remove the microSD card from the board (not while
+      it's on!), pop it in a card reader and mount it on your computer. It
+      should mount as two seperate filesystems; open the one called 
+      Angstrom-Cloud9- and copy PyBBIO/ to home/root/. Then unmount the card
+      and place it back in the BeagleBone.
+   Complete steps 3 and 4 above.
+ 
+Note:
+ If you've installed PyBBIO with 'git clone' and then update it with 
+ 'git pull', you'll have to run 'sh install -i' again for the changes to
+ take effect. 
 
 
-Hardware access is acheived using a memory map of the special file
-/dev/mem, which is a map of the entire physical memory of the AM3358
-ARM processor. 
-The addresses of all the processor's memory registers as well as details
-on how to properly use them can be found in the AM335x Technical Reference 
+Hardware access is acheived using a memory map of the special file /dev/mem, 
+which is a map of the entire physical memory of the AM3358 ARM processor. 
+The addresses of all the processor's memory registers, as well as details
+on how to properly use them, can be found in the AM335x Technical Reference 
 Manual (TI document spruh73c.pdf) which can be found here:
- http://www.ti.com/dsp/docs/dspsupporttechdocs.tsp?sectionId=3&tabId=409&docCategoryId=6&viewType=mostuseful&rootFamilyId=44&familyId=2920
+  http://www.ti.com/dsp/docs/dspsupporttechdocs.tsp?sectionId=3&tabId=409&docCategoryId=6&viewType=mostuseful&rootFamilyId=44&familyId=2920

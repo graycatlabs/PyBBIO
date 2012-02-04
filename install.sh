@@ -1,11 +1,11 @@
 #!/bin/sh
-# Install script for PyBBIO
+# Install script for PyBBIO v0.2
 # May require root priveledges.
 
 PYTHON_PATH="/usr/lib/python2.7"
 BBIO="bbio.py"
 CONFIG_DIR="$HOME/.pybbio"
-CONFIG_FILE="bbio.cfg"
+CONFIG_FILE="beaglebone.cfg"
 CONFIG_FILE_DIR="config"
 
 help() 
