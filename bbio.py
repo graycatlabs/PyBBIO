@@ -88,12 +88,14 @@ def _analog_init():
   _setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
   while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
+
+  print "Clock enabled..."
   
   # Must turn off write protect:
   _andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
   # Write STEPCONFIG registers:
   for i in xrange(8):
-    config = SEL_INP(eval(ain % i)) | ADC_AVG4
+    config = SEL_INP(ain % i) | ADC_AVG4
     print "%s: %s" % (step_config % (i+1),hex(eval(step_config % (i+1))+MMAP_OFFSET))
     print "ADC step config: %s" % bin(config)
     _andReg(eval(step_config % (i+1)), config)
@@ -107,6 +109,7 @@ def cleanup():
   # Disable ADC module clock:
   _andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
   __mmap.close()
+  print "All clean!"
 
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
