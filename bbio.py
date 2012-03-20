@@ -94,30 +94,26 @@ def cleanup():
 
 def _analog_cleanup():
   # Disable ADC subsystem:
-  _andReg(ADC_CTRL, ~TSC_ADC_SS_ENABLE)
+  _clearReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
   # Disable ADC module clock:
-  _andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
+  _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   __mmap.close()
 
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (direction):
-    reg = _getReg(GPIO[gpio_pin][0]+GPIO_OE)
-    _setReg(GPIO[gpio_pin][0]+GPIO_OE, reg | GPIO[gpio_pin][1])
+    _orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
     return
-  reg = _getReg(GPIO[gpio_pin][0]+GPIO_OE)
-  _setReg(GPIO[gpio_pin][0]+GPIO_OE, reg & ~GPIO[gpio_pin][1])
+  _clearReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
 
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (state):
-    reg = _getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
-    _setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg | GPIO[gpio_pin][1])
+    _orReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
     return
-  reg = _getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
-  _setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg & ~GPIO[gpio_pin][1])
+  _clearReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
@@ -136,8 +132,7 @@ def digitalRead(gpio_pin):
 def toggle(gpio_pin):
   """ Toggles the state of the given digital pin. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  reg = _getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
-  _setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg ^ GPIO[gpio_pin][1])
+  _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
 def _andReg(address, mask):
   """ Sets 32-bit Register at address to its current value AND mask. """
@@ -151,6 +146,10 @@ def _xorReg(address, mask):
   """ Sets 32-bit Register at address to its current value XOR mask. """
   _setReg(address, _getReg(address)^mask)
 
+def _clearReg(address, mask):
+  """ Clears mask bits in register at given address. """
+  _andReg(address, ~mask)
+
 def _getReg(address):
   """ Returns unpacked 32 bit register value starting from address. """
   return struct.unpack("<L", __mmap[address:address+4])[0]
@@ -158,3 +157,4 @@ def _getReg(address):
 def _setReg(address, new_value):
   """ Sets 32 bits at given address to given value. """
   __mmap[address:address+4] = struct.pack("<L", new_value)
+
