@@ -64,8 +64,7 @@ if [ $1 = "-i" ]; then
       if [ ! -d "$CONFIG_DIR/config.old/" ]; then
         mkdir $CONFIG_DIR/config.old/
       fi
-      STAMP=$(date +"%F_%H-%M")
-      BACKUP="$STAMP-$CONFIG_FILE"
+      BACKUP="$CONFIG_FILE"
       mv $CONFIG_DIR/$CONFIG_FILE $CONFIG_DIR/config.old/$BACKUP
     fi
   fi 
