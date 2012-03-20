@@ -11,7 +11,7 @@ def setup():
 
 # Create a main function:
 def main():
-  print analogRead('AIN7')
+  print analogRead('VSYS')
   sleep(0.5)
 
 # Start the loop:
