@@ -11,7 +11,9 @@ def setup():
 
 # Create a main function:
 def main():
-  print analogRead('VSYS')
+  adc_value = analogRead(VSYS)
+  voltage = adc_value * (1.8/2.0**12)
+  print "%f v" % voltage
   sleep(0.5)
 
 # Start the loop:
