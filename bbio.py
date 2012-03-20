@@ -126,8 +126,8 @@ def digitalWrite(gpio_pin, state):
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
   assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
-  analog_pin = ADC[analog_pin]
-  assert ((analog_pin >= 0) and (analog_pin <= 7)), "*Invalid analog pin" 
+  _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
+  while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
   return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
 
 def digitalRead(gpio_pin):
