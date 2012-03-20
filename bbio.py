@@ -29,7 +29,6 @@ import struct, os, sys
 from time import sleep
 from mmap import mmap
 
-
 # Load global configuration:
 CONFIG_FILE="%s/.pybbio/beaglebone.cfg" % os.environ['HOME']
 config = open(CONFIG_FILE, 'r').read()
@@ -62,20 +61,43 @@ def run(setup, main):
     # Something may have gone wrong, clean up and print exception
     cleanup()
     print e
-
+      
 def stop():
   """ Preffered way for a program to stop itself. """
   raise KeyboardInterrupt # Expected happy stop condition in run()
 
 def _init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
-  # Nothing to do here for GPIO; will be needed once other
-  # functionality is added. 
+  _analog_init()
+  
+def _analog_init():
+  """ Initializes the on-board 8ch 12bit ADC. """
+  step_config = 'ADCSTEPCONFIG%i'
+  #step_delay = 'ADCSTEPDELAY%i'
+  ain = 'AIN%i'   
+  # Enable ADC module clock:
+  _setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
+  # Wait for enable complete:
+  while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
+  # Must turn off STEPCONFIG write protect:
+  _andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
+  # Set STEPCONFIG1-STEPCONFIG8 to correspond to ADC inputs 0-7:
+  for i in xrange(8):
+    config = SEL_INP(ain % i) | ADC_AVG4 # Average 4 readings
+    _andReg(eval(step_config % (i+1)), config)
+  # Now we can enable ADC subsystem, re-enabling write protect:
+  _setReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
 def cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
-  # Nothing to do here for GPIO; will be needed once other
-  # functionality is added. 
+  _analog_cleanup()
+
+def _analog_cleanup():
+  # Disable ADC subsystem:
+  _andReg(ADC_CTRL, ~TSC_ADC_SS_ENABLE)
+  # Disable ADC module clock:
+  _andReg(CM_WKUP_ADC_TSC_CLKCTRL, ~MODULEMODE_ENABLE)
+  __mmap.close()
 
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
@@ -96,6 +118,13 @@ def digitalWrite(gpio_pin, state):
     return
   reg = _getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT)
   _setReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, reg & ~GPIO[gpio_pin][1])
+
+def analogRead(analog_pin):
+  """ Returns analog value read on given analog input pin. """
+  assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
+  _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
+  while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
+  return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
 
 def digitalRead(gpio_pin):
   """ Returns pin state as 1 or 0. """
