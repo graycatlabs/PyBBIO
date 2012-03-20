@@ -5,9 +5,9 @@
  Website: https://github.com/alexanderhiam/PyBBIO
 
  A Python library for hardware IO support on the TI Beaglebone.
- At the moment it is quite limited, only providing API for simple
- digital IO functionality. I have big plans for this, however, so
- keep checking the github page for updates.
+ Currently only supporting basic digital and analog IO, but more 
+ peripheral support is on the way, so keep checking the Github page
+ for updates.
 
  Copyright (c) 2012 - Alexander Hiam
 
