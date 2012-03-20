@@ -90,6 +90,9 @@ def _analog_init():
 
 def cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
+  _analog_cleanup()
+
+def _analog_cleanup():
   # Disable ADC subsystem:
   _andReg(ADC_CTRL, ~TSC_ADC_SS_ENABLE)
   # Disable ADC module clock:
