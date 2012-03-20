@@ -22,16 +22,15 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ************************************************************************
 
-This is a very barebones library at the moment, only supporting basic
-digital IO. It should eventually include support for all the peripheral
-functions provided on the two BeagleBone expansion headers, so keep 
-checking the github page for updates.  
+The goal of this library is to create a simple programming environment 
+similar to the Arduino. At the moment it supports basic digital IO
+through digitalRead() and digitalWrite() functions, as well as ADC
+support through analogRead(). PWM and UART are on the way, so keep 
+checking the Github page for updates.  
 
 I am using the same pin names as are assigned to the BeagleBone's two
 female expansion headers in the schematic, which can be found here:
   http://beagleboard.org/hardware/design/
-
-I am trying to emulate the Arduino API as much as possible.
 
 Full API documentation found here:
   http://www.alexanderhiam.com/code/pybbio/
@@ -75,10 +74,10 @@ Installing PyBBIO:
 Uninstalling PyBBIO:
   1. On BeagleBone, cd into PyBBIO folder, e.g.:
        # cd ~/PyBBIO
-  2. Runinstaller with uninstall flag:
+  2. Run installer with uninstall flag:
        # sh install.sh -u
-  PyBBIO configurationdirectory and Python module will be uninstalled,
-  3. PyBBIO folder can then be deleted,e.g.:
+  PyBBIO configuration directory and Python module will be removed,
+  3. PyBBIO folder can then be deleted, e.g.:
        # cd ..
        # rm -rf PyBBIO
   
