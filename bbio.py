@@ -100,9 +100,12 @@ def _analog_cleanup():
   __mmap.close()
 
 def delay(ms):
-  """ Just a wrapper for time.sleep that takes milliseconds to
-      match arduino delay function. """
+  """ Sleeps for given number of milliseconds. """
   sleep(ms/1000.0)
+
+def delayMicroseconds(us):
+  """ Sleeps for given number of microseconds. """
+  sleep(us/1000000.0)
 
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
