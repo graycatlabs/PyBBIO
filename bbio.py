@@ -39,6 +39,8 @@ assert ('MMAP_OFFSET' in config) and ('MMAP_SIZE' in config),\
                                                                 CONFIG_FILE
 exec(config)
 
+sys.path.append(LIBRARIES_PATH)
+
 # Create global mmap:
 f = open("/dev/mem", "r+b")
 __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
