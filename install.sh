@@ -7,6 +7,9 @@ BBIO="bbio.py"
 CONFIG_DIR="$HOME/.pybbio"
 CONFIG_FILE="beaglebone.cfg"
 CONFIG_FILE_DIR="config"
+SCRIPT=`readlink -f $0`
+LIBRARIES_DIR=`dirname $SCRIPT`/libraries
+REGEX='s!<<<[^>]*>>>!'$LIBRARIES_DIR'!g'
 
 help() 
 {
@@ -58,18 +61,15 @@ if [ $1 = "-i" ]; then
   fi
 
   if [ -f "$CONFIG_DIR/$CONFIG_FILE" ]; then
-    if ! diff $CONFIG_DIR/$CONFIG_FILE $CONFIG_FILE_DIR/$CONFIG_FILE > /dev/null; 
-    then 
-      echo "Backing up old config file..."
-      if [ ! -d "$CONFIG_DIR/config.old/" ]; then
-        mkdir $CONFIG_DIR/config.old/
-      fi
-      BACKUP="$CONFIG_FILE"
-      mv $CONFIG_DIR/$CONFIG_FILE $CONFIG_DIR/config.old/$BACKUP
+    echo "Backing up old config file..."
+    if [ ! -d "$CONFIG_DIR/config.old/" ]; then
+      mkdir $CONFIG_DIR/config.old/
     fi
+    BACKUP="$CONFIG_FILE"
+    mv $CONFIG_DIR/$CONFIG_FILE $CONFIG_DIR/config.old/$BACKUP
   fi 
   echo "Copying new config file..."
-  cp $CONFIG_FILE_DIR/$CONFIG_FILE $CONFIG_DIR
+  sed -e $REGEX $CONFIG_FILE_DIR/$CONFIG_FILE > $CONFIG_DIR/$CONFIG_FILE
   echo "PyBBIO installed successfully"
   exit 0
 fi
