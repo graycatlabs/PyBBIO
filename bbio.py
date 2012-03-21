@@ -134,27 +134,36 @@ def toggle(gpio_pin):
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
-def _andReg(address, mask):
-  """ Sets 32-bit Register at address to its current value AND mask. """
-  _setReg(address, _getReg(address)&mask)
+def _andReg(address, mask, length=32):
+  """ Sets 16 or 32 bit Register at address to its current value AND mask. """
+  _setReg(address, _getReg(address, length)&mask, length)
 
-def _orReg(address, mask):
-  """ Sets 32-bit Register at address to its current value OR mask. """
-  _setReg(address, _getReg(address)|mask)
+def _orReg(address, mask, length=32):
+  """ Sets 16 or 32 bit Register at address to its current value OR mask. """
+  _setReg(address, _getReg(address, length)|mask, length)
 
-def _xorReg(address, mask):
-  """ Sets 32-bit Register at address to its current value XOR mask. """
-  _setReg(address, _getReg(address)^mask)
+def _xorReg(address, mask, length=32):
+  """ Sets 16 or 32 bit Register at address to its current value XOR mask. """
+  _setReg(address, _getReg(address, length)^mask, length)
 
-def _clearReg(address, mask):
-  """ Clears mask bits in register at given address. """
-  _andReg(address, ~mask)
+def _clearReg(address, mask, length=32):
+  """ Clears mask bits in 16 or 32 bit register at given address. """
+  _andReg(address, ~mask, length)
 
-def _getReg(address):
-  """ Returns unpacked 32 bit register value starting from address. """
-  return struct.unpack("<L", __mmap[address:address+4])[0]
+def _getReg(address, length=32):
+  """ Returns unpacked 16 or 32 bit register value starting from address. """
+  if (length == 32):
+    return struct.unpack("<L", __mmap[address:address+4])[0]
+  elif (length == 16):
+    return struct.unpack("<H", __mmap[address:address+2])[0]
+  else:
+    raise ValueError("Invalid register length: %i - must be 16 or 32" % length)
 
-def _setReg(address, new_value):
-  """ Sets 32 bits at given address to given value. """
-  __mmap[address:address+4] = struct.pack("<L", new_value)
-
+def _setReg(address, new_value, length=32):
+  """ Sets 16 or 32 bits at given address to given value. """
+  if (length == 32):
+    __mmap[address:address+4] = struct.pack("<L", new_value)
+  elif (length == 16):
+    __mmap[address:address+2] = struct.pack("<H", new_value)
+  else:
+    raise ValueError("Invalid register length: %i - must be 16 or 32" % length)
