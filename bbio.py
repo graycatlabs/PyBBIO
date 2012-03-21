@@ -9,6 +9,8 @@
  peripheral support is on the way, so keep checking the Github page
  for updates.
 
+ 16-bit register support mod from sbma44 - https://github.com/sbma44
+
  Copyright (c) 2012 - Alexander Hiam
 
  This program is free software: you can redistribute it and/or modify
