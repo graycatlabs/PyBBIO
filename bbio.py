@@ -99,6 +99,11 @@ def _analog_cleanup():
   _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   __mmap.close()
 
+def delay(ms):
+  """ Just a wrapper for time.sleep that takes milliseconds to
+      match arduino delay function. """
+  sleep(ms/1000.0)
+
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
