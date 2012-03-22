@@ -16,10 +16,10 @@ def setup():
     print "   %s" % i
 
 # Create a main function:
-def main():
+def loop():
   # No need to keep running
   stop()
 
 # Start the loop:
-run(setup, main)
+run(setup, loop)
 
