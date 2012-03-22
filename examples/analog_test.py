@@ -18,7 +18,7 @@ def setup():
   pass
 
 # Create a main function:
-def main():
+def loop():
   adc_value = analogRead(ain)
   # ADC reference voltage is 1.8v, and it is a 
   # 12-bit ADC, so to get volts per step:
@@ -29,4 +29,4 @@ def main():
   sleep(0.5)
 
 # Start the loop:
-run(setup, main)
+run(setup, loop)
