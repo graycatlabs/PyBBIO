@@ -11,7 +11,7 @@ def setup():
   pinMode(GPIO1_6, INPUT)
 
 # Create a main function:
-def main():
+def loop():
   state = digitalRead(GPIO1_6)
   digitalWrite(USR3, state)
   # It's good to put a bit of a delay in if possible
@@ -19,4 +19,4 @@ def main():
   sleep(0.1)
 
 # Start the loop:
-run(setup, main)
+run(setup, loop)
