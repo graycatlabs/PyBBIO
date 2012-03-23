@@ -1,0 +1,99 @@
+# Output from sleep_test.py running on the Beaglebone
+ 
+
+ Microsecond delay using time.sleep():
+       0.0 usec delay: time = 5.889 usec, error = 5.889
+       0.5 usec delay: time = 16.449 usec, error = 15.949
+       1.0 usec delay: time = 92.063 usec, error = 91.063
+      10.0 usec delay: time = 100.960 usec, error = 90.960
+      50.0 usec delay: time = 139.729 usec, error = 89.729
+     100.0 usec delay: time = 190.264 usec, error = 90.264
+     500.0 usec delay: time = 590.348 usec, error = 90.348
+    1000.0 usec delay: time = 1091.740 usec, error = 91.740
+  100000.0 usec delay: time = 100150.728 usec, error = 150.728
+ 1000000.0 usec delay: time = 1001091.551 usec, error = 1091.551
+
+  avg error = +- 180.233 usec
+
+--------------------
+
+ Microsecond delay using ctypes and usleep():
+       0.0 usec delay: time = 5.634 usec, error = 5.634
+       0.5 usec delay: time = 100.061 usec, error = 99.561
+       1.0 usec delay: time = 97.442 usec, error = 96.442
+      10.0 usec delay: time = 105.112 usec, error = 95.112
+      50.0 usec delay: time = 145.689 usec, error = 95.689
+     100.0 usec delay: time = 196.451 usec, error = 96.451
+     500.0 usec delay: time = 596.220 usec, error = 96.220
+    1000.0 usec delay: time = 1097.216 usec, error = 97.216
+  100000.0 usec delay: time = 100108.187 usec, error = 108.187
+ 1000000.0 usec delay: time = 1000154.345 usec, error = 154.345
+
+  avg error = +- 93.922 usec
+
+--------------------
+
+ Microsecond delay using ctypes and nanosleep():
+       0.0 usec delay: time = 5.649 usec, error = 5.649
+       0.5 usec delay: time = 125.734 usec, error = 125.234
+       1.0 usec delay: time = 119.798 usec, error = 118.798
+      10.0 usec delay: time = 128.906 usec, error = 118.906
+      50.0 usec delay: time = 169.283 usec, error = 119.283
+     100.0 usec delay: time = 217.804 usec, error = 117.804
+     500.0 usec delay: time = 619.062 usec, error = 119.062
+    1000.0 usec delay: time = 1119.126 usec, error = 119.126
+  100000.0 usec delay: time = 100132.204 usec, error = 132.204
+ 1000000.0 usec delay: time = 1000170.900 usec, error = 170.900
+
+  avg error = +- 114.132 usec
+
+--------------------
+
+ Millisecond delay using time.sleep():
+       0.0 msec delay: time = 0.006 msec, error = 0.006
+       0.1 msec delay: time = 0.192 msec, error = 0.092
+       0.5 msec delay: time = 0.593 msec, error = 0.093
+       1.0 msec delay: time = 1.092 msec, error = 0.092
+      10.0 msec delay: time = 10.093 msec, error = 0.093
+      50.0 msec delay: time = 50.098 msec, error = 0.098
+     100.0 msec delay: time = 100.160 msec, error = 0.160
+     500.0 msec delay: time = 500.567 msec, error = 0.567
+    1000.0 msec delay: time = 1001.069 msec, error = 1.069
+    5000.0 msec delay: time = 5005.080 msec, error = 5.080
+
+  avg error = +- 0.734 msec
+
+--------------------
+
+ Millisecond delay using ctypes and usleep():
+       0.0 msec delay: time = 0.006 msec, error = 0.006
+       0.1 msec delay: time = 0.202 msec, error = 0.102
+       0.5 msec delay: time = 0.603 msec, error = 0.103
+       1.0 msec delay: time = 1.098 msec, error = 0.098
+      10.0 msec delay: time = 10.100 msec, error = 0.100
+      50.0 msec delay: time = 50.106 msec, error = 0.106
+     100.0 msec delay: time = 100.117 msec, error = 0.117
+     500.0 msec delay: time = 500.123 msec, error = 0.123
+    1000.0 msec delay: time = 1000.156 msec, error = 0.156
+    5000.0 msec delay: time = 5000.173 msec, error = 0.173
+
+  avg error = +- 0.108 msec
+
+--------------------
+
+ Millisecond delay using ctypes and usleep() 
+ with simple error compensation:
+       0.0 msec delay: time = 0.006 msec, error = 0.006
+       0.1 msec delay: time = 0.105 msec, error = 0.005
+       0.5 msec delay: time = 0.505 msec, error = 0.005
+       1.0 msec delay: time = 1.007 msec, error = 0.007
+      10.0 msec delay: time = 10.009 msec, error = 0.009
+      50.0 msec delay: time = 50.015 msec, error = 0.015
+     100.0 msec delay: time = 100.029 msec, error = 0.029
+     500.0 msec delay: time = 500.038 msec, error = 0.038
+    1000.0 msec delay: time = 1000.078 msec, error = 0.078
+    5000.0 msec delay: time = 5000.083 msec, error = 0.083
+
+  avg error = +- 0.027 msec
+
+--------------------
