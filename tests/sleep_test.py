@@ -17,6 +17,10 @@ import ctypes, time
 
 #--- Microsecond delay functions: ---
 
+# Load libc shared library:
+libc = ctypes.CDLL('libc.so.6')
+
+
 def sleepMicroseconds(us):
   """ Delay microseconds using time.sleep(). """
   time.sleep(us * 1e-6)
@@ -25,9 +29,6 @@ def delayMicroseconds(us):
   """ Delay microseconds with libc usleep() using ctypes. """
   libc.usleep(int(us))
 
-
-# Load libc shared library:
-libc = ctypes.CDLL('libc.so.6')
 
 class Timespec(ctypes.Structure):
   """ timespec struct for nanosleep, see:
