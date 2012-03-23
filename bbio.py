@@ -29,7 +29,12 @@
 
 import struct, os, sys
 from time import sleep
-from mmap import mmap
+try:
+  from mmap import mmap
+except:
+  print "\n mmap module not found; to install:\n\
+   # opkg update && opkg install python-mmap\n"
+  sys.exit(0)
 
 # Load global configuration:
 CONFIG_FILE="%s/.pybbio/beaglebone.cfg" % os.environ['HOME']
