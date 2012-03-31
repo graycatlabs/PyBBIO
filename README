@@ -31,6 +31,14 @@ I am using the same pin names as are assigned to the BeagleBone's two
 female expansion headers in the schematic, which can be found here:
   http://beagleboard.org/hardware/design/
 
+The libraries directory is a place to put PyBBIO specific libraries. 
+When PyBBIO is installed, the path to the libraries directory is added
+to the installed configuration file. This way these libraries are stored
+where they can be easily accessed and added to. The libraries in the 
+directory can be imported using standard Python syntax after bbio is 
+imported. This is demonstrated in tests/library_test.py using the example
+library at libraries/example.py.
+
 Full API documentation found here:
   http://www.alexanderhiam.com/code/pybbio/
 
