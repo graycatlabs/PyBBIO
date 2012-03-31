@@ -18,7 +18,7 @@
    modified 4 Sep 2010
    by Tom Igoe
 
- This example isin the public domain.
+ This example is in the public domain.
 """
 
 from bbio import *
