@@ -45,9 +45,8 @@ exec(config)
 sys.path.append(LIBRARIES_PATH)
 
 # Create global mmap:
-f = open("/dev/mem", "r+b")
-__mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
-f.close() # Only needed to make map
+with open("/dev/mem", "r+b") as f:
+  __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
 
 def run(setup, main):
