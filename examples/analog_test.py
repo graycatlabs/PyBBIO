@@ -26,7 +26,7 @@ def loop():
   # Multiply ADC value by volts/step to get voltage:
   voltage = adc_value * volts_per_step
   print "%fv" % voltage
-  sleep(0.5)
+  delay(500)
 
 # Start the loop:
 run(setup, loop)

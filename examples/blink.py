@@ -19,7 +19,7 @@ def loop():
   # Toggle the two LEDs and sleep a few seconds:
   toggle(USR2)
   toggle(USR3)
-  sleep(0.5)
+  delay(500)
 
 # Start the loop:
 run(setup, loop)
