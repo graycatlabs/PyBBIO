@@ -16,7 +16,7 @@ def main():
   digitalWrite(USR3, state)
   # It's good to put a bit of a delay in if possible
   # to keep the processor happy:
-  sleep(0.1)
+  delay(100)
 
 # Start the loop:
 run(setup, main)
