@@ -26,8 +26,7 @@
  limitations under the License.
 """
 
-import struct, os, sys
-from time import sleep
+import struct, os, sys, time
 try:
   from mmap import mmap
 except:
@@ -107,11 +106,13 @@ def _analog_cleanup():
 
 def delay(ms):
   """ Sleeps for given number of milliseconds. """
-  sleep(ms/1000.0)
+  time.sleep(ms/1000.0)
 
 def delayMicroseconds(us):
-  """ Sleeps for given number of microseconds. """
-  sleep(us/1000000.0)
+  """ Sleeps for given number of microseconds > ~30; still working 
+      on a more accurate method. """
+  t = time.time()
+  while (((time.time()-t)*1000000) < us): pass
 
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
