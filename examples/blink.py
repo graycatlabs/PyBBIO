@@ -1,5 +1,7 @@
 # blink.py - Alexander Hiam - 2/2012
 # Blinks two of the Beagleboard's on-board LEDs until CTRL-C is pressed.
+#
+# This example is in the public domain
 
 # Import PyBBIO library:
 from bbio import *

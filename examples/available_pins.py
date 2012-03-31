@@ -2,6 +2,8 @@
 # Prints all the pins available for IO expansion by their 
 # names used in PyBBIO (refer to beaglebone schematic for
 # header locations).
+#
+# This example is in the public domain
 
 # Import PyBBIO library:
 from bbio import *

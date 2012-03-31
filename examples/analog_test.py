@@ -5,6 +5,8 @@
 # The maximum ADC input voltage is 1.8v,
 # applying greater voltages will likely cause
 # permanent damage to the ADC module! 
+#
+# This example is in the public domain
  
 # Import PyBBIO library:
 from bbio import *

@@ -1,5 +1,7 @@
 # digitalRead.py - Alexander Hiam - 2/2012
 # USR3 LED mirrors GPIO1_6 until CTRL-C is pressed.
+#
+# This example is in the public domain
 
 # Import PyBBIO library:
 from bbio import *
