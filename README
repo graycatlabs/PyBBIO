@@ -39,7 +39,10 @@ directory can be imported using standard Python syntax after bbio is
 imported. This is demonstrated in tests/library_test.py using the example
 library at libraries/example.py.
 
-Full API documentation found here:
+Instructions here:
+  https://github.com/alexanderhiam/PyBBIO/wiki
+
+Full API documentation here:
   http://www.alexanderhiam.com/code/pybbio/
 
 The python-mmap module is required and was not installed on my BeagleBone,
