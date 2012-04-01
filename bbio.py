@@ -143,6 +143,16 @@ def digitalRead(gpio_pin):
     return 1
   return 0
 
+def pinState(gpio_pin):
+  """ Returns the state of a digital pin if it is configured as
+      an output. Returns None if it is configuredas an input. """
+  assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
+  if (_getReg(GPIO[gpio_pin][0]+GPIO_OE) & GPIO[gpio_pin][1]):
+    return None
+  if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT) & GPIO[gpio_pin][1]):
+    return HIGH
+  return LOW
+
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
   assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
