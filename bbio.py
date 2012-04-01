@@ -131,12 +131,10 @@ def digitalWrite(gpio_pin, state):
     return
   _clearReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
-def analogRead(analog_pin):
-  """ Returns analog value read on given analog input pin. """
-  assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
-  _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
-  while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
-  return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
+def toggle(gpio_pin):
+  """ Toggles the state of the given digital pin. """
+  assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
+  _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
 def digitalRead(gpio_pin):
   """ Returns pin state as 1 or 0. """
@@ -145,10 +143,12 @@ def digitalRead(gpio_pin):
     return 1
   return 0
 
-def toggle(gpio_pin):
-  """ Toggles the state of the given digital pin. """
-  assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
+def analogRead(analog_pin):
+  """ Returns analog value read on given analog input pin. """
+  assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
+  _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
+  while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
+  return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
 
 def _andReg(address, mask, length=32):
   """ Sets 16 or 32 bit Register at address to its current value AND mask. """
