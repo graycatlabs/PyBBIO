@@ -8,6 +8,11 @@ BBIOServer is a dynamic web interface library for PyBBIO:
 
 See the example program at PyBBIO/examples/BBIOServer_test.py
 
+*Note:
+  On my Beaglebone this server is super fast when I'm accessing it
+  through my router with port forwarding, but it is running very 
+  slow when accessing it over my WLAN; I'm working to fix this.
+
 BBIOServer is released as part of PyBBIO under its Apache 2.0 license.
 See PyBBIO/LICENSE.txt
 
