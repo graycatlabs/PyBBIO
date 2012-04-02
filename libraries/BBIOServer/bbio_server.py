@@ -135,6 +135,11 @@ class BBIOServer():
     """ Takes a list of Page instances, creates html files, and starts
         the server. """
 
+    # Make sure at least one page has been given:
+    if not(pages):
+      print "*Can't start server - no pages provided."
+      return
+
     # Make sure pages/ directory exists:
     if not(os.path.exists(PAGES_DIR)):
       os.system("mkdir %s" % PAGES_DIR)
