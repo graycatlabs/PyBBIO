@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Redirecting to PyBBIO web interface...</title>
+<script type="text/javascript">
+  window.location =  "/pages/%s";
+</script>
+</HEAD>
+<body>
+<noscript>
+  <br><br>
+  <b><u><i>Please enable javascript to access PyBBIO Server.</i></u></b>
+</noscript>
+</body>
+</html>

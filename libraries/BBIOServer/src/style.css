@@ -1,0 +1,123 @@
+/*
+ CSS stylesheet for BBIOServer.
+*/
+
+body {
+  background: #eeeeff;
+  font-family: monospace;
+  font-size: 14px;
+  padding: 10px 0px 10px 10px;
+}
+
+a {
+  text-decoration: none;
+  color: #444499; 
+  outline: 0;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+#page-wrapper{
+  display: inline-block;
+  border: 1px solid #888888;
+  background: #ffffff;
+}
+
+#header {
+  height: 60px;
+  background: #ffffff;
+  padding: 5px 20px;
+  margin: 0px 7px;
+  border-bottom: 1px solid #888888;
+}
+#header h2 { margin: 15px; }
+
+#sidebar {
+  float: left;
+  min-width: 100px;
+  padding: 20px 7px 20px 20px;
+}
+#sidebar li {
+  font-size: 15px;
+  list-style-type: none; 
+  padding: 5px ;
+  text-indent: -10px; 
+}
+#sidebar li:before { 
+  content: "- "; 
+}
+
+#content {
+  float: right;
+  width: 500px;
+  padding: 20px;
+  line-height: 140%;
+  margin: 7px 0px;
+  border-left: 1px solid #888888;
+}
+
+div .heading {
+  float: left;
+  width: 100%;
+  margin: 5px 15px 10px 0px;
+  padding: 5px 0px 6px 2px;
+  border-bottom: 1px dashed #888888;
+  font-size: 16px;  
+  font-weight: bold;
+}
+
+div .text {
+  float: left;
+  margin: 5px 15px 10px 5px;
+  padding: 5px 0px 5px 2px;
+}
+
+div .object-wrapper {
+  float: left;
+  margin: 0px 0px 7px 10px;
+}
+div .object-wrapper .entry {
+  float: left;
+  display: inline-block;
+  padding: 5px;
+  margin: 5px;
+}
+
+div .button {
+  float: left;
+  display: inline-block;
+  padding: 5px;
+  margin: 5px;
+  background: #fafafa;
+  border: 1px solid #999999;
+  -moz-user-select: none; 
+  -khtml-user-select: none; 
+  -webkit-user-select: none; 
+  -o-user-select: none; 
+}
+div .button:hover {
+  background: #efefef;
+  cursor: pointer;
+}
+
+div .value-field {
+  float: left;
+  display: inline-block;
+  margin: 5px;
+  padding: 5px 2px;
+}
+
+div .monitor-field {
+  float: left;
+  display: inline-block;
+  margin: 5px 0px 5px 5px;
+  padding: 5px 0px 5px 2px;
+}
+
+#copyright {
+  float: left;
+  margin-left: 3px;
+  font-size: 10px;
+}
+
