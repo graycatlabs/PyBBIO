@@ -117,9 +117,10 @@ div .monitor-field {
 }
 
 #copyright {
-  float: left;
+  float: left; 
   width: 600px;
   margin-left: 3px;
+  margin-right: 1000px;
   font-size: 10px;
 }
 
