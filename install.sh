@@ -31,6 +31,11 @@ if [ $1 = "-u" ]; then
   if [ -f "$PYTHON_PATH/$BBIO" ]; then
     rm $PYTHON_PATH/$BBIO
   fi
+  echo "$PYTHON_PATH/$BBIO"o
+  if [ -f "$PYTHON_PATH/$BBIO"o ]; then
+    # Remove compiled '.pyo' file as well:
+    rm "$PYTHON_PATH/$BBIO"o
+  fi
   if [ -d "$CONFIG_DIR" ]; then
     if [ -d "$CONFIG_DIR/config.old/" ]; then    
       rm $CONFIG_DIR/config.old/*.*
