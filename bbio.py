@@ -115,12 +115,17 @@ def delayMicroseconds(us):
   t = time.time()
   while (((time.time()-t)*1000000) < us): pass
 
-def pinMode(gpio_pin, direction):
-  """ Sets given digital pin to input if direction=1, output otherwise. """
+def pinMode(gpio_pin, direction, pull=-1):
+  """ Sets given digital pin to input if direction=1, output otherwise.
+      'pull' will set the pull up/down resitsor if setting as an input:
+      pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (direction == INPUT):
     # Pinmux:
-    _pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT)
+    if (pull > 0): pull = CONF_PULLUP
+    elif (pull == 0): pull = CONF_PULL_DISABLE
+    else: pull = 0
+    _pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT|pull)
     # Set input:
     _orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
     return
