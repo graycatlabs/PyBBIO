@@ -33,6 +33,13 @@ except:
   print "\n mmap module not found; to install:\n\
    # opkg update && opkg install python-mmap\n"
   sys.exit(0)
+try:
+  import serial
+except:
+  print "\n pyserial module not found; to install:\n\
+   # opkg update && opkg install python-pyserial\n"
+  sys.exit(0)
+
 
 # Load global configuration:
 CONFIG_FILE="%s/.pybbio/beaglebone.cfg" % os.environ['HOME']
@@ -104,6 +111,11 @@ def _analog_cleanup():
   # Disable ADC module clock:
   _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   __mmap.close()
+
+def _serial_cleanup():
+  """ Ensures that all serial ports opened by current process are closed. """
+  for port in (Serial1, Serial2, Serial3, Serial4, Serial5):
+    port.end()
 
 def delay(ms):
   """ Sleeps for given number of milliseconds. """
@@ -217,3 +229,123 @@ def _setReg(address, new_value, length=32):
   else:
     raise ValueError("Invalid register length: %i - must be 16 or 32" % length)
 
+
+
+# _UART_PORT is a wrapper class for pySerial to enable Arduino-like access
+# to the UART1, UART2, UART4, and UART5 serial ports on the expansion headers:
+class _UART_PORT(object):
+  def __init__(self, uart):
+    assert port in UART, "*Invalid UART: %s" % port
+    self.config = uart
+    self.baud = 0
+    self.open = False
+    self.ser_port = None
+    self.peek_char = ''
+
+  def begin(self, baud, timeout=1):
+    """ Starts the serial port at the given baud rate. """
+    # Set proper pinmux to match expansion headers:
+    tx_pinmux_filename = UART[self.config][1]
+    tx_pinmux_mode     = UART[self.config][2]+CONF_UART_TX
+    _pinMux(tx_pinmux_filename, tx_pinmux_mode)
+
+    rx_pinmux_filename = UART[self.config][3]
+    rx_pinmux_mode     = UART[self.config][4]+CONF_UART_RX
+    _pinMux(rx_pinmux_filename, rx_pinmux_mode)    
+
+    port = UART[self.config][0]
+    self.baud = baud
+    self.ser_port = serial.Serial(port, baud, timeout=timeout)
+    self.open = True 
+
+  def end(self):
+    """ Closes the serial port if open. """
+    if not(self.open): return
+    self.flush()
+    self.ser_port.close()
+    self.ser_port = None
+    self.baud = 0
+    self.open = False
+
+  def available(self):
+    """ Returns the number of bytes currently in the receive buffer. """
+    return self.ser_port.inWaiting() + len(self.peek_char)
+
+  def read(self):
+    """ Returns first byte of data in the receive buffer or -1 if none. """
+    if (self.peek_char):
+      c = self.peek_char
+      self.peek_char = ''
+      return c
+    if self.available():
+      return self.ser_port.read(1)
+    return -1
+
+  def peek(self):
+    """ Returns the next char from the receive buffer without removing it, 
+        or -1 if no data available. """
+    if (self.peek_char):
+      return self.peek_char
+    if self.available():
+      self.peek_char = self.ser_port.read(1)
+      return self.peek_char
+    return -1    
+
+  def flush(self):
+    """ Waits for current write to finish then flushes rx/tx buffers. """
+    self.ser_port.flush()
+    self.peek_char = ''
+
+  def prints(self, data, base=DEC):
+    """ Prints string of given data to the serial port. Returns the number
+        of bytes written. The optional 'base' argument is used to format the
+        data per the Arduino serial.print() formatting scheme, see:
+        http://arduino.cc/en/Serial/Print """
+    return self.write(self._process(data, base))
+
+  def println(self, data, base=DEC):
+    """ Prints string of given data to the serial port followed by a 
+        carriage return and line feed. Returns the number of bytes written.
+        The optional 'base' argument is used to format the data per the Arduino
+        serial.print() formatting scheme, see: http://arduino.cc/en/Serial/Print """
+    return self.write(self._process(data, base)+"\r\n")
+
+  def write(self, data):
+    """ Writes given data to serial port. Data not converted to string. 
+        Returns the number of bytes written. """
+    assert self.open, "*%s not open, call begin() method before writing" %\
+                      UART[self.config][0]
+    return self.ser_port.write(data)
+
+  def _process(self, data, base):
+    """ Processes and returns given data per Arduino format specified on 
+        serial.print() page: http://arduino.cc/en/Serial/Print """
+    if (type(data) == str):
+      # Can't format if already a string:
+      return data
+
+    if (type(data) is int):
+      if (base == DEC):
+        return str(data) # e.g. 20 -> "20"
+      if (base == BIN):
+        return bin(data)[2:] # e.g. 20 -> "10100"
+      if (base == OCT):
+        return oct(data)[1:] # e.g. 20 -> "24"
+      if (base == HEX):
+        return hex(data)[2:] # e.g. 20 -> "14"
+
+    elif (type(data) is float):
+      if (base == 0):
+        return str(int(data))
+      if (base > 0):
+        return ("%0." + ("%i" % base) + "f") % data
+
+    # If we get here data isn't supported by this formatting scheme,
+    # just convert to a string and return:
+    return str(data)
+
+# Initialize the global serial port instances:
+Serial1 = _UART_PORT('UART1')
+Serial2 = _UART_PORT('UART2')
+Serial4 = _UART_PORT('UART4')
+Serial5 = _UART_PORT('UART5')
