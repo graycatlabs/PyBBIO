@@ -75,7 +75,7 @@ def stop():
 def _init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
   _analog_init()
-  
+
 def _analog_init():
   """ Initializes the on-board 8ch 12bit ADC. """
   step_config = 'ADCSTEPCONFIG%i'
@@ -118,9 +118,15 @@ def delayMicroseconds(us):
 def pinMode(gpio_pin, direction):
   """ Sets given digital pin to input if direction=1, output otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if (direction):
+  if (direction == INPUT):
+    # Pinmux:
+    _pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT)
+    # Set input:
     _orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
     return
+  # Pinmux:
+  _pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT)
+  # Set output:
   _clearReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
 
 def digitalWrite(gpio_pin, state):
@@ -160,6 +166,18 @@ def analogRead(analog_pin):
   while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
   return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
 
+def _pinMux(fn, mode):
+  """ Uses kernel omap_mux files to set pin modes. """
+  # There's no simple way to write the control module registers from a 
+  # user-level process because it lacks the proper privileges, but it's 
+  # easy enough to just use the built-in file-based system and let the 
+  # kernel do the work. 
+  try:
+    with open(PINMUX_PATH+fn, 'wb') as f:
+      f.write(hex(mode)[2:]) # Write hex string (stripping off '0x')
+  except IOError:
+    print "*omap_mux file not found: '%s'" % (PINMUX_PATH+fn)
+
 def _andReg(address, mask, length=32):
   """ Sets 16 or 32 bit Register at address to its current value AND mask. """
   _setReg(address, _getReg(address, length)&mask, length)
@@ -193,3 +211,4 @@ def _setReg(address, new_value, length=32):
     __mmap[address:address+2] = struct.pack("<H", new_value)
   else:
     raise ValueError("Invalid register length: %i - must be 16 or 32" % length)
+
