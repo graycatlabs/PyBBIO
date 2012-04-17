@@ -179,6 +179,12 @@ def pinState(gpio_pin):
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
   assert (analog_pin in ADC), "*Invalid analog pin: '%s'" % analog_pin
+
+  if (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK):
+    # The ADC module clock has been shut off, e.g. by a different 
+    # PyBBIO script stopping while this one was running, turn back on:
+    _analog_init() 
+
   _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
   while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
   return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
