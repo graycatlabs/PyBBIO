@@ -296,14 +296,14 @@ class _UART_PORT(object):
     self.ser_port.flush()
     self.peek_char = ''
 
-  def prints(self, data, base=DEC):
+  def prints(self, data, base=None):
     """ Prints string of given data to the serial port. Returns the number
         of bytes written. The optional 'base' argument is used to format the
         data per the Arduino serial.print() formatting scheme, see:
         http://arduino.cc/en/Serial/Print """
     return self.write(self._process(data, base))
 
-  def println(self, data, base=DEC):
+  def println(self, data, base=None):
     """ Prints string of given data to the serial port followed by a 
         carriage return and line feed. Returns the number of bytes written.
         The optional 'base' argument is used to format the data per the Arduino
@@ -311,11 +311,30 @@ class _UART_PORT(object):
     return self.write(self._process(data, base)+"\r\n")
 
   def write(self, data):
-    """ Writes given data to serial port. Data not converted to string. 
-        Returns the number of bytes written. """
+    """ Writes given data to serial port. If data is list or string each
+        element/character is sent sequentially. If data is float it is 
+        converted to an int, if data is int it is sent as a single byte 
+        (least significant if data > 1 byte). Returns the number of bytes
+        written. """
     assert self.open, "*%s not open, call begin() method before writing" %\
                       UART[self.config][0]
-    return self.ser_port.write(data)
+
+    if (type(data) == float): data = int(data)
+    if (type(data) == int): data = chr(data & 0xff)
+
+    elif ((type(data) == list) or (type(data) == tuple)):
+      bytes_written = 0
+      for i in data:
+        bytes_written += self.write(i)  
+      return bytes_written
+
+    else:
+      # Type not supported by write, e.g. dict; use prints().
+      return 0
+
+    written = self.ser_port.write(data)
+    # Serial.serial.write() returns None if no bits written, we want 0:
+    return written if written else 0
 
   def _process(self, data, base):
     """ Processes and returns given data per Arduino format specified on 
@@ -325,6 +344,7 @@ class _UART_PORT(object):
       return data
 
     if (type(data) is int):
+      if not (base): base = DEC # Default for ints
       if (base == DEC):
         return str(data) # e.g. 20 -> "20"
       if (base == BIN):
@@ -335,9 +355,10 @@ class _UART_PORT(object):
         return hex(data)[2:] # e.g. 20 -> "14"
 
     elif (type(data) is float):
-      if (base == 0):
+      if not (base): base = 2 # Default for floats
+      if ((base == 0)):
         return str(int(data))
-      if (base > 0):
+      if ((type(base) == int) and (base > 0)):
         return ("%0." + ("%i" % base) + "f") % data
 
     # If we get here data isn't supported by this formatting scheme,
