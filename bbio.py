@@ -63,23 +63,23 @@ def run(setup, main):
       e.g. CTRL-C or a call to the stop() function from within the
       main function. """
   try:
-    _init()
+    bbio_init()
     setup()
     while (True):
       main()
   except KeyboardInterrupt:
     # Manual exit signal, clean up and exit happy
-    cleanup()
+    bbio_cleanup()
   except Exception, e:
     # Something may have gone wrong, clean up and print exception
-    cleanup()
+    bbio_cleanup()
     print e
       
 def stop():
   """ Preffered way for a program to stop itself. """
   raise KeyboardInterrupt # Expected happy stop condition in run()
 
-def _init():
+def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
   _analog_init()
 
@@ -101,20 +101,21 @@ def _analog_init():
   # Now we can enable ADC subsystem, re-enabling write protect:
   _setReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
-def cleanup():
+def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
   _analog_cleanup()
+  _serial_cleanup()
+  __mmap.close()
 
 def _analog_cleanup():
   # Disable ADC subsystem:
   _clearReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
   # Disable ADC module clock:
   _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
-  __mmap.close()
 
 def _serial_cleanup():
   """ Ensures that all serial ports opened by current process are closed. """
-  for port in (Serial1, Serial2, Serial3, Serial4, Serial5):
+  for port in (Serial1, Serial2, Serial4, Serial5):
     port.end()
 
 def delay(ms):
