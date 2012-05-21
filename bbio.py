@@ -242,7 +242,7 @@ def _setReg(address, new_value, length=32):
 # to the UART1, UART2, UART4, and UART5 serial ports on the expansion headers:
 class _UART_PORT(object):
   def __init__(self, uart):
-    assert port in UART, "*Invalid UART: %s" % port
+    assert uart in UART, "*Invalid UART: %s" % uart
     self.config = uart
     self.baud = 0
     self.open = False
