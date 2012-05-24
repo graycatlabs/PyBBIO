@@ -1,4 +1,4 @@
-BBIOServer - v0.1
+BBIOServer - v1.0
 
 Copyright 2012 Alexander Hiam
 ahiam@marlboro.edu
@@ -6,20 +6,16 @@ ahiam@marlboro.edu
 BBIOServer is a dynamic web interface library for PyBBIO:
  https://github.com/alexanderhiam/PyBBIO
 
-See the example program at PyBBIO/examples/BBIOServer_test.py
-
-*Note:
-  On my Beaglebone this server is super fast when I'm accessing it
-  through my router with port forwarding, but it is running very 
-  slow when accessing it over my WLAN; I'm working to fix this.
+See tutorial here:
+ https://github.com/alexanderhiam/PyBBIO/wiki/BBIOServer
+as well as the example program in PyBBIO/examples/BBIOServer_test.py
 
 BBIOServer is released as part of PyBBIO under its Apache 2.0 license.
 See PyBBIO/LICENSE.txt
 
-
 ---------------------------------------------------
 
-BBIOServer uses and includes a copy of the JQuery library v1.7.2,
+BBIOServer uses and includes a copy of the minified JQuery library v1.7.2,
 released under the MIT license. 
 
 JQuery license details:

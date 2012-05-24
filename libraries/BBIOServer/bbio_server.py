@@ -1,5 +1,5 @@
 """
- BBIOServer - v0.1
+ BBIOServer - v1.0
  Copyright 2012 Alexander Hiam
  A dynamic web interface library for PyBBIO.
 """
@@ -26,7 +26,7 @@ os.chdir(THIS_DIR)
 
 # This is where we store the function strings indexed by their
 # unique ids:
-FUNCTION_STRINGS = {}
+FUNCTIONS = {}
 
 
 class BBIORequestHandler(SimpleHTTPRequestHandler):
@@ -41,11 +41,9 @@ class BBIORequestHandler(SimpleHTTPRequestHandler):
       url = url.split('?')[1]
       params = urlparse.parse_qs(url)
       function_id = params['function_id'][0]
-
-      # This should be a key in the FUNCTION_STRINGS dictionary: 
-      if (function_id in FUNCTION_STRINGS):
-        function = FUNCTION_STRINGS[function_id]
-
+      
+      function = FUNCTIONS.get(function_id)
+      if (function_id):
         if ("entry_text" in params):
           # This is a request from a text entry, so we also need to
           # parse out the text to be passed to the function:
@@ -61,13 +59,12 @@ class BBIORequestHandler(SimpleHTTPRequestHandler):
           # evaluated by Python, which we really don't want. If we
           # put it in an extra set of quotes it will evaluate to a 
           # string correctly: 
-          text = "'%s'" % text
-          function = function % (text)
-
-        # Evaluate the function string and capture the return value
-        # in a string (which will be an empty string if function has 
-        # no return value):
-        response = str(eval(function))
+          response = str(function(text))
+        else:
+          # Evaluate the function string and capture the return value
+          # in a string (which will be an empty string if function has 
+          # no return value):
+          response = str(function())
 
       else:
         # The function id is not in the dictionary. This happens if
@@ -218,29 +215,17 @@ class Page(object):
     self.html += '<div class="text" style="%s">%s</div>\n' %\
                  (style, text)
 
-  def add_button(self, function_str, label, newline=False, pointer=None):
+  def add_button(self, function, label, newline=False):
     """ Add a button to the current position in the page with the given
-        label, which will execute the given function string, e.g.:
-        'digitalWrite(USR3, HIGH)'. If the function is not part of the 
-        PyBBIO library, a pointer to the function must be passed in as
-        pointer, e.g.: add_button('my_funct(USR3)', pointer=my_funct). 
-        If newline=True the text will be put on a new line, otherwise it 
-        will be stacked on the current line. """
+        label, which will execute the given lambda function, e.g.:
+        'lambda: digitalWrite(USR3)'. If newline=True the text will be put
+        on a new line, otherwise it will be stacked on the current line. """
     # Use system time to create a unique id for the given function.
     # This is used as a lookup value in the FUNCTION_STRINGS dictionary.
     function_id = str(int(time.time()*1e6) & 0xffff)
-    FUNCTION_STRINGS[function_id] = function_str
+    FUNCTIONS[function_id] = function
 
     style = "clear: left;" if newline else ''
-
-    if (pointer): 
-      # We need to add the fuction to this namespace. This is easy
-      # with a little bit of Python wierdness:
-      # Get the string of the function name from the pointer:
-      name = pointer.__name__ 
-      # Declare it as a global variable in this namespace and set
-      # it equal to given function pointer:  
-      exec("global %s; %s = pointer" % (name, name))
 
     # Add the HTML. Set the button to call the javascript function 
     # which communicates with the request handler, passing it the
@@ -251,24 +236,19 @@ class Page(object):
         (function_id, label) +\
      '</div>\n</div>\n'
 
-  def add_entry(self, function_str, submit_label, newline=False, pointer=None):
+  def add_entry(self, function, submit_label, newline=False):
     """ Add a text entry box and a submit button with the given label to the 
-        current position in the page. When submitted, the function string 
-        will be executed with the entered text inserted, and it must be in
-        the form: 'my_funct(%s)'. If the function is not part of the PyBBIO
-        library, a pointer to the function must be passed in as pointer. 
-        If newline=True the text will be put on a new line, otherwise it 
-        will be stacked on the current line. """
+        current position in the page. When submitted, the given function will
+        be called, passing it the text currently in the entry. The function 
+        must take take a value, e.g.: 'lambda s: print s'. If newline=True 
+        the text will be put on a new line, otherwise it will be stacked on
+        the current line. """
 
     # Create the unique id and store the function:
     function_id = str(int(time.time()*1e6) & 0xffff)
-    FUNCTION_STRINGS[function_id] = function_str
-    style = "clear: left;" if newline else ''
+    FUNCTIONS[function_id] = function
 
-    if (pointer): 
-      # Add function to this namespace:
-      name = pointer.__name__
-      exec("global %s; %s = pointer" % (name,name))
+    style = "clear: left;" if newline else ''
 
     # Add the HTML. Pass the Javascript function the function id,
     # as well as a string to indicate it's an entry. This way the
@@ -282,26 +262,18 @@ class Page(object):
       (function_id, submit_label) +\
      '</div>\n</div>\n'
 
-  def add_monitor(self, function_str, label, units='', newline=False, 
-                  pointer=None):
+  def add_monitor(self, function, label, units='', newline=False):
     """ Add a monitor to the current position in the page. It will be
         displayed in the format: 'label' 'value' 'units', where value is 
         the most recent return value of the given function; will be 
-        updated every 200 ms or so. If the function is not part of the 
-        PyBBIO library, a pointer to the function must be passed in as
-        pointer. If newline=True the text will be put on a new line,
-        otherwise it will be stacked on the current line. """
+        updated every 200 ms or so. If newline=True the text will be put
+        on a new line, otherwise it will be stacked on the current line. """
     
     # Create the unique id and store the function:
     function_id = str(int(time.time()*1e6) & 0xffff)
-    FUNCTION_STRINGS[function_id] = function_str
+    FUNCTIONS[function_id] = function
 
     style = "clear: left;" if newline else ''
-
-    if (pointer): 
-      # Add function to this namespace:
-      name = pointer.__name__
-      exec("global %s; %s = pointer" % (name,name))
 
     # Add the HTML. Set the monitor id as the function id. When
     # the page loads a Javascript function is called which continually

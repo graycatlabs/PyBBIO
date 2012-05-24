@@ -44,10 +44,8 @@ def setup():
   text.add_text("Press submit to send the text in entry box:")
 
   # Create the text entry box on a new line; button will say 'Submit',
-  # and when submitted the text in the box will be sent to print_entry().
-  # Because print_entry is not a standard PyBBIO function, we must pass
-  # a pointer to it as the 'pointer' parameter:
-  text.add_entry("print_entry(%s)", "Submit", newline=True, pointer=print_entry)
+  # and when submitted the text in the box will be sent to print_entry():
+  text.add_entry(lambda text: print_entry(text), "Submit", newline=True)
 
   # Create a new page to test the buttons and monitors:
   io = Page("I/O")
@@ -57,34 +55,32 @@ def setup():
   io.add_text("Control the on-board LEDs", newline=True)
 
   # Add a button on a new line with the label 'Toggle USR2 LED' that will
-  # call 'toggle(USR2)' when pressed. Because toggle() is a standard 
-  # PyBBIO function, we don't need to pass in a pointer:
-  io.add_button("toggle(USR2)", "Toggle USR2 LED", newline=True)
+  # call 'toggle(USR2)' when pressed:
+  io.add_button(lambda: toggle(USR2), "Toggle USR2 LED", newline=True)
 
   # Add a monitor which will continually call 'pinState(USR2)' and 
   # display the return value in the form: 'current state: [value]':
-  io.add_monitor("pinState(USR2)", "current state:")
+  io.add_monitor(lambda: pinState(USR2), "current state:")
 
   # Same thing here with the other LED:
-  io.add_button("toggle(USR3)", "Toggle USR3 LED", newline=True)
-  io.add_monitor("pinState(USR3)", "current state:")
+  io.add_button(lambda: toggle(USR3), "Toggle USR3 LED", newline=True)
+  io.add_monitor(lambda: pinState(USR3), "current state:")
 
   # Create another section for ADC readings:
   io.add_heading("ADC Readings")
   io.add_text("Read some ADC inputs", newline=True)
 
   # Add a monitor to display the ADC value:
-  io.add_monitor("analogRead(AIN0)", "AIN0 value:", newline=True)
+  io.add_monitor(lambda: analogRead(AIN0), "AIN0 value:", newline=True)
 
-  # And one on the same line to display the voltage using the
-  # vlotage() function defined above (passing a pointer to it).
-  # Because units are given this time, the value will be displayed
-  # in the form: 'voltage: [value] v':
-  io.add_monitor("voltage(AIN0)", "voltage:", units="v", pointer=voltage)
+  # And one on the same line to display the voltage using the voltage()
+  # function defined above. Because the units variable is used this time
+  # the value will be displayed in the form: 'voltage: [value] v':
+  io.add_monitor(lambda: voltage(AIN0), "voltage:", units="v")
 
   # Same thing here:
-  io.add_monitor("analogRead(AIN1)", "AIN1 value:", newline=True)
-  io.add_monitor("voltage(AIN1)", "voltage:", units="v", pointer=voltage)
+  io.add_monitor(lambda: analogRead(AIN1), "AIN1 value:", newline=True)
+  io.add_monitor(lambda: voltage(AIN1), "voltage:", units="v")
 
   # Then start the server, passing it all the pages. The first page
   # passed in will be the home page:
