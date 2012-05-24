@@ -110,6 +110,11 @@ def bbio_cleanup():
 def _analog_cleanup():
   # Disable ADC subsystem:
   _clearReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
+
+  # Software reset:
+  _setReg(ADC_SYSCONFIG, ADC_SOFTRESET)
+  while(_getReg(ADC_SYSCONFIG) & ADC_SOFTRESET): pass
+
   # Disable ADC module clock:
   _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
 
