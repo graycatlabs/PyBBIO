@@ -46,8 +46,8 @@ def setup():
   # Create the web page:
   serial = Page("Serial")
   serial.add_text("A simple interface to Serial2.")
-  serial.add_entry("serial_tx(%s)", "Send", newline=True, pointer=serial_tx)
-  serial.add_monitor("serial_rx()", "Received:", newline=True, pointer=serial_rx)
+  serial.add_entry(lambda string: serial_tx(string), "Send", newline=True)
+  serial.add_monitor(lambda: serial_rx(), "Received:", newline=True)
 
   # Start the server:
   server.start(serial)
