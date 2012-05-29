@@ -1,5 +1,5 @@
 """
- PyBBIO - bbio.py - v0.3.1
+ PyBBIO - bbio.py - v0.3.2
  Created: 12/2011
  Author: Alexander Hiam - ahiam@marlboro.edu - www.alexanderhiam.com
  Website: https://github.com/alexanderhiam/PyBBIO
