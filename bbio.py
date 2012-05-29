@@ -85,19 +85,16 @@ def bbio_init():
 
 def _analog_init():
   """ Initializes the on-board 8ch 12bit ADC. """
-  step_config = 'ADCSTEPCONFIG%i'
-  #step_delay = 'ADCSTEPDELAY%i'
-  ain = 'AIN%i'   
   # Enable ADC module clock:
   _setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
   while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
   # Must turn off STEPCONFIG write protect:
-  _andReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
+  _setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
   # Set STEPCONFIG1-STEPCONFIG8 to correspond to ADC inputs 0-7:
   for i in xrange(8):
-    config = SEL_INP(ain % i) | ADC_AVG4 # Average 4 readings
-    _andReg(eval(step_config % (i+1)), config)
+    config = SEL_INP('AIN%i' % i)
+    _setReg(eval('ADCSTEPCONFIG%i' % (i+1)), config)
   # Now we can enable ADC subsystem, re-enabling write protect:
   _setReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
@@ -191,9 +188,12 @@ def analogRead(analog_pin):
     # PyBBIO script stopping while this one was running, turn back on:
     _analog_init() 
 
-  _orReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
+  # Enable sequncer step that's set for given input:
+  _setReg(ADC_STEPENABLE, ADC_ENABLE(analog_pin))
+  # Sequencer starts automatically after enabling step, wait for complete:
   while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
-  return _getReg(ADC_FIFO0DATA)&ADC_FIFO_MASK
+  # Return 12-bit value from the ADC FIFO register:
+  return _getReg(ADC_FIFO0DATA) & ADC_FIFO_MASK
 
 def _pinMux(fn, mode):
   """ Uses kernel omap_mux files to set pin modes. """
