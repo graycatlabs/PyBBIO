@@ -33,14 +33,12 @@ def setup():
   pass
 
 def loop():
+  # Get the ADC values:
   val1 = analogRead(pot1)
   val2 = analogRead(pot2)
-  # ADC reference voltage is 1.8v, and it is a 
-  # 12-bit ADC, so to get volts per step:
-  volts_per_step = 1.8 / 2.0**12
-  # Multiply ADC value by volts/step to get voltage:
-  voltage1 = val1 * volts_per_step
-  voltage2 = val2 * volts_per_step
+  # And convert to voltages:
+  voltage1 = inVolts(val1)
+  voltage2 = inVolts(val2)
   print " pot1 ADC value: %i - voltage: %fv" % (val1, voltage1)
   print " pot2 ADC value: %i - voltage: %fv\n" % (val2, voltage2)
   delay(500)

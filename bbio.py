@@ -132,7 +132,7 @@ def delayMicroseconds(us):
 
 def pinMode(gpio_pin, direction, pull=0):
   """ Sets given digital pin to input if direction=1, output otherwise.
-      'pull' will set the pull up/down resitsor if setting as an input:
+      'pull' will set the pull up/down resistor if setting as an input:
       pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (direction == INPUT):
@@ -194,6 +194,11 @@ def analogRead(analog_pin):
   while(_getReg(ADC_STEPENABLE) & ADC_ENABLE(analog_pin)): pass
   # Return 12-bit value from the ADC FIFO register:
   return _getReg(ADC_FIFO0DATA) & ADC_FIFO_MASK
+
+def inVolts(adc_value, bits=12, vRef=1.8):
+  """ Converts the given ADC value to a voltage according to the given
+      number of bits and reference voltage. """
+  return adc_value*(vRef/2**bits)
 
 def _pinMux(fn, mode):
   """ Uses kernel omap_mux files to set pin modes. """
