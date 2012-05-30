@@ -289,14 +289,13 @@ class _UART_PORT(object):
     return self.ser_port.inWaiting() + len(self.peek_char)
 
   def read(self):
-    """ Returns first byte of data in the receive buffer or -1 if none. """
+    """ Returns first byte of data in the receive buffer or -1 if timeout reached. """
     if (self.peek_char):
       c = self.peek_char
       self.peek_char = ''
       return c
-    if self.available():
-      return self.ser_port.read(1)
-    return -1
+    byte = self.ser_port.read(1)
+    return -1 if (byte == None) else byte
 
   def peek(self):
     """ Returns the next char from the receive buffer without removing it, 
