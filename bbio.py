@@ -196,8 +196,8 @@ def analogRead(analog_pin):
   return _getReg(ADC_FIFO0DATA) & ADC_FIFO_MASK
 
 def inVolts(adc_value, bits=12, vRef=1.8):
-  """ Converts the given ADC value to a voltage according to the given
-      number of bits and reference voltage. """
+  """ Converts and returns the given ADC value to a voltage according
+      to the given number of bits and reference voltage. """
   return adc_value*(vRef/2**bits)
 
 def _pinMux(fn, mode):
