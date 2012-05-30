@@ -42,9 +42,6 @@ library at libraries/example.py.
 Instructions here:
   https://github.com/alexanderhiam/PyBBIO/wiki
 
-Full API documentation here:
-  http://www.alexanderhiam.com/code/pybbio/
-
 The python-mmap module is required and was not installed on my BeagleBone,
 despite it usually being part of the standard Python modules. 
 It can easily be installed by running at the BeagleBone shell:
@@ -103,5 +100,3 @@ The addresses of all the processor's memory registers, as well as details
 on how to properly use them, can be found in the AM335x Technical Reference 
 Manual (TI document spruh73c.pdf) which can be found here:
   http://www.ti.com/dsp/docs/dspsupporttechdocs.tsp?sectionId=3&tabId=409&docCategoryId=6&viewType=mostuseful&rootFamilyId=44&familyId=2920
-Direct link:
- http://www.ti.com/litv/pdf/spruh73d
