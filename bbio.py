@@ -56,12 +56,16 @@ with open("/dev/mem", "r+b") as f:
   __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
 
+START_TIME_MS = 0 # Set in run() - used by millis() and micros()
+
 def run(setup, main):
   """ The main loop; must be passed a setup and a main function.
       First the setup function will be called once, then the main
       function wil be continuously until a stop signal is raised, 
       e.g. CTRL-C or a call to the stop() function from within the
       main function. """
+  global START_TIME_MS
+  START_TIME_MS = time.time()*1000
   try:
     bbio_init()
     setup()
@@ -119,6 +123,14 @@ def _serial_cleanup():
   """ Ensures that all serial ports opened by current process are closed. """
   for port in (Serial1, Serial2, Serial4, Serial5):
     port.end()
+
+def millis():
+  """ Returns roughly the number of millisoconds since program start. """
+  return time.time()*1000 - START_TIME_MS
+
+def micros():
+  """ Returns roughly the number of microsoconds since program start. """
+  return time.time()*1000000 - START_TIME_MS*1000
 
 def delay(ms):
   """ Sleeps for given number of milliseconds. """
