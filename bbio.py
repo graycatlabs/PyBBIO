@@ -105,8 +105,7 @@ def _analog_init():
 
 def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
-  _analog_cleanup()
-  _serial_cleanup()
+  # Run user cleanup routines:
   for cleanup in ADDITIONAL_CLEANUP:
     try:
       cleanup()
@@ -116,6 +115,9 @@ def bbio_cleanup():
       print "*Exception raised trying to call cleanup routine '%s':\n  %s" %\
             (cleanup, e)
 
+  # System cleanup:
+  _analog_cleanup()
+  _serial_cleanup()
   __mmap.close()
 
 def _analog_cleanup():
