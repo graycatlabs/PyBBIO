@@ -5,6 +5,9 @@ Copyright 2012 Alexander Hiam <ahiam@marlboro.edu>
 EventIO provides basic multi-process event-driven programming
 for PyBBIO (https://github.com/alexanderhiam/PyBBIO). 
 
+Documentation:
+  https://github.com/alexanderhiam/PyBBIO/wiki/EventIO
+
 Example program:
   PyBBIO/examples/EventIO_test.py
 
