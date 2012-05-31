@@ -48,15 +48,16 @@ assert ('MMAP_OFFSET' in config) and ('MMAP_SIZE' in config),\
       "*Config file '%s' must contain values MMAP_OFFSET and MMAP_SIZE" %\
                                                                 CONFIG_FILE
 exec(config)
-
 sys.path.append(LIBRARIES_PATH)
+
+ADDITIONAL_CLEANUP = [] # See add_cleanup() below.
+START_TIME_MS = 0 # Set in run() - used by millis() and micros().
+
 
 # Create global mmap:
 with open("/dev/mem", "r+b") as f:
   __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
-
-START_TIME_MS = 0 # Set in run() - used by millis() and micros()
 
 def run(setup, main):
   """ The main loop; must be passed a setup and a main function.
@@ -106,6 +107,15 @@ def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
   _analog_cleanup()
   _serial_cleanup()
+  for cleanup in ADDITIONAL_CLEANUP:
+    try:
+      cleanup()
+    except Exception as e:
+      # Something went wrong with one of the cleanup routines, but we
+      # want to keep going; just print the error and continue
+      print "*Exception raised trying to call cleanup routine '%s':\n  %s" %\
+            (cleanup, e)
+
   __mmap.close()
 
 def _analog_cleanup():
@@ -123,6 +133,12 @@ def _serial_cleanup():
   """ Ensures that all serial ports opened by current process are closed. """
   for port in (Serial1, Serial2, Serial4, Serial5):
     port.end()
+
+def addToCleanup(routine):
+  """ Takes a callable object to be called during the cleanup once a 
+      program has stopped, e.g. a function to close a log file, kill 
+      a thread, etc. """
+  ADDITIONAL_CLEANUP.append(routine)
 
 def millis():
   """ Returns roughly the number of millisoconds since program start. """
