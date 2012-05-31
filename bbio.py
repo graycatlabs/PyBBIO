@@ -90,18 +90,26 @@ def bbio_init():
 
 def _analog_init():
   """ Initializes the on-board 8ch 12bit ADC. """
-  # Enable ADC module clock:
+  # Enable ADC module clock, though should already be enabled on
+  # newer Angstrom images:
   _setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
   while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
-  # Must turn off STEPCONFIG write protect:
-  _setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT(0))
+
+  # Software reset:
+  _setReg(ADC_SYSCONFIG, ADC_SOFTRESET)
+  while(_getReg(ADC_SYSCONFIG) & ADC_SOFTRESET): pass
+
+  # Make sure STEPCONFIG write protect is off:
+  _setReg(ADC_CTRL, ADC_STEPCONFIG_WRITE_PROTECT_OFF)
+
   # Set STEPCONFIG1-STEPCONFIG8 to correspond to ADC inputs 0-7:
   for i in xrange(8):
     config = SEL_INP('AIN%i' % i)
     _setReg(eval('ADCSTEPCONFIG%i' % (i+1)), config)
-  # Now we can enable ADC subsystem, re-enabling write protect:
-  _setReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
+  # Now we can enable ADC subsystem, leaving write protect off:
+  _orReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
+
 
 def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
@@ -114,22 +122,24 @@ def bbio_cleanup():
       # want to keep going; just print the error and continue
       print "*Exception raised trying to call cleanup routine '%s':\n  %s" %\
             (cleanup, e)
-
   # System cleanup:
   _analog_cleanup()
   _serial_cleanup()
   __mmap.close()
 
 def _analog_cleanup():
-  # Disable ADC subsystem:
-  _clearReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
-
   # Software reset:
   _setReg(ADC_SYSCONFIG, ADC_SOFTRESET)
   while(_getReg(ADC_SYSCONFIG) & ADC_SOFTRESET): pass
 
+  # When I started writing PyBBIO on an older Angstrom image, the ADC
+  # was not enabled on boot, so I had these lines to shut it back off:
+  # Disable ADC subsystem:
+  #_clearReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
   # Disable ADC module clock:
-  _clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
+  #_clearReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
+  # Newer images enable the ADC module at boot, so we just leave it 
+  # running.
 
 def _serial_cleanup():
   """ Ensures that all serial ports opened by current process are closed. """
