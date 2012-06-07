@@ -1,5 +1,5 @@
 """
- BBIOServer - v1.0
+ BBIOServer - v1.2
  Copyright 2012 Alexander Hiam
  A dynamic web interface library for PyBBIO.
 """
@@ -10,6 +10,7 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 
 from bbio import *
+from SafeProcess import *
 
 THIS_DIR = os.path.dirname(__file__)
 PAGES_DIR = "%s/pages" % THIS_DIR
@@ -156,25 +157,12 @@ class BBIOServer():
       with open(path, 'w') as f:
         f.write(str(page) % links)
 
-    # The server is started as a subprocess. This way it's easy
-    # to catch a KeyboardInterrupt and stop the server happily:
-    self._server_process = Process(target=self._server.serve_forever)
+    # The server is started as a subprocess using PyBBIO's SafeProcess. 
+    # This way it will be non-blocking and stop automatically during
+    # PyBBIO's cleanup routine.
+    self._server_process = SafeProcess(target=self._server.serve_forever)
     self._server_process.start()
 
-    try:
-      while(True):
-        # Do as little as possible here to keep the CPU and memory
-        # usage to a minimum:
-        delay(10000)
-    except KeyboardInterrupt:
-      self.stop()
-    except Exception, e:
-      print e
-      self.stop()
-
-  def stop(self):
-    self._server_process.terminate()
-    
 
 class Page(object):
   def __init__(self, title):

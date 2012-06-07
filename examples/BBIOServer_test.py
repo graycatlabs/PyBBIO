@@ -88,16 +88,15 @@ def setup():
 
 
 def loop():
-  # The server will block until ctrl-c is pressed, so if we get here
-  # we know the server is no longer running. If we don't stop at this
-  # point we will continue looping over this function until ctrl-c is
-  # pressed again. If we don't need to do anything here it's easiest 
-  # to just stop the loop here:
-  print "\nServer has stopped"
-  stop()
+  # As of BBIOServer v1.2 the server is non-blocking, so we if we just
+  # want to sit quietly here until ctrl-c is pressed it's best to put
+  # some delay in:
+  delay(10000)
+
 
 # Then run it the usual way:
 run(setup, loop)
+print "\nServer has stopped"
 
 # Now, on a computer on the same network as you beaglebone, open your
 # browser and navigate to:
