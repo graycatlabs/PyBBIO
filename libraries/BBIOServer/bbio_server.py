@@ -43,7 +43,7 @@ class BBIORequestHandler(SimpleHTTPRequestHandler):
       function_id = params['function_id'][0]
       
       function = FUNCTIONS.get(function_id)
-      if (function_id):
+      if (function):
         if ("entry_text" in params):
           # This is a request from a text entry, so we also need to
           # parse out the text to be passed to the function:
