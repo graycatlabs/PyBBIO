@@ -54,16 +54,10 @@ class BBIORequestHandler(SimpleHTTPRequestHandler):
             # would not have an entry_text param and we'd get errors
             # trying to call the function; convert it back:
             text = "" 
-          # If we inserted the text into the function string and 
-          # evaluated it at this point, the text received would be 
-          # evaluated by Python, which we really don't want. If we
-          # put it in an extra set of quotes it will evaluate to a 
-          # string correctly: 
+
           response = str(function(text))
         else:
-          # Evaluate the function string and capture the return value
-          # in a string (which will be an empty string if function has 
-          # no return value):
+          # The function takes no arguments, just call it.
           response = str(function())
 
       else:
