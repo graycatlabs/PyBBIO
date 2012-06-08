@@ -19,6 +19,11 @@ server = BBIOServer()
 # Port 8000 is used by default, but can be specified when creating
 # server instance:
 #  server = BBIOServer(port_number)
+# It also defaults to blocking mode, but if we wanted it to run
+# non-blocking, i.e. the loop() routine continues as normal while 
+# the server runs in the background, we could say:
+#  server = BBIOServer(blocking=False)
+
 
 def voltage(analog_pin):
   """ Takes analog reading from given pin and returns a string 
@@ -88,15 +93,15 @@ def setup():
 
 
 def loop():
-  # As of BBIOServer v1.2 the server is non-blocking, so we if we just
-  # want to sit quietly here until ctrl-c is pressed it's best to put
-  # some delay in:
-  delay(10000)
+  # We're running in blocking mode, so we won't get here until ctrl-c
+  # is preseed. 
+  print "\nServer has stopped"
+  stop()
+
 
 
 # Then run it the usual way:
 run(setup, loop)
-print "\nServer has stopped"
 
 # Now, on a computer on the same network as you beaglebone, open your
 # browser and navigate to:

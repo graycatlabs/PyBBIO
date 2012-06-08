@@ -12,6 +12,8 @@ from BaseHTTPServer import HTTPServer
 from bbio import *
 from SafeProcess import *
 
+BBIOSERVER_VERSION = "1.2"
+
 THIS_DIR = os.path.dirname(__file__)
 PAGES_DIR = "%s/pages" % THIS_DIR
 HEADER = "%s/src/header.html" % THIS_DIR
@@ -114,7 +116,7 @@ class NoPrint():
     pass
 
 class BBIOServer():
-  def __init__(self, port=8000, verbose=False):
+  def __init__(self, port=8000, verbose=False, blocking=True):
     if not(verbose):
       # A log of every request to the server is written to stderr.
       # This makes for a lot of printing when using the monitors. 
@@ -122,6 +124,7 @@ class BBIOServer():
       sys.stderr = NoPrint()
 
     self._server = BBIOHTTPServer(('',port), BBIORequestHandler)
+    self.blocking = blocking
 
   def start(self, *pages):
     """ Takes a list of Page instances, creates html files, and starts
@@ -163,9 +166,18 @@ class BBIOServer():
     self._server_process = SafeProcess(target=self._server.serve_forever)
     self._server_process.start()
 
+    if (self.blocking):
+      try:
+        while(True): delay(10000)
+      except KeyboardInterrupt:
+        pass
+
+  def stop(self):
+    self._server_process.terminate()
+
 
 class Page(object):
-  def __init__(self, title):
+  def __init__(self, title, stylesheet="style.css"):
     self.title = title
     # Convert the title to a valid .html filename:
     not_allowed = " \"';:,.<>/\|?!@#$%^&*()+="
@@ -183,7 +195,7 @@ class Page(object):
     # will be able to insert the links even though the pages are 
     # all created separately:
     self.html = open(HEADER, 'r').read() % \
-                (title, title, open(SIDEBAR, 'r').read())
+                (title, stylesheet, title, open(SIDEBAR, 'r').read())
 
   def add_heading(self, text):
     """ Add a heading to the current position in the page. """
@@ -272,4 +284,4 @@ class Page(object):
   def __str__(self):
     # Return the HTML with the content of the footer template
     # appended to it: 
-    return self.html + open(FOOTER, 'r').read()
+    return self.html + open(FOOTER, 'r').read() % (BBIOSERVER_VERSION)
