@@ -1,4 +1,4 @@
-PyBBIO###  v0.3.2
+### PyBBIO v0.3.2
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
 
