@@ -1,0 +1,130 @@
+/*
+ CSS mobile stylesheet for BBIOServer.
+*/
+
+
+body {
+  background: #eeeeff;
+  font-family: monospace;
+  font-size: 12px;
+  margin: 5px;
+}
+
+a {
+  text-decoration: none;
+  color: #444499; 
+  outline: 0;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+#page-wrapper{
+  display: inline-block;
+  width: 99%;
+  max-width: 720px;
+  padding-bottom: 5px;
+  border: 1px solid #888888;
+  background: #ffffff;
+}
+
+#header {
+  background: #ffffff;
+  padding: 2px;
+  margin: 0px;
+  border-bottom: 1px solid #888888;
+}
+#header h2 { margin: 5px; }
+
+#sidebar {
+  padding: 2px 0px 2px 0px;
+  border-bottom: 1px solid #888888;
+}
+
+#sidebar li {
+  font-size: 15px;
+  list-style-type: none; 
+  display: inline;
+  padding-left: 10px;
+  border-left: 1px solid #888888;
+}
+
+#sidebar li a:hover {
+  background: #efefef;
+}
+
+#sidebar li:first-child {
+  border: 0px;
+}
+
+#content {
+  padding: 2px;
+  margin: 2px;
+}
+
+div .heading {
+  float: left;
+  width: 100%;
+  margin: 2px 0px 10px 0px;
+  padding: 5px 0px 6px 2px;
+  border-bottom: 1px dashed #888888;
+  font-size: 16px;  
+  font-weight: bold;
+}
+
+div .text {
+  float: left;
+  margin: 2px;
+}
+
+div .object-wrapper {
+  float: left;
+  margin: 0px 0px 7px 10px;
+}
+div .object-wrapper .entry {
+  float: left;
+  display: inline-block;
+  margin-top: 2px;
+  font-family: monospace;
+  font-size: 12px;
+  height: 28px;
+}
+
+div .button {
+  float: left;
+  display: inline-block;
+  padding: 5px;
+  margin-top: 3px;
+  background: #fafafa;
+  border: 1px solid #999999;
+  -moz-user-select: none; 
+  -khtml-user-select: none; 
+  -webkit-user-select: none; 
+  -o-user-select: none; 
+}
+div .button:hover {
+  background: #efefef;
+  cursor: pointer;
+}
+
+div .value-field {
+  float: left;
+  display: inline-block;
+  margin: 5px;
+  padding: 5px 0px;
+}
+
+div .monitor-field {
+  float: left;
+  display: inline-block;
+  margin: 5px 0px 5px 2px;
+  padding: 5px 0px 5px 2px;
+}
+
+#copyright {
+  float: left; 
+  width: 98%;
+  margin-left: 5px;
+  margin-right: 1000px;
+  font-size: 10px;
+}
