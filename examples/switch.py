@@ -35,7 +35,7 @@ def main():
   global LED_STATE, SW_STATE 
   # Python requires you explicitely declare all global variables 
   # that you want to change within a code block using the global
-  # global statement; see:
+  # statement; see:
   #  http://docs.python.org/reference/simple_stmts.html#the-global-statement
 
   if (digitalRead(SWITCH) == HIGH):
