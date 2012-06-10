@@ -80,6 +80,23 @@ class DebouncedEvent(object):
     return EVENT_CONTINUE
 
 
+# This event will be triggered after the given number of milliseconds has
+# elapsed. If the event function returns EVENT_CONTINUE the timer will 
+# restart.
+class TimedEvent(object):
+  def __init__(self, event, event_time_ms):
+    self.event = event
+    self.event_time_ms = event_time_ms
+    self.timer = event_time_ms
+
+  def trigger(self):
+    if (self.timer):
+      self.timer -= 1
+      return False
+    self.timer = event_time_ms
+    return True
+
+
 # This event is based on the debounced event and compares the state of a given
 # digital pin to the trigger state and calls the event function if they're the 
 # same. Sets the pin to an input when created.
@@ -90,8 +107,8 @@ class DigitalTrigger(DebouncedEvent):
     super(DigitalTrigger, self).__init__(trigger, event, debounce_ms)
 
 
-# This Event compares the value on the given analog pin to the trigger level and
-# calls the event function if direction=1 and the value is above, or if 
+# This Event compares the value on the given analog pin to the trigger level
+# and calls the event function if direction=1 and the value is above, or if 
 # direction=-1 and the value is below. Either looks at a single reading or a 
 # running average of size n_points.
 class AnalogLevel(Event):
