@@ -32,7 +32,7 @@ server = BBIOServer()
 def voltage(analog_pin):
   """ Takes analog reading from given pin and returns a string 
       of the voltage to 2 decimal places. """
-  return "%0.2f" % (analogRead(analog_pin) * (1.8 / 2**12))
+  return "%0.2f" % inVolts(analogRead(analog_pin))
 
 def print_entry(text):
   """ Just prints the given text. """
