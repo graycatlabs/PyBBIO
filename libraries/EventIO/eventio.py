@@ -83,18 +83,17 @@ class DebouncedEvent(object):
 # This event will be triggered after the given number of milliseconds has
 # elapsed. If the event function returns EVENT_CONTINUE the timer will 
 # restart.
-class TimedEvent(object):
+class TimedEvent(Event):
   def __init__(self, event, event_time_ms):
     self.event = event
     self.event_time_ms = event_time_ms
-    self.timer = event_time_ms
+    self.start_time = millis()
 
   def trigger(self):
-    if (self.timer):
-      self.timer -= 1
-      return False
-    self.timer = event_time_ms
-    return True
+    if (millis() - self.start_time >= self.event_time_ms):
+      self.start_time = millis()
+      return True
+    return False
 
 
 # This event is based on the debounced event and compares the state of a given
