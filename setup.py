@@ -21,6 +21,7 @@ setup(name='PyBBIO',
       description='A Python library for Arduino-style hardware IO support on the Beaglebone',
       author='Alexander Hiam',
       author_email='ahiam@marlboro.edu',
+      license='Apache 2.0',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
       packages=['bbio'],
      )
