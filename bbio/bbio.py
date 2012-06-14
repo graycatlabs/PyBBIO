@@ -26,7 +26,6 @@
  limitations under the License.
 """
 
-import struct, os, sys, time
 try:
   from mmap import mmap
 except:
@@ -39,15 +38,10 @@ except:
   print "\n pyserial module not found; to install:\n\
    # opkg update && opkg install python-pyserial\n"
   sys.exit(0)
+import struct, os, sys, time
 
+from config import *
 
-# Load global configuration:
-CONFIG_FILE="%s/.pybbio/beaglebone.cfg" % os.environ['HOME']
-config = open(CONFIG_FILE, 'r').read()
-assert ('MMAP_OFFSET' in config) and ('MMAP_SIZE' in config),\
-      "*Config file '%s' must contain values MMAP_OFFSET and MMAP_SIZE" %\
-                                                                CONFIG_FILE
-exec(config)
 sys.path.append(LIBRARIES_PATH)
 
 ADDITIONAL_CLEANUP = [] # See add_cleanup() below.
