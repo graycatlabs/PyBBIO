@@ -1,4 +1,4 @@
-### PyBBIO v0.3.2
+### PyBBIO v0.4
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
 
@@ -20,10 +20,10 @@ Then you'll need to get the code:
     # cd ~
     # git clone git://github.com/alexanderhiam/PyBBIO.git
 
-The next step is to run the install script:
+The next step is to run the setup.py script:
 
     # cd PyBBIO
-    # sh install.sh -i
+    # python setup.py install
 
 PyBBIO should now be installed correctly. Run the blink example to make sure all is well:
 
@@ -37,7 +37,7 @@ I am working as fast as I can to add support for many of the features that the B
 
     # cd ~/PyBBIO
     # git pull
-    # sh install -i
+    # python setup.py install
 
 #Uninstalling
 If you need to uninstall PyBBIO you can use the install.sh script:
