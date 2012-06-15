@@ -2,14 +2,20 @@
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
 
-PyBBIO is a Python library for Arduino-style hardware IO support on the TI Beaglebone. It currently supports supports basic digital IO through digitalRead() and digitalWrite() functions, as well as ADC support through analogRead() and an Arduino-style UART interface. PWM, SPI and I2C are on the way, so keep checking the Github page for updates.  
+PyBBIO is a Python library for Arduino-style hardware IO support on the TI 
+Beaglebone. It currently supports supports basic digital IO through 
+digitalRead() and digitalWrite() functions, as well as ADC support through 
+analogRead() and an Arduino-style UART interface. PWM, SPI and I2C are on 
+the way, so keep checking the Github page for updates.  
 #### Documentation at http://github.com/alexanderhiam/PyBBIO/wiki
 
 #Installing
 
-Installation is quite simple. It is assumed that your Beaglebone is already set up and configured on your network, and that you have already SSHed onto it. 
+Installation is quite simple. It is assumed that your Beaglebone is already 
+set up and configured on your network, and that you have already SSHed onto it. 
 
-Note that these instructions assume you want PyBBIO/ to live in your home directory. This is not a requirement and can changed as desired. 
+Note that these instructions assume you want PyBBIO/ to live in your home 
+directory. This is not a requirement and can changed as desired. 
 
 The first step is to install the dependencies: 
 
@@ -20,30 +26,29 @@ Then you'll need to get the code:
     # cd ~
     # git clone git://github.com/alexanderhiam/PyBBIO.git
 
-The next step is to run the setup.py script:
+As of version 0.4, PyBBIO is contained in a standard Python package, so it is 
+installed using the normal Python way:
 
     # cd PyBBIO
     # python setup.py install
 
-PyBBIO should now be installed correctly. Run the blink example to make sure all is well:
+PyBBIO should now be installed correctly. Run the blink example to make sure 
+all is well:
 
     # cd examples
     # python blink.py
 
-And confirm that the LEDs next to the Ethernet jack labelled USR2 and USR3 are blinking back and forth. 
+And confirm that the LEDs next to the Ethernet jack labelled USR2 and USR3 
+are blinking back and forth. 
 
 #Updating
-I am working as fast as I can to add support for many of the features that the Beablebone's AM3359 processor has to offer, so you'll want to make sure your version is up to date. Thanks to git this is a very simple process:
+I am working as fast as I can to add support for many of the features that 
+the Beablebone's AM3359 processor has to offer, so you'll want to make sure 
+your version is up to date. Thanks to git this is a very simple process:
 
     # cd ~/PyBBIO
     # git pull
     # python setup.py install
-
-#Uninstalling
-If you need to uninstall PyBBIO you can use the install.sh script:
-
-    # cd ~/PyBBIO
-    # sh install.sh -u
 
 #License
 
