@@ -57,6 +57,6 @@ setup(name='PyBBIO',
 # Now replace the local config file to original state to keep git
 # from complaining when updating with 'git pull':
 with open(config_file, 'wb') as config:
-  config.write(config_str)
+  config.write(config_str.replace(new_config_line, old_config_line))
 
 
