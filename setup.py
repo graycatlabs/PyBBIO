@@ -23,7 +23,7 @@ with open(config_file, 'wb') as config:
 # the old install if it is there:
 old_install = ("/usr/lib/python2.7/bbio.py", 
                "/usr/lib/python2.7/bbio.pyo")
-removed_old_install = True
+removed_old_install = False
 for f in old_install:
   if os.path.exists(f):
     try:
