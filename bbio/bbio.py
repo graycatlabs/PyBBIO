@@ -49,7 +49,8 @@ START_TIME_MS = 0 # Set in run() - used by millis() and micros().
 
 
 # Create global mmap:
-with open("/dev/mem", "r+b") as f:
+MEM_FILE = "/dev/mem"
+with open(MEM_FILE, "r+b") as f:
   __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
 
