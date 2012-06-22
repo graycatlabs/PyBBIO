@@ -56,7 +56,7 @@ try:
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
         packages=['bbio'])
 
-except ValueError:
+except ImportError, ValueError:
   # The Beaglebone's Python can have some issues with OpenSSL, which
   # causes the standard distutils install to crash. See: 
   #  https://github.com/alexanderhiam/PyBBIO/issues/5
