@@ -66,9 +66,6 @@ except ValueError:
   import shutil
   shutil.rmtree("/usr/lib/python2.7/site-packages/bbio", ignore_errors=True)
   shutil.copytree("bbio", "/usr/lib/python2.7/site-packages/bbio")
-  with open("/usr/lib/python2.7/site-packages/bbio/test", "w") as f:
-    f.write("Test")
-
 
 # Now replace the local config file to original state to keep git
 # from complaining when updating with 'git pull':
