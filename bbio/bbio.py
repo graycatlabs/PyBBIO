@@ -26,6 +26,8 @@
  limitations under the License.
 """
 
+import sys
+
 try:
   from mmap import mmap
 except:
@@ -38,7 +40,7 @@ except:
   print "\n pyserial module not found; to install:\n\
    # opkg update && opkg install python-pyserial\n"
   sys.exit(0)
-import struct, os, sys, time
+import struct, os, time
 
 from config import *
 
