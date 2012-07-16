@@ -102,8 +102,9 @@ def _analog_init():
 
   # Set STEPCONFIG1-STEPCONFIG8 to correspond to ADC inputs 0-7:
   for i in xrange(8):
-    config = SEL_INP('AIN%i' % i)
+    config = SEL_INP('AIN%i' % i) | ADC_AVG2
     _setReg(eval('ADCSTEPCONFIG%i' % (i+1)), config)
+    _setReg(eval('ADCSTEPDELAY%i' % (i+1)), SAMPLE_DELAY(15))
   # Now we can enable ADC subsystem, leaving write protect off:
   _orReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
