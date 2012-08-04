@@ -108,7 +108,7 @@ GPIO = {
   "GPIO1_15" : [GPIO1, 1<<15,         'gpmc_ad15'],
   "GPIO1_16" : [GPIO1, 1<<16,           'gpmc_a0'],
   "GPIO1_17" : [GPIO1, 1<<17,           'gpmc_a1'],
-  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_be1n'],
+  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_ben1'],
   "GPIO1_29" : [GPIO1, 1<<29,         'gpmc_csn0'],
   "GPIO1_30" : [GPIO1, 1<<30,         'gpmc_csn1'],
   "GPIO1_31" : [GPIO1, 1<<31,         'gpmc_csn2'],
