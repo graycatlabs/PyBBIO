@@ -87,7 +87,7 @@ LOW    = 0
 # "GPIO1_4" = [   GPIO1,      1<<4,      'gpmc_ad4']  
 
 GPIO = {
-      "USR0" : [GPIO1, 1<<22,           'gpmc_a5'],
+      "USR0" : [GPIO1, 1<<21,           'gpmc_a5'],
       "USR1" : [GPIO1, 1<<22,           'gpmc_a6'],
       "USR2" : [GPIO1, 1<<23,           'gpmc_a7'],
       "USR3" : [GPIO1, 1<<24,           'gpmc_a8'],
@@ -108,11 +108,11 @@ GPIO = {
   "GPIO1_15" : [GPIO1, 1<<15,         'gpmc_ad15'],
   "GPIO1_16" : [GPIO1, 1<<16,           'gpmc_a0'],
   "GPIO1_17" : [GPIO1, 1<<17,           'gpmc_a1'],
-  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_ben1'],
+  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_be1n'],
   "GPIO1_29" : [GPIO1, 1<<29,         'gpmc_csn0'],
   "GPIO1_30" : [GPIO1, 1<<30,         'gpmc_csn1'],
   "GPIO1_31" : [GPIO1, 1<<31,         'gpmc_csn2'],
-   "GPIO2_1" : [GPIO2,     1,          'gpmc_clk'],
+   "GPIO2_1" : [GPIO2,  1<<1,          'gpmc_clk'],
    "GPIO2_6" : [GPIO2,  1<<6,         'lcd_data0'],
    "GPIO2_7" : [GPIO2,  1<<7,         'lcd_data1'],
    "GPIO2_8" : [GPIO2,  1<<8,         'lcd_data2'],
