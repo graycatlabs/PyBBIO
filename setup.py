@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # PyBBIO setup script
 
-from distutils.core import setup
 import fileinput, sys, os
 
 
@@ -45,30 +44,36 @@ if (removed_old_install):
 """
 
 # Finally we can install the package:
-
-
-#setup(name='PyBBIO',
-#      version='0.4',
-#      description='A Python library for Arduino-style hardware IO support on the Beaglebone',
-#      author='Alexander Hiam',
-#      author_email='ahiam@marlboro.edu',
-#      license='Apache 2.0',
-#      url='https://github.com/alexanderhiam/PyBBIO/wiki',
-#      packages=['bbio'])
-
-# The Beaglebone's Python can have some issues with OpenSSL, which
-# causes the standard distutils install to crash. See: 
-#  https://github.com/alexanderhiam/PyBBIO/issues/5
-# This is a quick and dirty hack to make sure it installs while I
-# find a better solution:
 print "Installing PyBBIO..."
-import shutil
-shutil.rmtree("/usr/lib/python2.7/site-packages/bbio", ignore_errors=True)
-shutil.copytree("bbio", "/usr/lib/python2.7/site-packages/bbio")
+
+if (not "-f" in sys.argv):
+
+  from distutils.core import setup
+
+  setup(name='PyBBIO',
+        version='0.4',
+        description='A Python library for Arduino-style hardware IO support on the Beaglebone',
+        author='Alexander Hiam',
+        author_email='ahiam@marlboro.edu',
+        license='Apache 2.0',
+        url='https://github.com/alexanderhiam/PyBBIO/wiki',
+        packages=['bbio'])
+
+else: 
+  # '-f' flag was given; force the install:
+  # The Beaglebone's Python can have some issues with OpenSSL, which
+  # causes the standard distutils install to crash. See: 
+  #  https://github.com/alexanderhiam/PyBBIO/issues/5
+  # This is a quick and dirty hack to make sure it installs while I
+  # find a better solution:
+  print "bypassing distutils"
+  import shutil
+  shutil.rmtree("/usr/lib/python2.7/site-packages/bbio", ignore_errors=True)
+  shutil.copytree("bbio", "/usr/lib/python2.7/site-packages/bbio")
+
 
 # Now replace the local config file to original state to keep git
 # from complaining when updating with 'git pull':
 with open(config_file, 'wb') as config:
   config.write(config_str.replace(new_config_line, old_config_line))
-
 print "Finished!"
