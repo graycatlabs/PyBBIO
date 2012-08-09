@@ -19,7 +19,7 @@ directory. This is not a requirement and can changed as desired.
 
 The first step is to install the dependencies: 
 
-    # opkg update && opkg install python-mmap python-pyserial
+    # opkg update && opkg install python-distutils python-mmap python-pyserial
 
 Then you'll need to get the code:
 
@@ -31,6 +31,10 @@ installed using the normal Python way:
 
     # cd PyBBIO
     # python setup.py install
+
+If that complains and crashes, then you can force it to install by bypassing distutils with the '-f' flag:
+
+    # python setup.py -f install
 
 PyBBIO should now be installed correctly. Run the blink example to make sure 
 all is well:
@@ -49,6 +53,8 @@ your version is up to date. Thanks to git this is a very simple process:
     # cd ~/PyBBIO
     # git pull
     # python setup.py install
+
+And like above you may need to add the '-f' flag to the install command.
 
 #License
 
