@@ -191,9 +191,9 @@ def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (state):
-    _orReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
-    return
-  _clearReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
+    _setReg(GPIO[gpio_pin][0]+GPIO_SETDATAOUT, GPIO[gpio_pin][1])
+  else:
+    _setReg(GPIO[gpio_pin][0]+GPIO_CLEARDATAOUT, GPIO[gpio_pin][1])
 
 def toggle(gpio_pin):
   """ Toggles the state of the given digital pin. """
