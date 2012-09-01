@@ -33,6 +33,7 @@ class EventLoop(SafeProcess):
         event = self.events.popleft()
         if (event.run() == EVENT_CONTINUE):
           self.events.append(event)
+        delay(0.1)
     except IndexError:
       # Queue is empty; end loop.
       pass
