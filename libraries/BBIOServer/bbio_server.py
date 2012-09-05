@@ -108,23 +108,25 @@ class BBIOHTTPServer(HTTPServer):
     print '-'*40
 
 
-class NoPrint():
-  # This acts as a file object, but it doesn't print anything.
-  def write(self, string):
-    pass
+class RequestFilter():
+  # This acts as a file object, but it doesn't print any messages
+  # from the server.
+  def write(self, err):
+    if not (('GET' in err) or ('404' in err)):
+      print err
   def flush(self):
     pass
 
 class BBIOServer():
   def __init__(self, port=8000, verbose=False, blocking=True):
+    self._server = BBIOHTTPServer(('',port), BBIORequestHandler)
+    self.blocking = blocking
     if not(verbose):
       # A log of every request to the server is written to stderr.
       # This makes for a lot of printing when using the monitors. 
-      # We can avoid this by redirecting stderr to a NoPrint() instance:
-      sys.stderr = NoPrint()
-
-    self._server = BBIOHTTPServer(('',port), BBIORequestHandler)
-    self.blocking = blocking
+      # We can avoid this by redirecting stderr to a RequestFilter() 
+      # instance:
+      sys.stderr = RequestFilter()
 
   def start(self, *pages):
     """ Takes a list of Page instances, creates html files, and starts
