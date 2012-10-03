@@ -1,4 +1,4 @@
-### PyBBIO v0.4
+### PyBBIO v0.5
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
 
@@ -27,7 +27,7 @@ Then you'll need to get the code:
     # git clone git://github.com/alexanderhiam/PyBBIO.git
 
 As of version 0.4, PyBBIO is contained in a standard Python package, so it is 
-installed using the normal Python way:
+installed the normal Python way:
 
     # cd PyBBIO
     # python setup.py install
