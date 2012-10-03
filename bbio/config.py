@@ -51,7 +51,7 @@ CONF_PULLUP       = 1<<4
 CONF_PULLDOWN     = 0x00
 CONF_PULL_DISABLE = 1<<3
 
-CONF_GPIO_MODE    = 0x07 
+CONF_GPIO_MODE   = 0x07 
 CONF_GPIO_OUTPUT = CONF_GPIO_MODE
 CONF_GPIO_INPUT  = CONF_GPIO_MODE+CONF_RX_ACTIVE
 CONF_ADC_PIN     = CONF_RX_ACTIVE+CONF_PULL_DISABLE
@@ -309,4 +309,28 @@ OCT = 'OCT'
 HEX = 'HEX'
 
 ##--- End UART config ------##
+##############################
+
+
+##############################
+##--- Start PWM config: ----##
+
+# EHRPWM pinmux config dict in form:
+#  [mux_file, mux_mode]
+
+EHRPWM = {
+  'PWMA1' : [ 'gpmc_a2', 0x06],
+  'PWMA2' : [ 'gpmc_a3', 0x06],
+  'PWMB1' : ['gpmc_ad8', 0x04],
+  'PWMB2' : ['gpmc_ad9', 0x04]
+}
+
+PWMA1 = 'PWMA1'
+PWMA2 = 'PWMA2'
+PWMB1 = 'PWMB1'
+PWMB2 = 'PWMB2'
+
+
+
+##--- End PWM config: ------##
 ##############################

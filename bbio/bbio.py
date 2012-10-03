@@ -108,6 +108,9 @@ def _analog_init():
   # Now we can enable ADC subsystem, leaving write protect off:
   _orReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
+def _pwm_config():
+  """ Enable EHRPWM module clock. """
+  pass
 
 def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
@@ -237,6 +240,10 @@ def inVolts(adc_value, bits=12, vRef=1.8):
   """ Converts and returns the given ADC value to a voltage according
       to the given number of bits and reference voltage. """
   return adc_value*(vRef/2**bits)
+
+def analogWrite(pwm_pin, value):
+  """  """
+  pass
 
 def _pinMux(fn, mode):
   """ Uses kernel omap_mux files to set pin modes. """
