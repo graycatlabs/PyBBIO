@@ -1,12 +1,13 @@
-### PyBBIO v0.4
+### PyBBIO v0.5
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
 
 PyBBIO is a Python library for Arduino-style hardware IO support on the TI 
-Beaglebone. It currently supports supports basic digital IO through 
-digitalRead() and digitalWrite() functions, as well as ADC support through 
-analogRead() and an Arduino-style UART interface. PWM, SPI and I2C are on 
-the way, so keep checking the Github page for updates.  
+Beaglebone. It currently supports basic digital IO through digitalRead() 
+and digitalWrite() functions, ADC support through analogRead(), PWM support 
+analogWrite() as well as a few utility functions for changing PWM frequency
+etc., and an Arduino-style UART interface. SPI and I2C are on the way, so 
+keep checking the Github page for updates.  
 #### Documentation at http://github.com/alexanderhiam/PyBBIO/wiki
 
 #Installing
@@ -27,7 +28,7 @@ Then you'll need to get the code:
     # git clone git://github.com/alexanderhiam/PyBBIO.git
 
 As of version 0.4, PyBBIO is contained in a standard Python package, so it is 
-installed using the normal Python way:
+installed the normal Python way:
 
     # cd PyBBIO
     # python setup.py install
