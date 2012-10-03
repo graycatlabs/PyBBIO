@@ -59,7 +59,7 @@ with open(MEM_FILE, "r+b") as f:
 def run(setup, main):
   """ The main loop; must be passed a setup and a main function.
       First the setup function will be called once, then the main
-      function wil be continuously until a stop signal is raised, 
+      function wil be continuously until a stop signal is raised, L", 
       e.g. CTRL-C or a call to the stop() function from within the
       main function. """
   global START_TIME_MS
@@ -84,6 +84,7 @@ def stop():
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
   _analog_init()
+  _pwm_init()
 
 def _analog_init():
   """ Initializes the on-board 8ch 12bit ADC. """
@@ -91,7 +92,7 @@ def _analog_init():
   # newer Angstrom images:
   _setReg(CM_WKUP_ADC_TSC_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
-  while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): time.sleep(0.1)
+  while (_getReg(CM_WKUP_ADC_TSC_CLKCTRL) & IDLEST_MASK): delay(1)
 
   # Software reset:
   _setReg(ADC_SYSCONFIG, ADC_SOFTRESET)
@@ -108,9 +109,14 @@ def _analog_init():
   # Now we can enable ADC subsystem, leaving write protect off:
   _orReg(ADC_CTRL, TSC_ADC_SS_ENABLE)
 
-def _pwm_config():
-  """ Enable EHRPWM module clock. """
-  pass
+def _pwm_init():
+  # Enable EHRPWM module clocks:
+  _setReg(CM_PER_EPWMSS1_CLKCTRL, MODULEMODE_ENABLE)
+  # Wait for enable complete:
+  while (_getReg(CM_PER_EPWMSS1_CLKCTRL) & IDLEST_MASK): delay(1)
+  _setReg(CM_PER_EPWMSS2_CLKCTRL, MODULEMODE_ENABLE)
+  # Wait for enable complete:
+  while (_getReg(CM_PER_EPWMSS2_CLKCTRL) & IDLEST_MASK): delay(1)
 
 def bbio_cleanup():
   """ Post-run cleanup, i.e. stopping module clocks, etc. """
@@ -126,6 +132,7 @@ def bbio_cleanup():
   # System cleanup:
   _analog_cleanup()
   _serial_cleanup()
+  _pwm_cleanup()
   __mmap.close()
 
 def _analog_cleanup():
@@ -146,6 +153,14 @@ def _serial_cleanup():
   """ Ensures that all serial ports opened by current process are closed. """
   for port in (Serial1, Serial2, Serial4, Serial5):
     port.end()
+
+def _pwm_cleanup():
+  # Disable all PWM outputs:
+  for i in PWM_PINS.keys():
+    pwmDisable(i)
+  # Could disable EHRPWM module clocks here to save some power when
+  # PyBBIO isn't running, but I'm not really worried about it for the 
+  # time being.  
 
 def addToCleanup(routine):
   """ Takes a callable object to be called during the cleanup once a 
@@ -241,9 +256,90 @@ def inVolts(adc_value, bits=12, vRef=1.8):
       to the given number of bits and reference voltage. """
   return adc_value*(vRef/2**bits)
 
-def analogWrite(pwm_pin, value):
-  """  """
-  pass
+def analogWrite(pwm_pin, value, resolution=RES_8BIT):
+  """ Sets the duty cycle of the given PWM output using the
+      given resolution. Must be  """
+  try:
+    pwmEnable(pwm_pin)
+    assert resolution > 0, "*PWM resolution must be greater than 0"
+    if (value < 0): value = 0
+    if (value >= resolution): value = resolution-1
+    freq = int(kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ]))
+    period_ns = (1e9/freq)
+    # Todo: round values properly!: 
+    duty_ns = int(value * (period_ns/resolution))
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(duty_ns))
+    # Enable output:
+    if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '0\n'):
+      kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '1') 
+  except IOError:
+    print "*PWM pin '%s' reserved by another process!" % pwm_pin
+
+# For those who don't like calling a digital signal analog:
+pwmWrite = analogWrite
+
+def pwmFrequency(pwm_pin, freq_hz):
+  """ Sets the frequncy in Hertz of the given PWM output's module. """
+  assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
+  assert freq_hz > 0, "*PWM frequency must be greater than 0"
+  
+  # calculate the duty cycle in nanoseconds for the new period:
+  old_duty_ns = int(kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY]))
+  old_period_ns = 1e9/int(kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ]))
+  duty_percent = old_duty_ns / old_period_ns
+  new_period_ns = 1e9/freq_hz
+  # Todo: round values properly!:
+  new_duty_ns = int(duty_percent * new_period_ns)
+
+  try: 
+    # Duty cyle must be set to 0 before changing frequency:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
+    # Set new frequency:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(freq_hz))
+    # Set the duty cycle:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(new_duty_ns))
+  except IOError:
+    print "*PWM pin '%s' reserved by another process!" % pwm_pin
+  
+def pwmEnable(pwm_pin):
+  """ Ensures given PWM output is reserved for userspace use and 
+      sets proper pinmux. Sets frequency to default value if output
+      not already reserved. """
+  assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
+  # Set pinmux mode:
+  _pinMux(PWM_PINS[pwm_pin][0], PWM_PINS[pwm_pin][1])
+  if ('sysfs' not in kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
+    # Reserve use of output:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '1')
+    delay(1) # Give it some time to take effect
+    # Make sure output is disabled, so it won't start outputing a 
+    # signal until analogWrite() is called: 
+    if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
+      kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
+    # Set frequency to default:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(PWM_DEFAULT_FREQ))
+
+def pwmDisable(pwm_pin):
+  """ Disables PWM output on given pin. """
+  assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
+  # Disable PWM output:
+  if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
+  # Relinquish userspace control:
+  if ('sysfs' in kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '0')
+
+def kernelFileIO(file_object, val=None):
+  """ For reading/writing files open in 'r+' mode. When called just
+      with a file object, will return contents of file. When called 
+      with file object and 'val', the file will be overritten with 
+      new value and the changes flushed. 'val' must be type str.
+      Meant to be used with Kernel driver files for much more 
+      efficient IO (no need to reopen every time). """  
+  file_object.seek(0)
+  if (val == None): return file_object.read()
+  file_object.write(val)
+  file_object.flush()
 
 def _pinMux(fn, mode):
   """ Uses kernel omap_mux files to set pin modes. """
