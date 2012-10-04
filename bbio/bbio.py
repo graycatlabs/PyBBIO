@@ -258,7 +258,7 @@ def inVolts(adc_value, bits=12, vRef=1.8):
 
 def analogWrite(pwm_pin, value, resolution=RES_8BIT):
   """ Sets the duty cycle of the given PWM output using the
-      given resolution. Must be  """
+      given resolution. """
   try:
     pwmEnable(pwm_pin)
     assert resolution > 0, "*PWM resolution must be greater than 0"
