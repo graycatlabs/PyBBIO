@@ -259,8 +259,9 @@ def inVolts(adc_value, bits=12, vRef=1.8):
 def analogWrite(pwm_pin, value, resolution=RES_8BIT):
   """ Sets the duty cycle of the given PWM output using the
       given resolution. """
+  # Make sure the pin is configured:
+  pwmEnable(pwm_pin)
   try:
-    pwmEnable(pwm_pin)
     assert resolution > 0, "*PWM resolution must be greater than 0"
     if (value < 0): value = 0
     if (value >= resolution): value = resolution-1
@@ -282,7 +283,8 @@ def pwmFrequency(pwm_pin, freq_hz):
   """ Sets the frequncy in Hertz of the given PWM output's module. """
   assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
   assert freq_hz > 0, "*PWM frequency must be greater than 0"
-  
+  # Make sure the pin is configured:
+  pwmEnable(pwm_pin)
   # calculate the duty cycle in nanoseconds for the new period:
   old_duty_ns = int(kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY]))
   old_period_ns = 1e9/int(kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ]))
@@ -316,6 +318,8 @@ def pwmEnable(pwm_pin):
     # signal until analogWrite() is called: 
     if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
       kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
+    # Duty cyle must be set to 0 before changing frequency:
+    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
     # Set frequency to default:
     kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(PWM_DEFAULT_FREQ))
 
