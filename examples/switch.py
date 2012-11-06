@@ -4,7 +4,7 @@
 # Demonstrates the use of global variables in Python.
 # 
 # The circuit:
-#  - Momentary switch between 3.3v GPIO1_15
+#  - Momentary switch between 3.3v and GPIO1_15
 #  - 10k ohm resistor from GPIO1_15 to ground
 #  - Green LED from GPIO1_17 through 330 ohm resistor to ground
 #  - Red LED from GPIO3_21 through 330 ohm resistor to ground

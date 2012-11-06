@@ -8,7 +8,7 @@
 #   will be near 1.8v (confirm with a voltmeter if available).
 #
 #  -Connect two potentiometers so that each has one of its outer 
-#   pins connected to GND and the other two the 1.8v of the 
+#   pins connected to GND and the other to the 1.8v of the 
 #   voltage divider. Connect the center pin of one to AIN0 (pin 
 #   39 on P9) and the other to AIN2 (pin 37 on P9). 
 #

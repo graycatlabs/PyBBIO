@@ -351,7 +351,7 @@ RES_8BIT  = 2**8
 PERCENT   = 100
 
 # Default frequency in Hz of PWM modules (must be >0):
-PWM_DEFAULT_FREQ = 10000
+PWM_DEFAULT_FREQ = 100000
 
 ##--- End PWM config: ------##
 ##############################
