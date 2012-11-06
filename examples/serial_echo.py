@@ -28,7 +28,7 @@ def loop():
     # Print what was sent:
     print "Data received:\n  '%s'" % data
     # And write it back to the serial port:
-    Serial2.println(data) 
+    Serial2.write(data)
   # And a little delay to keep the Beaglebone happy:
   delay(200)
 

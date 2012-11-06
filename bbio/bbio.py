@@ -408,11 +408,11 @@ class _UART_PORT(object):
     """ Starts the serial port at the given baud rate. """
     # Set proper pinmux to match expansion headers:
     tx_pinmux_filename = UART[self.config][1]
-    tx_pinmux_mode     = UART[self.config][2]+CONF_UART_TX
+    tx_pinmux_mode     = UART[self.config][2] | CONF_UART_TX
     _pinMux(tx_pinmux_filename, tx_pinmux_mode)
 
     rx_pinmux_filename = UART[self.config][3]
-    rx_pinmux_mode     = UART[self.config][4]+CONF_UART_RX
+    rx_pinmux_mode     = UART[self.config][4] | CONF_UART_RX
     _pinMux(rx_pinmux_filename, rx_pinmux_mode)    
 
     port = UART[self.config][0]
@@ -489,12 +489,12 @@ class _UART_PORT(object):
         bytes_written += self.write(i)  
       return bytes_written
 
-    else:
+    elif (type(data) != str):
       # Type not supported by write, e.g. dict; use prints().
       return 0
 
     written = self.ser_port.write(data)
-    # Serial.serial.write() returns None if no bits written, we want 0:
+    # Serial.write() returns None if no bits written, we want 0:
     return written if written else 0
 
   def _process(self, data, base):
