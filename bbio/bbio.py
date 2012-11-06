@@ -56,33 +56,10 @@ with open(MEM_FILE, "r+b") as f:
   __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
 
-def run(setup, main):
-  """ The main loop; must be passed a setup and a main function.
-      First the setup function will be called once, then the main
-      function wil be continuously until a stop signal is raised, L", 
-      e.g. CTRL-C or a call to the stop() function from within the
-      main function. """
-  global START_TIME_MS
-  START_TIME_MS = time.time()*1000
-  try:
-    bbio_init()
-    setup()
-    while (True):
-      main()
-  except KeyboardInterrupt:
-    # Manual exit signal, clean up and exit happy
-    bbio_cleanup()
-  except Exception, e:
-    # Something may have gone wrong, clean up and print exception
-    bbio_cleanup()
-    print e
-      
-def stop():
-  """ Preffered way for a program to stop itself. """
-  raise KeyboardInterrupt # Expected happy stop condition in run()
-
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
+  global START_TIME_MS
+  START_TIME_MS = time.time()*1000
   _analog_init()
   _pwm_init()
 
@@ -531,3 +508,46 @@ Serial1 = _UART_PORT('UART1')
 Serial2 = _UART_PORT('UART2')
 Serial4 = _UART_PORT('UART4')
 Serial5 = _UART_PORT('UART5')
+
+
+
+# The following code detects if Python is running interactively,
+# and if so initializes PyBBIO on import and registers PyBBIO's
+# cleanup to be called at exit, otherwise it defines the run() and
+# stop() methods for the file based control flow:
+import __main__
+if not hasattr(__main__, '__file__'):
+  # We're in the interpreter, see: 
+  #  http://stackoverflow.com/questions/2356399/tell-if-python-is-in-interactive-mode
+  bbio_init()
+  print "PyBBIO initialized"
+  import atexit
+  def interactive_cleanup():
+    bbio_cleanup()
+    print "Finished PyBBIO cleanup"
+  atexit.register(interactive_cleanup)
+
+else:
+  # Imported in a Python file, define run() and stop():
+  def run(setup, main):
+    """ The main loop; must be passed a setup and a main function.
+        First the setup function will be called once, then the main
+        function wil be continuously until a stop signal is raised, L", 
+        e.g. CTRL-C or a call to the stop() function from within the
+        main function. """
+    try:
+      bbio_init()
+      setup()
+      while (True):
+        main()
+    except KeyboardInterrupt:
+      # Manual exit signal, clean up and exit happy
+      bbio_cleanup()
+    except Exception, e:
+      # Something may have gone wrong, clean up and print exception
+      bbio_cleanup()
+      print e
+      
+  def stop():
+    """ Preffered way for a program to stop itself. """
+    raise KeyboardInterrupt # Expected happy stop condition in run()
