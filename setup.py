@@ -80,6 +80,14 @@ try:
         license='Apache 2.0',
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
         packages=['bbio'])
+
+  # Older Angstrom images only included support for one of the PWM modules
+  # broken out on the headers, check and warn if no support for PWM2 module:
+  if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
+    print "Warning: you seem to have an BeagleBone image which only has drivers\n"+\
+          "For the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
+          "You should consider updating Angstrom!"
+
   print "Finished installing, enjoy!"
 except Exception, e:
   print "Install failed with exception:\n%s" % e

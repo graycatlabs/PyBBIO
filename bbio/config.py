@@ -323,14 +323,18 @@ PWM_CTRL_DIR     = "/sys/class/pwm/"
 PWM_PINS = {
   'PWM1A' : [ 'gpmc_a2', 0x06, 'ehrpwm.1:0/'],
   'PWM1B' : [ 'gpmc_a3', 0x06, 'ehrpwm.1:1/'],
-  'PWM2A' : ['gpmc_ad8', 0x04, 'ehrpwm.2:0/'],
-  'PWM2B' : ['gpmc_ad9', 0x04, 'ehrpwm.2:1/']
 }
-
 PWM1A = 'PWM1A'
 PWM1B = 'PWM1B'
-PWM2A = 'PWM2A'
-PWM2B = 'PWM2B'
+
+
+import os
+if os.path.exists(PWM_CTRL_DIR+'ehrpwm.2:0/'):
+  PWM_PINS['PWM2A'] = ['gpmc_ad8', 0x04, 'ehrpwm.2:0/']
+  PWM_PINS['PWM2B'] = ['gpmc_ad9', 0x04, 'ehrpwm.2:1/']
+  PWM2A = 'PWM2A'
+  PWM2B = 'PWM2B'
+
 
 PWM_FILES = dict(\
   (i, [open(PWM_CTRL_DIR+PWM_PINS[i][2]+'request', 'r+'),
