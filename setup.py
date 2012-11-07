@@ -33,6 +33,28 @@ if (removed_old_install):
 """
 
 
+# Some Angstrom images are missing the py_compile module; get it if not
+# present:
+import random
+python_lib_path = random.__file__.split('random')[0]
+if not os.path.exists(python_lib_path + 'py_compile.py'):
+  print "py_compile module missing; installing to %spy_compile.py" %\
+                                                          python_lib_path
+  import urllib2
+  url = "http://hg.python.org/cpython/raw-file/4ebe1ede981e/Lib/py_compile.py"
+  py_compile = urllib2.urlopen(url)
+  with open(python_lib_path+'py_compile.py', 'w') as f:
+    f.write(py_compile.read())
+  print "testing py_compile..."
+  try:
+    import py_compile
+    print "py_compile installed successfully"
+  except Exception, e:
+    print "*py_compile install failed, could not import"
+    print "*Exception raised:"
+    raise e
+
+
 # A bit of a hack here; replace line in config file to point to
 # the libraries directory:
 lib_path = os.path.join(os.getcwd(), 'libraries')
@@ -47,8 +69,7 @@ with open(config_file, 'wb') as config:
 # Finally we can install the package:
 print "Installing PyBBIO..."
 
-if (not "-f" in sys.argv):
-
+try:
   from distutils.core import setup
 
   setup(name='PyBBIO',
@@ -59,22 +80,12 @@ if (not "-f" in sys.argv):
         license='Apache 2.0',
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
         packages=['bbio'])
-
-else: 
-  # '-f' flag was given; force the install:
-  # The Beaglebone's Python can have some issues with OpenSSL, which
-  # causes the standard distutils install to crash. See: 
-  #  https://github.com/alexanderhiam/PyBBIO/issues/5
-  # This is a quick and dirty hack to make sure it installs while I
-  # find a better solution:
-  print "bypassing distutils"
-  import shutil
-  shutil.rmtree("/usr/lib/python2.7/site-packages/bbio", ignore_errors=True)
-  shutil.copytree("bbio", "/usr/lib/python2.7/site-packages/bbio")
-
+  print "Finished installing, enjoy!"
+except Exception, e:
+  print "Install failed with exception:\n%s" % e
 
 # Now replace the local config file to original state to keep git
 # from complaining when updating with 'git pull':
 with open(config_file, 'wb') as config:
   config.write(config_str.replace(new_config_line, old_config_line))
-print "Finished!"
+
