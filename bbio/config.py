@@ -75,10 +75,15 @@ GPIO_DATAOUT      = 0x13c
 GPIO_CLEARDATAOUT = 0x190
 GPIO_SETDATAOUT   = 0x194
 
-INPUT  = 1
-OUTPUT = 0
-HIGH   = 1
-LOW    = 0
+# Digital IO keywords:
+INPUT    =  1
+OUTPUT   =  0
+HIGH     =  1
+LOW      =  0
+RISING   =  1
+FALLING  = -1
+MSBFIRST =  1
+LSBFIRST = -1
 
 ## GPIO pins:
 

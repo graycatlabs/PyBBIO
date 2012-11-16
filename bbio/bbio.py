@@ -26,7 +26,7 @@
  limitations under the License.
 """
 
-import sys
+import sys, math
 
 try:
   from mmap import mmap
@@ -196,7 +196,7 @@ def toggle(gpio_pin):
   _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
 def digitalRead(gpio_pin):
-  """ Returns pin state as 1 or 0. """
+  """ Returns input pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
     return 1
@@ -211,6 +211,51 @@ def pinState(gpio_pin):
   if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT) & GPIO[gpio_pin][1]):
     return HIGH
   return LOW
+
+def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
+  """ Implements software SPI on the given pins to shift out data.
+      data can be list, string, or integer, and will be shifted out
+      in single bytes withthe same endianness as the bits. """
+  assert (type(data) != dict), "*shiftOut() does not support dictionaries" 
+
+  if ((type(data) != int) and ((len(data) > 1) or (type(data) == list))):
+    # Test for type list here to handle lists of length 1
+    for i in data if (bit_order == MSBFIRST) else data[::-1]:
+      # Loop through forward if MSB first, otherwise in reverse
+      shiftOut(data_pin, clk_pin, bit_order, i, edge)
+  else: 
+    if (type(data) == str): 
+      # Data is a single character here, get ascii value:
+      data = ord(data)
+      n_bytes = 1
+    else:
+      # Value is a number, calculate number of bytes:
+      n_bytes = int(math.ceil(data.bit_length()/8.0))
+    
+    # Ensure clock is in idle state:
+    digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
+
+    if (bit_order == MSBFIRST):
+      byte_start = (n_bytes-1)
+      byte_end = -1
+      bit_start = 7
+      bit_end = -1
+      inc = -1
+    else: 
+      byte_start = 0
+      byte_end = n_bytes
+      bit_start = 0
+      bit_end = 8
+      inc = 1
+
+    # Shift out the data:
+    for i in range(byte_start, byte_end, inc):
+      byte = data >> (8*i)
+      for j in range(bit_start, bit_end, inc):
+        digitalWrite(data_pin, (byte>>j) & 0x01)
+        digitalWrite(clk_pin, LOW if (edge==FALLING) else HIGH)
+        digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
+
 
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
