@@ -9,9 +9,6 @@ from bbio import *
 
 class ADS786x(object):
   """ Base class for all each of ADS786x series classes. """
-  data = 0 # indexes in ADS786x.pins
-  clk  = 1
-  cs = 2
   def __init__(self, data_pin, clk_pin, cs_pin, vref=3.3):
     self._data = data_pin
     self._clk = clk_pin
