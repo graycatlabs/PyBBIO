@@ -1,5 +1,5 @@
 """
- ADS786x.py 
+ ADS786x_test.py 
  Alexander Hiam - 12/2012
  
  Example program for PyBBIO's ADS786x library.
