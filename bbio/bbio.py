@@ -599,7 +599,7 @@ else:
     except Exception, e:
       # Something may have gone wrong, clean up and print exception
       bbio_cleanup()
-      print e
+      raise e
       
   def stop():
     """ Preffered way for a program to stop itself. """
