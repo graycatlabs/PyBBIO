@@ -212,6 +212,21 @@ def pinState(gpio_pin):
     return HIGH
   return LOW
 
+def shiftIn(data_pin, clk_pin, bit_order, n_bits=8, edge=FALLING):
+  """ Implements software SPI on the given pins to receive given  number
+      of bits from a slave device. edge is the edge which triggers the
+      device to write data. """
+  # Ensure clock is in idle state:
+  digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
+  if (bit_order == MSBFIRST): loop_range = (n_bits-1, -1, -1)
+  else: loop_range = (n_bits,) 
+  data = 0
+  for i in range(*loop_range):    
+    digitalWrite(clk_pin, LOW if (edge==FALLING) else HIGH)
+    digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
+    data |= digitalRead(data_pin) << i
+  return data
+
 def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
   """ Implements software SPI on the given pins to shift out data.
       data can be list, string, or integer, and if more than one byte
@@ -240,23 +255,12 @@ def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
     # Ensure clock is in idle state:
     digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
 
-    if (bit_order == MSBFIRST):
-      byte_start = (n_bytes-1)
-      byte_end = -1
-      bit_start = 7
-      bit_end = -1
-      inc = -1
-    else: 
-      byte_start = 0
-      byte_end = n_bytes
-      bit_start = 0
-      bit_end = 8
-      inc = 1
-
+    byte_range = (n_bytes-1, -1, -1) if (bit_order == MSBFIRST) else (n_bytes,)
+    bit_range = (7, -1, -1)if (bit_order == MSBFIRST) else (8,)
     # Shift out the data:
-    for i in range(byte_start, byte_end, inc):
+    for i in range(*byte_range):
       byte = data >> (8*i)
-      for j in range(bit_start, bit_end, inc):
+      for j in range(*bit_range):
         digitalWrite(data_pin, (byte>>j) & 0x01)
         digitalWrite(clk_pin, LOW if (edge==FALLING) else HIGH)
         digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
