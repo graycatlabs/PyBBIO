@@ -214,8 +214,9 @@ def pinState(gpio_pin):
 
 def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
   """ Implements software SPI on the given pins to shift out data.
-      data can be list, string, or integer, and will be shifted out
-      in single bytes withthe same endianness as the bits. """
+      data can be list, string, or integer, and if more than one byte
+      each byte will be shifted out with the same endianness as the 
+      bits. """
   assert (type(data) != dict), "*shiftOut() does not support dictionaries" 
 
   if ((type(data) != int) and ((len(data) > 1) or (type(data) == list))):
@@ -230,8 +231,12 @@ def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
       n_bytes = 1
     else:
       # Value is a number, calculate number of bytes:
-      n_bytes = int(math.ceil(data.bit_length()/8.0))
-    
+      if (data == 0):
+        # int.bit_length(0) returns 0:
+        n_bytes = 1
+      else: 
+        n_bytes = int(math.ceil(data.bit_length()/8.0))
+
     # Ensure clock is in idle state:
     digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
 
@@ -255,7 +260,6 @@ def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
         digitalWrite(data_pin, (byte>>j) & 0x01)
         digitalWrite(clk_pin, LOW if (edge==FALLING) else HIGH)
         digitalWrite(clk_pin, HIGH if (edge==FALLING) else LOW)
-
 
 def analogRead(analog_pin):
   """ Returns analog value read on given analog input pin. """
