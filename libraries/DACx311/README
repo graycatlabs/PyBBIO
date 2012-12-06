@@ -1,0 +1,16 @@
+DACx311 - v0.1
+
+Copyright 2012 Alexander Hiam
+ahiam@marlboro.edu
+
+DACx311 is a library for PyBBIO to interface with TI's DACx311 series
+digital-to-analog converters (DAC5311-8bit, DAC6311-10bit, DAC7311-12bit,
+DAC8311-14bit).
+
+See documentation here:
+ https://github.com/alexanderhiam/PyBBIO/wiki/DACx311
+As well as the included example program:
+ PyBBIO/examples/DACx311_test.py
+
+DACx311 is released as part of PyBBIO under its Apache 2.0 license.
+See PyBBIO/LICENSE.txt
