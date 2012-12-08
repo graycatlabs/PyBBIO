@@ -8,25 +8,18 @@
 from bbio import *
 
 class Servo(object):
-  DEFAULT_FREQ = 50     # PWM frequency
-  DEFAULT_MIN_MS = 0.5  # High pulse in ms for 0 degree 
-  DEFAULT_MAX_MS = 2.4  # High pulse in ms for 180 degree 
-
-  def __init__(self, pwm_pin=None, pwm_freq=None, min_ms=None, max_ms=None):
-    if (pwm_freq and (pwm_freq > 0)): self.pwm_freq = pwm_freq
-    else: self.pwm_freq = self.DEFAULT_FREQ
-
-    if (min_ms and (min_ms > 0) and (min_ms <= self.period_ms)): 
-      self.min_ms = min_ms
-    else: self.min_ms = self.DEFAULT_MIN_MS
-
-    if (max_ms and (max_ms > 0) and (man_ms <= self.period_ms)): 
-      self.max_ms = max_ms
-    else: self.max_ms = self.DEFAULT_MAX_MS
-    
+  def __init__(self, pwm_pin=None, pwm_freq=50, min_ms=0.5, max_ms=2.4):
+    assert (pwm_freq > 0), "pwm_freq must be positive, given: %s" %\
+                          str(pwm_freq)    
+    assert (min_ms > 0), "0 min_ms must be positive, given: %s" %\
+                          str(min_ms)
+    assert (mins_ms > 0), "max_ms must be positive, given: %s" %\
+                          str(max_ms)
+    self.pwm_freq = pwm_freq
+    self.min_ms = min_ms
+    self.max_ms = max_ms
     self.pwm_pin = None
     if (pwm_pin): self.attach(pwm_pin)
-
     self.angle = None
 
   def attach(self, pwm_pin):
