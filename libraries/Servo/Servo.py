@@ -13,7 +13,7 @@ class Servo(object):
                           str(pwm_freq)    
     assert (min_ms > 0), "0 min_ms must be positive, given: %s" %\
                           str(min_ms)
-    assert (mins_ms > 0), "max_ms must be positive, given: %s" %\
+    assert (max_ms > 0), "max_ms must be positive, given: %s" %\
                           str(max_ms)
     self.pwm_freq = pwm_freq
     self.min_ms = min_ms
