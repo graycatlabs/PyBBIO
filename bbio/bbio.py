@@ -233,6 +233,7 @@ def shiftOut(data_pin, clk_pin, bit_order, data, edge=FALLING):
       each byte will be shifted out with the same endianness as the 
       bits. """
   assert (type(data) != dict), "*shiftOut() does not support dictionaries" 
+  assert (type(data) != float), "*shiftOut() does not support floats" 
 
   if ((type(data) != int) and ((len(data) > 1) or (type(data) == list))):
     # Test for type list here to handle lists of length 1
