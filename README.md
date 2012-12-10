@@ -12,8 +12,8 @@ keep checking the Github page for updates.
 
 #Installing
 
-Installation is quite simple. It is assumed that your Beaglebone is already 
-set up and configured on your network, and that you have already SSHed onto it. 
+It is assumed that your Beaglebone is already set up and configured on your network, 
+and that you have already SSHed onto it. 
 
 Note that these instructions assume you want PyBBIO/ to live in your home 
 directory. This is not a requirement and can changed as desired. 
@@ -33,10 +33,6 @@ installed the normal Python way:
     # cd PyBBIO
     # python setup.py install
 
-If that complains and crashes, then you can force it to install by bypassing distutils with the '-f' flag:
-
-    # python setup.py -f install
-
 PyBBIO should now be installed correctly. Run the blink example to make sure 
 all is well:
 
@@ -55,7 +51,6 @@ your version is up to date. Thanks to git this is a very simple process:
     # git pull
     # python setup.py install
 
-And like above you may need to add the '-f' flag to the install command.
 
 #License
 
