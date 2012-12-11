@@ -583,22 +583,22 @@ if not hasattr(__main__, '__file__'):
 
 else:
   # Imported in a Python file, define run() and stop():
-  def run(setup, main):
-    """ The main loop; must be passed a setup and a main function.
-        First the setup function will be called once, then the main
-        function wil be continuously until a stop signal is raised, L", 
-        e.g. CTRL-C or a call to the stop() function from within the
-        main function. """
+  def run(setup, loop):
+    """ The main loop; must be passed a setup and a loop function.
+        First the setup function will be called once, then the loop
+        function wil be called continuously until a stop signal is 
+        raised, e.g. CTRL-C or a call to the stop() function from 
+        within the loop. """
     try:
       bbio_init()
       setup()
       while (True):
-        main()
+        loop()
     except KeyboardInterrupt:
       # Manual exit signal, clean up and exit happy
       bbio_cleanup()
     except Exception, e:
-      # Something may have gone wrong, clean up and print exception
+      # Something may have gone wrong, clean up and re-raise exception
       bbio_cleanup()
       raise e
       
