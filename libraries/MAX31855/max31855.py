@@ -1,5 +1,5 @@
 """
- MAX31855 - v0.1
+ MAX31855 - v0.2
  Copyright 2012 Alexander Hiam
  A library for PyBBIO to interface with Maxim's MAX31855 
  thermocouple amplifier.
@@ -9,10 +9,11 @@ from bbio import *
 
 
 class MAX31855(object):
-  def __init__(self, data_pin, clk_pin, cs_pin):
+  def __init__(self, data_pin, clk_pin, cs_pin, offset=0):
     self._data = data_pin
     self._clk = clk_pin
     self._cs = cs_pin
+    self.offset = offset
     pinMode(self._data, INPUT)
     for i in (self._cs, self._clk): pinMode(i, OUTPUT)
     self.error = None
@@ -35,7 +36,7 @@ class MAX31855(object):
     temp = (value >> 18) & 0x3fff
     sign = temp & (1<<14)
     if sign: temp = -(~temp+1 & 0x1fff)
-    return temp*0.25
+    return temp*0.25 + self.offset
     
   def readTempInternal(self):
     """ Reads and returns the MAX31855 reference junction temperature 
