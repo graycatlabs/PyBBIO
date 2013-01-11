@@ -109,7 +109,7 @@ GPIO = {
   "GPIO0_13" : [GPIO0, 1<<13,        'uart1_rtsn'],
   "GPIO0_14" : [GPIO0, 1<<14,         'uart1_rxd'],
   "GPIO0_15" : [GPIO0, 1<<15,         'uart1_txd'],
-  "GPIO0_20" : [CPIO0, 1<<20,  'xdma_event_intr1'],
+  "GPIO0_20" : [GPIO0, 1<<20,  'xdma_event_intr1'],
   "GPIO0_22" : [GPIO0, 1<<22,          'gpmc_ad8'],
   "GPIO0_23" : [GPIO0, 1<<23,          'gpmc_ad9'],
   "GPIO0_26" : [GPIO0, 1<<26,         'gpmc_ad10'],
