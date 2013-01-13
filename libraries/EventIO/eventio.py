@@ -1,5 +1,5 @@
 """
- EventIO - v0.1
+ EventIO - v0.2
  Copyright 2012 - Alexander Hiam <ahiam@marlboro.edu>
  Apache 2.0 license
 
@@ -101,8 +101,8 @@ class TimedEvent(Event):
 # digital pin to the trigger state and calls the event function if they're the 
 # same. Sets the pin to an input when created.
 class DigitalTrigger(DebouncedEvent):
-  def __init__(self, digital_pin, trigger_state, event, debounce_ms):
-    pinMode(digital_pin, INPUT)
+  def __init__(self, digital_pin, trigger_state, event, debounce_ms, pull=0):
+    pinMode(digital_pin, INPUT, pull)
     trigger = lambda: digitalRead(digital_pin) == trigger_state
     super(DigitalTrigger, self).__init__(trigger, event, debounce_ms)
 
