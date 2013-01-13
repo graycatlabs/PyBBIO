@@ -168,6 +168,8 @@ def pinMode(gpio_pin, direction, pull=0):
       'pull' will set the pull up/down resistor if setting as an input:
       pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
+  if _export(gpio_pin):
+    addToCleanup(lambda: _unexport(gpio_pin))
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
@@ -387,6 +389,30 @@ def _pinMux(fn, mode):
       f.write(hex(mode)[2:]) # Write hex string (stripping off '0x')
   except IOError:
     print "*omap_mux file not found: '%s'" % (PINMUX_PATH+fn)
+
+def _export(gpio_pin):
+  """ Reserves a pin for userspace use with sysfs /sys/class/gpio interface. 
+      Returns True if pin was exported, False if it was already under 
+      userspace control. """
+  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+    # Pin already under userspace control
+    return False
+  with open(EXPORT_FILE, 'wb') as f:
+    f.write(str(gpio_num))
+  return True
+
+def _unexport(gpio_pin):
+  """ Returns a pin to the kernel with sysfs /sys/class/gpio interface.
+      Returns True if pin was unexported, False if it was already under 
+      kernel control. """
+  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+    # Pin not under userspace control
+    return False
+  with open(UNEXPORT_FILE, 'wb') as f:
+    f.write(str(gpio_num))
+  return True
 
 def _andReg(address, mask, length=32):
   """ Sets 16 or 32 bit Register at address to its current value AND mask. """
