@@ -96,6 +96,10 @@ LSBFIRST = -1
 # "GPIO1_4" = [   GPIO1,      1<<4,      'gpmc_ad4']  
 
 GPIO = {
+      "USR0" : [GPIO1, 1<<21,           'gpmc_a5'],
+      "USR1" : [GPIO1, 1<<22,           'gpmc_a6'],
+      "USR2" : [GPIO1, 1<<23,           'gpmc_a7'],
+      "USR3" : [GPIO1, 1<<24,           'gpmc_a8'],
    "GPIO0_2" : [GPIO0,  1<<2,         'spi0_sclk'],
    "GPIO0_3" : [GPIO0,  1<<3,           'spi0_d0'],
    "GPIO0_4" : [GPIO0,  1<<4,           'spi0_d1'],
@@ -132,10 +136,6 @@ GPIO = {
   "GPIO1_17" : [GPIO1, 1<<17,           'gpmc_a1'],
   "GPIO1_18" : [GPIO1, 1<<18,           'gpmc_a2'],
   "GPIO1_19" : [GPIO1, 1<<19,           'gpmc_a3'],
-  "GPIO1_21" : [GPIO1, 1<<21,           'gpmc_a5'],
-  "GPIO1_22" : [GPIO1, 1<<22,           'gpmc_a6'],
-  "GPIO1_23" : [GPIO1, 1<<23,           'gpmc_a7'],
-  "GPIO1_24" : [GPIO1, 1<<24,           'gpmc_a8'],
   "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_ben1'],
   "GPIO1_29" : [GPIO1, 1<<29,         'gpmc_csn0'],
   "GPIO1_30" : [GPIO1, 1<<30,         'gpmc_csn1'],
@@ -172,6 +172,10 @@ GPIO = {
 # Having available pins in a dictionary makes it easy to
 # check for invalid pins, but it's nice not to have to pass
 # around strings, so here's some friendly constants:
+USR0 = "USR0"
+USR1 = "USR1"
+USR2 = "USR2"
+USR3 = "USR3"
 GPIO0_2  = "GPIO0_2"
 GPIO0_3  = "GPIO0_3"
 GPIO0_4  = "GPIO0_4"
@@ -208,10 +212,6 @@ GPIO1_16 = "GPIO1_16"
 GPIO1_17 = "GPIO1_17"
 GPIO1_18 = "GPIO1_18"
 GPIO1_19 = "GPIO1_19"
-GPIO1_21 = USR0 = "GPIO1_21"
-GPIO1_22 = USR1 = "GPIO1_22"
-GPIO1_23 = USR2 = "GPIO1_23"
-GPIO1_24 = USR3 = "GPIO1_24"
 GPIO1_28 = "GPIO1_28"
 GPIO1_29 = "GPIO1_29"
 GPIO1_30 = "GPIO1_30"

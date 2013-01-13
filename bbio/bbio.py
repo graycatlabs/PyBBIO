@@ -394,6 +394,9 @@ def _export(gpio_pin):
   """ Reserves a pin for userspace use with sysfs /sys/class/gpio interface. 
       Returns True if pin was exported, False if it was already under 
       userspace control. """
+  if ("USR" in gpio_pin):
+    # The user LEDs are already under userspace control
+    return False
   gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
   if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
     # Pin already under userspace control
@@ -406,6 +409,9 @@ def _unexport(gpio_pin):
   """ Returns a pin to the kernel with sysfs /sys/class/gpio interface.
       Returns True if pin was unexported, False if it was already under 
       kernel control. """
+  if ("USR" in gpio_pin):
+    # The user LEDs are always under userspace control
+    return False
   gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
   if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
     # Pin not under userspace control
