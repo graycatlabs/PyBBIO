@@ -173,8 +173,8 @@ def pinMode(gpio_pin, direction, pull=0):
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
-    elif (pull == 0): pull = CONF_PULL_DISABLE
-    else: pull = CONF_PULLDOWN
+    elif (pull < 0): pull = CONF_PULLDOWN
+    else: pull = CONF_PULL_DISABLE
     _pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT | pull)
     # Set input:
     _orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
