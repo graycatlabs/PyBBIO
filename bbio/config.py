@@ -64,6 +64,10 @@ CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
 
 ##############################
 ##--- Start GPIO config: ---##
+GPIO_FILE_BASE = '/sys/class/gpio/'
+EXPORT_FILE = GPIO_FILE_BASE + 'export'
+UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
+
 GPIO0 = 0x44e07000-MMAP_OFFSET
 GPIO1 = 0x4804c000-MMAP_OFFSET
 GPIO2 = 0x481ac000-MMAP_OFFSET
@@ -168,10 +172,10 @@ GPIO = {
 # Having available pins in a dictionary makes it easy to
 # check for invalid pins, but it's nice not to have to pass
 # around strings, so here's some friendly constants:
-USR0     = "USR0"
-USR1     = "USR1"
-USR2     = "USR2"
-USR3     = "USR3"
+USR0 = "USR0"
+USR1 = "USR1"
+USR2 = "USR2"
+USR3 = "USR3"
 GPIO0_2  = "GPIO0_2"
 GPIO0_3  = "GPIO0_3"
 GPIO0_4  = "GPIO0_4"
