@@ -86,6 +86,7 @@ HIGH     =  1
 LOW      =  0
 RISING   =  1
 FALLING  = -1
+BOTH     =  0
 MSBFIRST =  1
 LSBFIRST = -1
 
