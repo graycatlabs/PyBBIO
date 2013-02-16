@@ -26,7 +26,7 @@
  limitations under the License.
 """
 
-import sys, math
+import select, sys, threading, math
 
 try:
   from mmap import mmap
@@ -48,13 +48,37 @@ sys.path.append(LIBRARIES_PATH)
 
 ADDITIONAL_CLEANUP = [] # See add_cleanup() below.
 START_TIME_MS = 0 # Set in run() - used by millis() and micros().
-
+INTERRUPT_VALUE_FILES = {}
 
 # Create global mmap:
 MEM_FILE = "/dev/mem"
 with open(MEM_FILE, "r+b") as f:
   __mmap = mmap(f.fileno(), MMAP_SIZE, offset=MMAP_OFFSET)
 
+
+class EpollListener(threading.Thread):
+  def __init__(self):
+    self.epoll = select.epoll()
+    self.epoll_callbacks = {}
+    super(EpollListener, self).__init__()
+
+  def run(self):
+    while True:
+      events = self.epoll.poll()
+      for fileno, event in events:
+        for callback_fileno in self.epoll_callbacks:
+          if fileno == callback_fileno:
+            self.epoll_callbacks[fileno]()
+
+  def register(self, gpio_pin, callback):
+    """ Register an epoll trigger for the specified fileno, and store
+        the callback for that trigger. """
+    fileno = INTERRUPT_VALUE_FILES[gpio_pin].fileno()
+    self.epoll.register(fileno, select.EPOLLIN | select.EPOLLET)
+    self.epoll_callbacks[fileno] = callback
+
+EPOLL_LISTENER = EpollListener()
+EPOLL_LISTENER.daemon = True
 
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
@@ -183,6 +207,18 @@ def pinMode(gpio_pin, direction, pull=0):
   _pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT)
   # Set output:
   _clearReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
+
+def attachInterrupt(gpio_pin, callback, mode=BOTH):
+  """ Sets an interrupt on the specified pin. 'mode' can be RISING, FALLING,
+      or BOTH. 'callback' is the method called when an event is triggered. """
+  # Start the listener thread
+  if not EPOLL_LISTENER.is_alive():
+    EPOLL_LISTENER.start()
+  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  INTERRUPT_VALUE_FILES[gpio_pin] = open(
+    os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value'), 'r')
+  _edge(gpio_pin, mode)
+  EPOLL_LISTENER.register(gpio_pin, callback)
 
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
@@ -418,6 +454,23 @@ def _unexport(gpio_pin):
     return False
   with open(UNEXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
+  return True
+
+def _edge(gpio_pin, mode):
+  """ Sets an edge-triggered interrupt with sysfs /sys/class/gpio
+      interface. Returns True if successful, False if unsuccessful. """
+  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+    # Pin not under userspace control
+    return False
+  edge_file = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'edge')
+  with open(edge_file, 'wb') as f:
+    if mode == RISING:
+      f.write('rising')
+    elif mode == FALLING:
+      f.write('falling')
+    elif mode == BOTH:
+      f.write('both')
   return True
 
 def _andReg(address, mask, length=32):
