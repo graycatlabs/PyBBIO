@@ -70,7 +70,18 @@ with open(config_file, 'wb') as config:
 print "Installing PyBBIO..."
 
 try:
-  from distutils.core import setup
+  from distutils.core import setup, Extension
+
+  driver_extensions = []
+  driver_packages = []
+  platform = 'beaglebone'
+  if (platform == 'beaglebone'):
+    driver_extensions = [Extension('bbio.driver', 
+                                   ['drivers/beaglebone/beaglebone.c', 
+                                    'drivers/util/mmap_util.c'],
+                                   include_dirs=['drivers/util'])]
+    driver_packages = ['bbio.beaglebone']
+
 
   setup(name='PyBBIO',
         version='0.5',
@@ -79,7 +90,8 @@ try:
         author_email='ahiam@marlboro.edu',
         license='Apache 2.0',
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
-        packages=['bbio'])
+        packages=['bbio']  + driver_packages,
+        ext_modules=driver_extensions )
 
   # Older Angstrom images only included support for one of the PWM modules
   # broken out on the headers, check and warn if no support for PWM2 module:
