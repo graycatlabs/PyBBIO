@@ -224,19 +224,24 @@ def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if (state):
-    _setReg(GPIO[gpio_pin][0]+GPIO_SETDATAOUT, GPIO[gpio_pin][1])
+    #_setReg(GPIO[gpio_pin][0]+GPIO_SETDATAOUT, GPIO[gpio_pin][1])
+    driver.setReg(GPIO[gpio_pin][0]+GPIO_SETDATAOUT, GPIO[gpio_pin][1])
   else:
-    _setReg(GPIO[gpio_pin][0]+GPIO_CLEARDATAOUT, GPIO[gpio_pin][1])
+    #_setReg(GPIO[gpio_pin][0]+GPIO_CLEARDATAOUT, GPIO[gpio_pin][1])
+    driver.setReg(GPIO[gpio_pin][0]+GPIO_CLEARDATAOUT, GPIO[gpio_pin][1])
 
 def toggle(gpio_pin):
   """ Toggles the state of the given digital pin. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   _xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
+import driver
+
 def digitalRead(gpio_pin):
   """ Returns input pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
+  #if (_getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
+  if (driver.getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
     return 1
   return 0
 

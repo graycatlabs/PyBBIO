@@ -23,13 +23,16 @@ void mmapClose(void);
 /* Closes mmap. Should be called before program exit.
  */
 
-uint getReg(memaddr address, int order);
-/* Returns 32-bit value starting at given address with given endianness.
+uint _getReg(memaddr address, int order, int bytes);
+/* Returns given number of bytes starting at given address with given 
+ * endianness.
  */
 
-uint getReg16(memaddr address, int order);
-/* Returns 16-bit value starting at given address with given endianness.
+void _setReg(memaddr address, uint value, int order, int bytes);
+/* Sets memory from address to address+bytes to the given value using
+ * the given byte ordering.
  */
+
 
 
 #endif

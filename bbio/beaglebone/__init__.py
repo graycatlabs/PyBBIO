@@ -3,9 +3,6 @@
 
 from bbio.driver import *
 
-def digitalRead(pin):
-  return driver.digitalRead(GPIO[pin])
-
 
 GPIO = {
       "USR0" : [GPIO1, 1<<21,           'gpmc_a5'],

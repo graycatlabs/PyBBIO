@@ -5,27 +5,27 @@
  * A utility for memory access through mmap.
  */
 
-
-#include "mmap_util.h"
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>
 #include <sys/mman.h>
-
-
+#include "mmap_util.h"
 
 struct memory {
 	int fd;
   int size;
-  int *map;
+  uint8_t *map;
 };
 
 static int mmap_exists = 0;
 static struct memory *_mmap;
 
 int mmapInit(char *fn, memaddr offset, memaddr size) {
-	int fd, *map;
+	int fd;
+	uint8_t *map;
   if (mmap_exists) return 0;
 	fd = open(fn, O_RDWR);
   if (fd < 0) return 0;
@@ -48,26 +48,30 @@ void mmapClose(void) {
 	}
 }
 
-uint getReg(memaddr address, int order) {
-  int i;
+uint _getReg(memaddr address, int order, int bytes) {
+  int i, bits;
   uint value;
 	if(!mmap_exists) return 0;
+  bits = bytes*8;
   value = 0;
-  for (i=0; i<4; i++) {
-    if (order == BIGENDIAN) value |= _mmap->map[address+i] << (32-(i<<3));
-		else value |= _mmap->map[address+i] << (i<<3);
+  for (i=0; i<bytes; i++) {
+		if (order == BIGENDIAN) {
+			value |= (uint) (_mmap->map[address+i] << (bits-(i<<3)));
+		}
+		else value |= (uint) (_mmap->map[address+i] << (i<<3));
 	}
   return value;
 }
 
-uint getReg16(memaddr address, int order) {
-  int i;
-  uint value;
-	if(!mmap_exists) return 0;
-  value = 0;
-  for (i=0; i<2; i++) {
-    if (order == BIGENDIAN) value |= _mmap->map[address+i] << (32-(i<<3));
-		else value |= _mmap->map[address+i] << (i<<3);
-	}	
-	return value;
+void _setReg(memaddr address, uint value, int order, int bytes) {
+  int i, bits;
+	if(!mmap_exists) return;
+  bits = bytes*8;
+  for (i=0; i<bytes; i++) {
+		if (order == BIGENDIAN) {
+			_mmap->map[address+i] = (uint8_t) ((value >> (bits-(i<<3))) & 0xff);
+		}
+		else _mmap->map[address+i] = ((uint8_t) (value >> (i<<3)) & 0xff);
+	}
 }
+
