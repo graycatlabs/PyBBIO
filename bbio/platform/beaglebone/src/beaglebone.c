@@ -9,7 +9,6 @@
 #include <Python.h>
 #include "beaglebone.h"
 #include <mmap_util.h>
-#include <pinmux_util.h>
 #include <stdio.h>
 
 
@@ -56,7 +55,6 @@ static PyObject *setReg16(PyObject *self, PyObject *args) {
 
 
 static PyMethodDef functions[] = {
-  {"test_it", test_it, METH_VARARGS, "testing c extensions"},
   {"cleanup", cleanup, METH_VARARGS, 
 	 "Driver cleanup routine; must be called once before program exit."},
   
@@ -70,7 +68,6 @@ static PyMethodDef functions[] = {
 };
 
 void initdriver(void) {
-  counter = 0;
   mmapInit(MMAP_FILE, MMAP_OFFSET, MMAP_SIZE);
   Py_InitModule3("driver", functions, "Test module");
 }
