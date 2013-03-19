@@ -16,17 +16,19 @@ It is assumed that your Beaglebone is already set up and configured on your netw
 and that you have already SSHed onto it. 
 
 Note that these instructions assume you want PyBBIO/ to live in your home 
-directory. This is not a requirement and can changed as desired. 
+directory. This is not a requirement and can be changed as desired. 
 
 The first step is to install the dependencies: 
 
 On Angstrom:
 
-    # opkg update && opkg install python-pyserial curl
+    # opkg update && opkg install curl gcc python-pyserial python-dev
+    # curl http://python-distribute.org/distribute_setup.py | python
 
 On Ubuntu:
 
-    # apt-get update && apt-get install python-serial curl
+    # apt-get update && apt-get install curl gcc python-serial python-dev
+    # curl http://python-distribute.org/distribute_setup.py | python
 
 Then you'll need to get the code:
 
