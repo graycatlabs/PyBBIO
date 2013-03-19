@@ -1,5 +1,9 @@
-#
-#
+# PyBBIO config file for bealebone
+
+#---------------------------------------------------#
+# Changes to this file may lead to permanent damage #
+# to you Beaglebone, edit with care.                #
+#---------------------------------------------------#
 
 MMAP_OFFSET = 0x44c00000 
 MMAP_SIZE   = 0x48ffffff-MMAP_OFFSET

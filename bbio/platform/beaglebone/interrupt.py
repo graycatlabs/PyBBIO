@@ -1,3 +1,13 @@
+# interrupt.py 
+# Part of PyBBIO
+# github.com/alexanderhiam/PyBBIO
+# Apache 2.0 license
+# 
+# Beaglebone GPIO interrupt driver
+#
+# The code in this file was written and contributed by 
+# Alan Christopher Thomas - https://github.com/alanctkc
+# Thanks!
 
 from config import *
 from gpio import *

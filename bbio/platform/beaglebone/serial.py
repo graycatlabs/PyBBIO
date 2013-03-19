@@ -1,5 +1,12 @@
+# serial.py 
+# Part of PyBBIO
+# github.com/alexanderhiam/PyBBIO
+# Apache 2.0 license
+# 
+# Beaglebone serial driver
 
-from pinmux import *
+
+import pinmux
 from config import *
 
 try:
@@ -26,11 +33,11 @@ class _UART_PORT(object):
     # Set proper pinmux to match expansion headers:
     tx_pinmux_filename = UART[self.config][1]
     tx_pinmux_mode     = UART[self.config][2] | CONF_UART_TX
-    pinMux(tx_pinmux_filename, tx_pinmux_mode)
+    pinmux.pinMux(tx_pinmux_filename, tx_pinmux_mode)
 
     rx_pinmux_filename = UART[self.config][3]
     rx_pinmux_mode     = UART[self.config][4] | CONF_UART_RX
-    pinMux(rx_pinmux_filename, rx_pinmux_mode)    
+    pinmux.pinMux(rx_pinmux_filename, rx_pinmux_mode)    
 
     port = UART[self.config][0]
     self.baud = baud

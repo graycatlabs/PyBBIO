@@ -1,9 +1,14 @@
-#
+# memory.py 
+# Part of PyBBIO
+# github.com/alexanderhiam/PyBBIO
+# Apache 2.0 license
+# 
+# Beaglebone memory register access driver
 #
 # 16-bit register support mod from sbma44 - https://github.com/sbma44
 
 
-from bbio.platform import driver
+from bbio.platform.beaglebone import driver
 
 def andReg(address, mask, length=32):
   """ Sets 16 or 32 bit Register at address to its current value AND mask. """

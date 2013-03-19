@@ -1,17 +1,23 @@
+# pwm.py 
+# Part of PyBBIO
+# github.com/alexanderhiam/PyBBIO
+# Apache 2.0 license
+# 
+# Beaglebone PWM driver
 
-from memory import *
-from pinmux import *
+
+import memory, pinmux
 from config import *
 
 
 def pwm_init():
   # Enable EHRPWM module clocks:
-  setReg(CM_PER_EPWMSS1_CLKCTRL, MODULEMODE_ENABLE)
+  memory.setReg(CM_PER_EPWMSS1_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
-  while (getReg(CM_PER_EPWMSS1_CLKCTRL) & IDLEST_MASK): delay(1)
-  setReg(CM_PER_EPWMSS2_CLKCTRL, MODULEMODE_ENABLE)
+  while (memory.getReg(CM_PER_EPWMSS1_CLKCTRL) & IDLEST_MASK): delay(1)
+  memory.setReg(CM_PER_EPWMSS2_CLKCTRL, MODULEMODE_ENABLE)
   # Wait for enable complete:
-  while (getReg(CM_PER_EPWMSS2_CLKCTRL) & IDLEST_MASK): delay(1)
+  while (memory.getReg(CM_PER_EPWMSS2_CLKCTRL) & IDLEST_MASK): delay(1)
 
 def pwm_cleanup():
   # Disable all PWM outputs:
@@ -19,8 +25,7 @@ def pwm_cleanup():
     pwmDisable(i)
   # Could disable EHRPWM module clocks here to save some power when
   # PyBBIO isn't running, but I'm not really worried about it for the 
-  # time being.  
-
+  # time being.
 
 def analogWrite(pwm_pin, value, resolution=RES_8BIT):
   """ Sets the duty cycle of the given PWM output using the
@@ -31,14 +36,14 @@ def analogWrite(pwm_pin, value, resolution=RES_8BIT):
     assert resolution > 0, "*PWM resolution must be greater than 0"
     if (value < 0): value = 0
     if (value >= resolution): value = resolution-1
-    freq = int(kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ]))
+    freq = int(pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ]))
     period_ns = (1e9/freq)
     # Todo: round values properly!: 
     duty_ns = int(value * (period_ns/resolution))
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(duty_ns))
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(duty_ns))
     # Enable output:
-    if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '0\n'):
-      kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '1') 
+    if (pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '0\n'):
+      pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '1') 
   except IOError:
     print "*PWM pin '%s' reserved by another process!" % pwm_pin
 
@@ -61,11 +66,11 @@ def pwmFrequency(pwm_pin, freq_hz):
 
   try: 
     # Duty cyle must be set to 0 before changing frequency:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
     # Set new frequency:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(freq_hz))
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(freq_hz))
     # Set the duty cycle:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(new_duty_ns))
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], str(new_duty_ns))
   except IOError:
     print "*PWM pin '%s' reserved by another process!" % pwm_pin
   
@@ -75,26 +80,26 @@ def pwmEnable(pwm_pin):
       not already reserved. """
   assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
   # Set pinmux mode:
-  pinMux(PWM_PINS[pwm_pin][0], PWM_PINS[pwm_pin][1])
-  if ('sysfs' not in kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
+  pinmux.pinMux(PWM_PINS[pwm_pin][0], PWM_PINS[pwm_pin][1])
+  if ('sysfs' not in pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
     # Reserve use of output:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '1')
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '1')
     delay(1) # Give it some time to take effect
     # Make sure output is disabled, so it won't start outputing a 
     # signal until analogWrite() is called: 
-    if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
-      kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
+    if (pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
+      pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
     # Duty cyle must be set to 0 before changing frequency:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_DUTY], '0')
     # Set frequency to default:
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(PWM_DEFAULT_FREQ))
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_FREQ], str(PWM_DEFAULT_FREQ))
 
 def pwmDisable(pwm_pin):
   """ Disables PWM output on given pin. """
   assert (pwm_pin in PWM_PINS), "*Invalid PWM pin: '%s'" % pwm_pin
   # Disable PWM output:
-  if (kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
+  if (pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE]) == '1\n'):
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_ENABLE], '0')
   # Relinquish userspace control:
-  if ('sysfs' in kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
-    kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '0')
+  if ('sysfs' in pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST])):
+    pinmux.kernelFileIO(PWM_FILES[pwm_pin][PWM_REQUEST], '0')

@@ -72,8 +72,12 @@ print "Installing PyBBIO..."
 try:
   from setuptools import setup, Extension
 
+  warnings = []
+
   driver_extensions = []
   driver_packages = []
+  driver_data = []
+
   platform = 'beaglebone'
   if (platform == 'beaglebone'):
     driver_extensions = [Extension('bbio.platform.beaglebone.driver', 
@@ -83,9 +87,18 @@ try:
     driver_packages = ['bbio.platform.beaglebone']
     driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
 
+    # Older Angstrom images only included support for one of the PWM modules
+    # broken out on the headers, check and warn if no support for PWM2 module:
+    if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
+      w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
+          "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
+          "You should consider updating Angstrom!"
+      warnings.append(w)
+
+
   setup(name='PyBBIO',
         version='0.5',
-        description='A Python library for Arduino-style hardware IO support on the Beaglebone',
+        description='A Python library for Arduino-style hardware IO support on single board Linux systems',
         author='Alexander Hiam',
         author_email='ahiam@marlboro.edu',
         license='Apache 2.0',
@@ -94,14 +107,12 @@ try:
         ext_modules=driver_extensions, 
         data_files=driver_data)
 
-  # Older Angstrom images only included support for one of the PWM modules
-  # broken out on the headers, check and warn if no support for PWM2 module:
-  if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
-    print "Warning: you seem to have a BeagleBone image which only has drivers\n"+\
-          "for the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
-          "You should consider updating Angstrom!"
+  print "install finished with %i warnings" % len(warnings)
+  if (len(warnings)):
+    for i in range(len(warnings)):
+      print "*Warning [%i]: %s\n" % (i+1, warnings[i])
 
-  print "Finished installing, enjoy!"
+  print "PyBBIO is now installed on your %s, enjoy!" % platform
 except Exception, e:
   print "Install failed with exception:\n%s" % e
 

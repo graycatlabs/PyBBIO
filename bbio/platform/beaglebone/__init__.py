@@ -1,3 +1,4 @@
+# initialization for beaglebone
 
 import config
 
