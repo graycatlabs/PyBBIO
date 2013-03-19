@@ -16,6 +16,10 @@ def setup():
   print "\n ADC pins:" 
   for i in ADC.keys():
     print "   %s" % i
+  print "\n PWM pins:" 
+  for i in PWM_PINS.keys():
+    print "   %s" % i
+
 
 # Create a main function:
 def loop():
