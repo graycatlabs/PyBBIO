@@ -1,6 +1,6 @@
-### PyBBIO v0.5
+### PyBBIO v0.6
 http://github.com/alexanderhiam/PyBBIO  
-Copyright (c) 2012 - Alexander Hiam - ahiam@marlboro.edu    
+Copyright (c) 2012, 2013 - Alexander Hiam - ahiam@marlboro.edu    
 
 PyBBIO is a Python library for Arduino-style hardware IO support on the TI 
 Beaglebone. It currently supports basic digital IO through digitalRead() 
@@ -20,15 +20,20 @@ directory. This is not a requirement and can changed as desired.
 
 The first step is to install the dependencies: 
 
-    # opkg update && opkg install python-distutils python-mmap python-pyserial
+On Angstrom:
+
+    # opkg update && opkg install python-pyserial curl
+
+On Ubuntu:
+
+    # apt-get update && apt-get install python-serial curl
 
 Then you'll need to get the code:
 
     # cd ~
     # git clone git://github.com/alexanderhiam/PyBBIO.git
 
-As of version 0.4, PyBBIO is contained in a standard Python package, so it is 
-installed the normal Python way:
+Now run the install script:
 
     # cd PyBBIO
     # python setup.py install

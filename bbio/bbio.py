@@ -1,6 +1,5 @@
 """
- PyBBIO - bbio.py - v0.5
- Created: 12/2011
+ PyBBIO - bbio.py - v0.6
  Author: Alexander Hiam - ahiam@marlboro.edu - www.alexanderhiam.com
  Website: https://github.com/alexanderhiam/PyBBIO
 
@@ -9,7 +8,7 @@
  peripheral support is on the way, so keep checking the Github page
  for updates.
 
- Copyright 2012 Alexander Hiam
+ Copyright 2012, 2013 Alexander Hiam
 
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
