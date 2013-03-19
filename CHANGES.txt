@@ -1,0 +1,11 @@
+###Changelog for PyBBIO  
+http://github.com/alexanderhiam/PyBBIO   
+
+
+#### version 0.6
+ * Moved to multi-file package structure
+ * New structure and install method can now easily support platforms besides 
+   the Beaglbone
+ * Swithed to setuptools instead of distutils for setup.py
+ * All memory access moved to C extension to increase speed
+ * Created this changelog!
