@@ -1,7 +1,8 @@
-/*
- * Requirements for building:
- *  gcc
- *  python-dev
+/* beaglebone.c
+ * Part of PyBBIO
+ * Apache 2.0 License
+ * 
+ * A Python C extension to help speed up IO on the Beaglebone.
  */
 
 
@@ -11,11 +12,6 @@
 #include <pinmux_util.h>
 #include <stdio.h>
 
-int counter;
-
-static PyObject *test_it(PyObject *self, PyObject *args) {
-  return Py_BuildValue("i", counter++);
-}
 
 static PyObject *cleanup(PyObject *self, PyObject *args) {
   mmapClose();

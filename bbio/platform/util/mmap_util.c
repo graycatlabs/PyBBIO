@@ -2,7 +2,7 @@
  * Part of PyBBIO
  * Apache 2.0 License
  * 
- * A utility for memory access through mmap.
+ * A C utility for memory access through mmap.
  */
 
 #include <stdio.h>
