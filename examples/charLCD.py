@@ -23,6 +23,9 @@ Based on: PyBBIO library and satellite code by Alexander Hiam - ahiam@marlboro.e
  or you WILL fry something, better yet all around 3.3V LCD.
  Code has a bug, I have yet to find, that crashes it after ~4-5 hours.
  most likely overflowing clock buffer, but I have no time to poke around.
+ EDIT: 3/25/2013
+ Reason for crash has been located, culprit was in fact integer overflow.
+ Replaced faulty code with OS Built-in uptime counter.
  
  Copyright 2012-2013 Alexander Besser
 
@@ -140,6 +143,12 @@ def setup():
     
 # Create a main function:
 def loop():
+
+  with open('/proc/uptime', 'r') as f:
+    uptime_seconds = float(f.readline().split()[0])
+    uptime_string = str(datetime.timedelta(seconds = uptime_seconds))
+
+    
   pid = str(os.getpid())
 
   ticker1 = str(datetime.timedelta(seconds=round(time.time() - ticks, 0)))
@@ -149,14 +158,19 @@ def loop():
   #ticker2 = "    " + str(datetime.timedelta(seconds=round(s, 0)))
   #ticker2 = "    " + str(datetime.timedelta(seconds=round(time.time() - ticks, 0)))
 
-  lcdprint(ticker1)
+  
+  #lcdprint(ticker1)
+  lcdprint("B-Bone Uptime")
   lcdcommand('11000000')
-  lcdprint(ticker2)
+  #lcdprint(ticker2)
+  lcdprint(uptime_string)
   lcdcommand('10000000')
-  usleep(100)
+  usleep(10000)
   #usleep(100)
 
 # exit()
 
 # Start the loop:
 run(setup, loop)
+
+from datetime import timedelta
