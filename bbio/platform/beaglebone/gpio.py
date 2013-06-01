@@ -5,8 +5,8 @@
 # 
 # Beaglebone GPIO driver
 
-
 import memory, pinmux
+from bbio.util import addToCleanup
 from config import *
 
 
@@ -60,7 +60,6 @@ def pinState(gpio_pin):
   if (memory.getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT) & GPIO[gpio_pin][1]):
     return HIGH
   return LOW
-
 
 def shiftIn(data_pin, clk_pin, bit_order, n_bits=8, edge=FALLING):
   """ Implements software SPI on the given pins to receive given  number

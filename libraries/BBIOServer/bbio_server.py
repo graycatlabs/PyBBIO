@@ -85,6 +85,9 @@ class BBIORequestHandler(SimpleHTTPRequestHandler):
     # means it's a normal page request; let SimpleHTTPRequestHandler
     # handle it the standard way:
     SimpleHTTPRequestHandler.do_GET(self)
+
+  def address_string(self):
+    host, port = self.client_address[:2]
     
 
 class BBIOHTTPServer(HTTPServer):

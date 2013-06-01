@@ -26,13 +26,10 @@
 import sys, time
 
 from platform import *
+from util import *
 from config import LIBRARIES_PATH
 
 sys.path.append(LIBRARIES_PATH)
-
-ADDITIONAL_CLEANUP = [] # See add_cleanup() below.
-START_TIME_MS = 0 # Set in run() - used by millis() and micros().
-
 
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
@@ -53,20 +50,6 @@ def bbio_cleanup():
             (cleanup, e)
   platform_cleanup()
 
-def addToCleanup(routine):
-  """ Takes a callable object to be called during the cleanup once a 
-      program has stopped, e.g. a function to close a log file, kill 
-      a thread, etc. """
-  ADDITIONAL_CLEANUP.append(routine)
-
-def millis():
-  """ Returns roughly the number of millisoconds since program start. """
-  return time.time()*1000 - START_TIME_MS
-
-def micros():
-  """ Returns roughly the number of microsoconds since program start. """
-  return time.time()*1000000 - START_TIME_MS*1000
-
 def delay(ms):
   """ Sleeps for given number of milliseconds. """
   time.sleep(ms/1000.0)
@@ -76,7 +59,6 @@ def delayMicroseconds(us):
       on a more accurate method. """
   t = time.time()
   while (((time.time()-t)*1000000) < us): pass
-
 
 
 # The following code detects if Python is running interactively,
