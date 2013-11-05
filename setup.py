@@ -126,7 +126,8 @@ try:
     driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
                    ('bbio/platform/beaglebone', 
                     ['bbio/platform/beaglebone/3.8/config.py',
-                     'bbio/platform/beaglebone/3.8/pinmux.py'])]
+                     'bbio/platform/beaglebone/3.8/pinmux.py',
+                     'bbio/platform/beaglebone/3.8/cape_manager.py'])]
 
     os.system('python tools/install-bb-overlays.py')
 

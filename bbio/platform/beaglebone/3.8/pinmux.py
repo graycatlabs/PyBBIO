@@ -7,7 +7,7 @@
 # For Beaglebone's with 3.8 kernel
 
 from config import *
-import glob, os
+import glob, os, cape_manager
 
 def kernelFileIO(file_object, val=None):
   """ For reading/writing files open in 'r+' mode. When called just
@@ -33,10 +33,9 @@ def pinMux(register_name, mode):
     return
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
-    os.system('echo PyBBIO-%s > %s' % (gpio_pin, SLOTS_PATH))
-    # Should use a proper pipe here and get stdout to see if pin is
-    # already reserved.
-
+    cape_manager.load('PyBBIO-%s' % gpio_pin)
+    
+    
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
     print "*Could not load overlay for pin: %s" % gpio_pin

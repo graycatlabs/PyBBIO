@@ -12,7 +12,7 @@ import glob
 ########################################
 ##--- Start device tree: ---##
 
-SLOTS_PATH = glob.glob('/sys/devices/bone_capemgr.*/slots')[0]
+SLOTS_FILE = glob.glob('/sys/devices/bone_capemgr.*/slots')[0]
 OCP_PATH = glob.glob('/sys/devices/ocp.*')[0]
 
 ##--- End device tree config ------##
