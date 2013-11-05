@@ -7,12 +7,25 @@
 
 # Load the common beaglebone configuration:
 from config_common import *
-
+import glob
 
 ########################################
-##--- Start control module config: ---##
+##--- Start device tree: ---##
 
-PINMUX_PATH = '/sys/kernel/debug/omap_mux/'
+SLOTS_PATH = glob.glob('/sys/devices/bone_capemgr.*/slots')[0]
+OCP_PATH = glob.glob('/sys/devices/ocp.*')[0]
 
-##--- End control module config ------##
+##--- End device tree config ------##
 ########################################
+
+##############################
+##--- Start GPIO config: ---##
+GPIO_FILE_BASE = '/sys/class/gpio/'
+EXPORT_FILE = GPIO_FILE_BASE + 'export'
+UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
+
+
+##--- End GPIO config ------## 
+##############################
+
+PWM_PINS = {}

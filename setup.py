@@ -114,7 +114,7 @@ try:
     exit('*uname failed, cannot detect kernel version! uname output:\n %s' % uname)
   if ('3.8' in uname):
     platform += ' Black'
-  
+    
 
   if (platform == 'BeagleBone Black'):
     # BeagleBone or BeagleBone Black with kernel >= 3.8
@@ -128,6 +128,7 @@ try:
                     ['bbio/platform/beaglebone/3.8/config.py',
                      'bbio/platform/beaglebone/3.8/pinmux.py'])]
 
+    os.system('python tools/install-bb-overlays.py')
 
   elif (platform == 'BeagleBone'):
     # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)

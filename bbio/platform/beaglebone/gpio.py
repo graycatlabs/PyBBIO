@@ -16,7 +16,7 @@ def pinMode(gpio_pin, direction, pull=0):
       pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if pinmux.export(gpio_pin):
-    addToCleanup(lambda: _unexport(gpio_pin))
+    addToCleanup(lambda: pinmux.unexport(gpio_pin))
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
