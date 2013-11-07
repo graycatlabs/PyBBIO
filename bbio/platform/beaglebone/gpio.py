@@ -5,7 +5,7 @@
 # 
 # Beaglebone GPIO driver
 
-import memory, pinmux
+import memory, pinmux, math
 from bbio.util import addToCleanup
 from config import *
 
