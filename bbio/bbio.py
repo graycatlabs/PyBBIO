@@ -96,7 +96,7 @@ else:
     except Exception, e:
       # Something may have gone wrong, clean up and re-raise exception
       bbio_cleanup()
-      raise e
+      raise 
       
   def stop():
     """ Preffered way for a program to stop itself. """
