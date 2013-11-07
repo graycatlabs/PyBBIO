@@ -37,8 +37,6 @@ IDLEST_MASK = 0x03<<16
 ########################################
 ##--- Start control module config: ---##
 
-PINMUX_PATH = '/sys/kernel/debug/omap_mux/'
-
 CONF_SLEW_SLOW    = 1<<6
 CONF_RX_ACTIVE    = 1<<5
 CONF_PULLUP       = 1<<4
@@ -58,9 +56,6 @@ CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
 
 ##############################
 ##--- Start GPIO config: ---##
-GPIO_FILE_BASE = '/sys/class/gpio/'
-EXPORT_FILE = GPIO_FILE_BASE + 'export'
-UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
 
 GPIO0 = 0x44e07000-MMAP_OFFSET
 GPIO1 = 0x4804c000-MMAP_OFFSET
@@ -87,81 +82,82 @@ LSBFIRST = -1
 ## GPIO pins:
 
 # GPIO pins must be in form: 
-#             [GPIO_mux, bit_value, pinmux_filename], e.g.:
-# "GPIO1_4" = [   GPIO1,      1<<4,      'gpmc_ad4']  
+#             [GPIO_mux, bit_value, pinmux_filename, dt_offset], where 
+# 'dt_offset' is the control module register offset from 44e10800, e.g.:
+# "GPIO1_4" = [   GPIO1,      1<<4,      'gpmc_ad4',      0x10]  
 
 GPIO = {
-      "USR0" : [GPIO1, 1<<21,           'gpmc_a5'],
-      "USR1" : [GPIO1, 1<<22,           'gpmc_a6'],
-      "USR2" : [GPIO1, 1<<23,           'gpmc_a7'],
-      "USR3" : [GPIO1, 1<<24,           'gpmc_a8'],
-   "GPIO0_2" : [GPIO0,  1<<2,         'spi0_sclk'],
-   "GPIO0_3" : [GPIO0,  1<<3,           'spi0_d0'],
-   "GPIO0_4" : [GPIO0,  1<<4,           'spi0_d1'],
-   "GPIO0_5" : [GPIO0,  1<<5,          'spi0_cs0'],
-   "GPIO0_7" : [GPIO0,  1<<7, 'ecap0_in_pwm0_out'],
-   "GPIO0_8" : [GPIO0,  1<<8,        'lcd_data12'],
-   "GPIO0_9" : [GPIO0,  1<<9,        'lcd_data13'],
-  "GPIO0_10" : [GPIO0, 1<<10,        'lcd_data14'],
-  "GPIO0_11" : [GPIO0, 1<<11,        'lcd_data15'],
-  "GPIO0_12" : [GPIO0, 1<<12,        'uart1_ctsn'],
-  "GPIO0_13" : [GPIO0, 1<<13,        'uart1_rtsn'],
-  "GPIO0_14" : [GPIO0, 1<<14,         'uart1_rxd'],
-  "GPIO0_15" : [GPIO0, 1<<15,         'uart1_txd'],
-  "GPIO0_20" : [GPIO0, 1<<20,  'xdma_event_intr1'],
-  "GPIO0_22" : [GPIO0, 1<<22,          'gpmc_ad8'],
-  "GPIO0_23" : [GPIO0, 1<<23,          'gpmc_ad9'],
-  "GPIO0_26" : [GPIO0, 1<<26,         'gpmc_ad10'],
-  "GPIO0_27" : [GPIO0, 1<<27,         'gpmc_ad11'],
-  "GPIO0_30" : [GPIO0, 1<<30,        'gpmc_wait0'],
-  "GPIO0_31" : [GPIO0, 1<<31,          'gpmc_wpn'],
-   "GPIO1_0" : [GPIO1,     1,          'gpmc_ad0'],
-   "GPIO1_1" : [GPIO1,  1<<1,          'gpmc_ad1'],
-   "GPIO1_2" : [GPIO1,  1<<2,          'gpmc_ad2'],
-   "GPIO1_3" : [GPIO1,  1<<3,          'gpmc_ad3'],
-   "GPIO1_4" : [GPIO1,  1<<4,          'gpmc_ad4'],
-   "GPIO1_5" : [GPIO1,  1<<5,          'gpmc_ad5'],
-   "GPIO1_6" : [GPIO1,  1<<6,          'gpmc_ad6'],
-   "GPIO1_7" : [GPIO1,  1<<7,          'gpmc_ad7'],
-  "GPIO1_12" : [GPIO1, 1<<12,         'gpmc_ad12'],
-  "GPIO1_13" : [GPIO1, 1<<13,         'gpmc_ad13'],
-  "GPIO1_14" : [GPIO1, 1<<14,         'gpmc_ad14'],
-  "GPIO1_15" : [GPIO1, 1<<15,         'gpmc_ad15'],
-  "GPIO1_16" : [GPIO1, 1<<16,           'gpmc_a0'],
-  "GPIO1_17" : [GPIO1, 1<<17,           'gpmc_a1'],
-  "GPIO1_18" : [GPIO1, 1<<18,           'gpmc_a2'],
-  "GPIO1_19" : [GPIO1, 1<<19,           'gpmc_a3'],
-  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_ben1'],
-  "GPIO1_29" : [GPIO1, 1<<29,         'gpmc_csn0'],
-  "GPIO1_30" : [GPIO1, 1<<30,         'gpmc_csn1'],
-  "GPIO1_31" : [GPIO1, 1<<31,         'gpmc_csn2'],
-   "GPIO2_1" : [GPIO2,  1<<1,          'gpmc_clk'],
-   "GPIO2_2" : [GPIO2,  1<<2,     'gpmc_advn_ale'],
-   "GPIO2_3" : [GPIO2,  1<<3,      'gpmc_oen_ren'],
-   "GPIO2_4" : [GPIO2,  1<<4,          'gpmc_wen'],
-   "GPIO2_5" : [GPIO2,  1<<5,     'gpmc_ben0_cle'],
-   "GPIO2_6" : [GPIO2,  1<<6,         'lcd_data0'],
-   "GPIO2_7" : [GPIO2,  1<<7,         'lcd_data1'],
-   "GPIO2_8" : [GPIO2,  1<<8,         'lcd_data2'],
-   "GPIO2_9" : [GPIO2,  1<<9,         'lcd_data3'],
-  "GPIO2_10" : [GPIO2, 1<<10,         'lcd_data4'],
-  "GPIO2_11" : [GPIO2, 1<<11,         'lcd_data5'],
-  "GPIO2_12" : [GPIO2, 1<<12,         'lcd_data6'],
-  "GPIO2_13" : [GPIO2, 1<<13,         'lcd_data7'],
-  "GPIO2_14" : [GPIO2, 1<<14,         'lcd_data8'],
-  "GPIO2_15" : [GPIO2, 1<<15,         'lcd_data9'],
-  "GPIO2_16" : [GPIO2, 1<<16,        'lcd_data10'],
-  "GPIO2_17" : [GPIO2, 1<<17,        'lcd_data11'],
-  "GPIO2_22" : [GPIO2, 1<<22,         'lcd_vsync'],
-  "GPIO2_23" : [GPIO2, 1<<23,         'lcd_hsync'],
-  "GPIO2_24" : [GPIO2, 1<<24,          'lcd_pclk'],
-  "GPIO2_25" : [GPIO2, 1<<25,    'lcd_ac_bias_en'],
-  "GPIO3_14" : [GPIO3, 1<<14,      'mcasp0_aclkx'],
-  "GPIO3_15" : [GPIO3, 1<<15,        'mcasp0_fsx'],
-  "GPIO3_16" : [GPIO3, 1<<16,       'mcasp0_axr0'],
-  "GPIO3_17" : [GPIO3, 1<<17,     'mcasp0_ahclkr'],
-  "GPIO3_19" : [GPIO3, 1<<19,        'mcasp0_fsr'],
-  "GPIO3_21" : [GPIO3, 1<<21,     'mcasp0_ahclkx']
+      "USR0" : [GPIO1, 1<<21,           'gpmc_a5', 0x054],
+      "USR1" : [GPIO1, 1<<22,           'gpmc_a6', 0x058],
+      "USR2" : [GPIO1, 1<<23,           'gpmc_a7', 0x05c],
+      "USR3" : [GPIO1, 1<<24,           'gpmc_a8', 0x060],
+   "GPIO0_2" : [GPIO0,  1<<2,         'spi0_sclk', 0x150],
+   "GPIO0_3" : [GPIO0,  1<<3,           'spi0_d0', 0x154],
+   "GPIO0_4" : [GPIO0,  1<<4,           'spi0_d1', 0x158],
+   "GPIO0_5" : [GPIO0,  1<<5,          'spi0_cs0', 0x15c],
+   "GPIO0_7" : [GPIO0,  1<<7, 'ecap0_in_pwm0_out', 0x164],
+   "GPIO0_8" : [GPIO0,  1<<8,        'lcd_data12', 0x0d0],
+   "GPIO0_9" : [GPIO0,  1<<9,        'lcd_data13', 0x0d4],
+  "GPIO0_10" : [GPIO0, 1<<10,        'lcd_data14', 0x0d8],
+  "GPIO0_11" : [GPIO0, 1<<11,        'lcd_data15', 0x0dc],
+  "GPIO0_12" : [GPIO0, 1<<12,        'uart1_ctsn', 0x178],
+  "GPIO0_13" : [GPIO0, 1<<13,        'uart1_rtsn', 0x17c],
+  "GPIO0_14" : [GPIO0, 1<<14,         'uart1_rxd', 0x180],
+  "GPIO0_15" : [GPIO0, 1<<15,         'uart1_txd', 0x184],
+  "GPIO0_20" : [GPIO0, 1<<20,  'xdma_event_intr1', 0x1b4],
+  "GPIO0_22" : [GPIO0, 1<<22,          'gpmc_ad8', 0x020],
+  "GPIO0_23" : [GPIO0, 1<<23,          'gpmc_ad9', 0x024],
+  "GPIO0_26" : [GPIO0, 1<<26,         'gpmc_ad10', 0x028],
+  "GPIO0_27" : [GPIO0, 1<<27,         'gpmc_ad11', 0x02c],
+  "GPIO0_30" : [GPIO0, 1<<30,        'gpmc_wait0', 0x070],
+  "GPIO0_31" : [GPIO0, 1<<31,          'gpmc_wpn', 0x074],
+   "GPIO1_0" : [GPIO1,     1,          'gpmc_ad0', 0x000],
+   "GPIO1_1" : [GPIO1,  1<<1,          'gpmc_ad1', 0x004],
+   "GPIO1_2" : [GPIO1,  1<<2,          'gpmc_ad2', 0x008],
+   "GPIO1_3" : [GPIO1,  1<<3,          'gpmc_ad3', 0x00c],
+   "GPIO1_4" : [GPIO1,  1<<4,          'gpmc_ad4', 0x010],
+   "GPIO1_5" : [GPIO1,  1<<5,          'gpmc_ad5', 0x014],
+   "GPIO1_6" : [GPIO1,  1<<6,          'gpmc_ad6', 0x018],
+   "GPIO1_7" : [GPIO1,  1<<7,          'gpmc_ad7', 0x01c],
+  "GPIO1_12" : [GPIO1, 1<<12,         'gpmc_ad12', 0x030],
+  "GPIO1_13" : [GPIO1, 1<<13,         'gpmc_ad13', 0x034],
+  "GPIO1_14" : [GPIO1, 1<<14,         'gpmc_ad14', 0x038],
+  "GPIO1_15" : [GPIO1, 1<<15,         'gpmc_ad15', 0x03c],
+  "GPIO1_16" : [GPIO1, 1<<16,           'gpmc_a0', 0x040],
+  "GPIO1_17" : [GPIO1, 1<<17,           'gpmc_a1', 0x044],
+  "GPIO1_18" : [GPIO1, 1<<18,           'gpmc_a2', 0x048],
+  "GPIO1_19" : [GPIO1, 1<<19,           'gpmc_a3', 0x04c],
+  "GPIO1_28" : [GPIO1, 1<<28,         'gpmc_ben1', 0x078],
+  "GPIO1_29" : [GPIO1, 1<<29,         'gpmc_csn0', 0x07c],
+  "GPIO1_30" : [GPIO1, 1<<30,         'gpmc_csn1', 0x080],
+  "GPIO1_31" : [GPIO1, 1<<31,         'gpmc_csn2', 0x084],
+   "GPIO2_1" : [GPIO2,  1<<1,          'gpmc_clk', 0x08c],
+   "GPIO2_2" : [GPIO2,  1<<2,     'gpmc_advn_ale', 0x090],
+   "GPIO2_3" : [GPIO2,  1<<3,      'gpmc_oen_ren', 0x094],
+   "GPIO2_4" : [GPIO2,  1<<4,          'gpmc_wen', 0x098],
+   "GPIO2_5" : [GPIO2,  1<<5,     'gpmc_ben0_cle', 0x09c],
+   "GPIO2_6" : [GPIO2,  1<<6,         'lcd_data0', 0x0a0],
+   "GPIO2_7" : [GPIO2,  1<<7,         'lcd_data1', 0x0a4],
+   "GPIO2_8" : [GPIO2,  1<<8,         'lcd_data2', 0x0a8],
+   "GPIO2_9" : [GPIO2,  1<<9,         'lcd_data3', 0x0ac],
+  "GPIO2_10" : [GPIO2, 1<<10,         'lcd_data4', 0x0b0],
+  "GPIO2_11" : [GPIO2, 1<<11,         'lcd_data5', 0x0b4],
+  "GPIO2_12" : [GPIO2, 1<<12,         'lcd_data6', 0x0b8],
+  "GPIO2_13" : [GPIO2, 1<<13,         'lcd_data7', 0x0bc],
+  "GPIO2_14" : [GPIO2, 1<<14,         'lcd_data8', 0x0c0],
+  "GPIO2_15" : [GPIO2, 1<<15,         'lcd_data9', 0x0c4],
+  "GPIO2_16" : [GPIO2, 1<<16,        'lcd_data10', 0x0c8],
+  "GPIO2_17" : [GPIO2, 1<<17,        'lcd_data11', 0x0cc],
+  "GPIO2_22" : [GPIO2, 1<<22,         'lcd_vsync', 0x0e0],
+  "GPIO2_23" : [GPIO2, 1<<23,         'lcd_hsync', 0x0e4],
+  "GPIO2_24" : [GPIO2, 1<<24,          'lcd_pclk', 0x0e8],
+  "GPIO2_25" : [GPIO2, 1<<25,    'lcd_ac_bias_en', 0x0ec],
+  "GPIO3_14" : [GPIO3, 1<<14,      'mcasp0_aclkx', 0x190],
+  "GPIO3_15" : [GPIO3, 1<<15,        'mcasp0_fsx', 0x194],
+  "GPIO3_16" : [GPIO3, 1<<16,       'mcasp0_axr0', 0x198],
+  "GPIO3_17" : [GPIO3, 1<<17,     'mcasp0_ahclkr', 0x19c],
+  "GPIO3_19" : [GPIO3, 1<<19,        'mcasp0_fsr', 0x1a4],
+  "GPIO3_21" : [GPIO3, 1<<21,     'mcasp0_ahclkx', 0x1ac]
 }
 
 # Having available pins in a dictionary makes it easy to
@@ -320,7 +316,7 @@ SAMPLE_DELAY = lambda cycles: (cycles&0xff)<<24
 # Set delay with _orReg(ADCSTEPDELAYx, SAMPLE_DELAY(cycles))
 
 #----------------------
-
+ 
 #--- ADC FIFO ---
 ADC_FIFO0DATA = ADC_TSC+0x100
 
@@ -357,17 +353,6 @@ AIN7 = A7 = VSYS = 'AIN7'
 ##############################
 ##--- Start UART config: ---##
 
-# UART ports must be in form: 
-#    [port, tx_pinmux_filename, tx_pinmux_mode, 
-#           rx_pinmux_filename, rx_pinmux_mode]
-
-UART = {
-  'UART1' : ['/dev/ttyO1', 'uart1_txd', 0,  'uart1_rxd', 0],
-  'UART2' : ['/dev/ttyO2',   'spi0_d0', 1,  'spi0_sclk', 1],
-  'UART4' : ['/dev/ttyO4',  'gpmc_wpn', 6, 'gpmc_wait0', 6],
-  'UART5' : ['/dev/ttyO5', 'lcd_data8', 4,  'lcd_data9', 4]
-}
-
 # Formatting constants to mimic Arduino's serial.print() formatting:
 DEC = 'DEC'
 BIN = 'BIN'
@@ -380,34 +365,6 @@ HEX = 'HEX'
 
 ##############################
 ##--- Start PWM config: ----##
-
-PWM_CTRL_DIR = "/sys/class/pwm/"
-
-# EHRPWM pinmux config dict in form:
-#  [mux_file, mux_mode, pwm_ctrl_dir]
-
-PWM_PINS = {
-  'PWM1A' : [ 'gpmc_a2', 0x06, 'ehrpwm.1:0/'],
-  'PWM1B' : [ 'gpmc_a3', 0x06, 'ehrpwm.1:1/']
-}
-PWM1A = 'PWM1A'
-PWM1B = 'PWM1B'
-
-
-import os
-if (os.path.exists(PWM_CTRL_DIR+'ehrpwm.2:0/')):
-  PWM_PINS['PWM2A'] = ['gpmc_ad8', 0x04, 'ehrpwm.2:0/']
-  PWM_PINS['PWM2B'] = ['gpmc_ad9', 0x04, 'ehrpwm.2:1/']
-  PWM2A = 'PWM2A'
-  PWM2B = 'PWM2B'
-
-
-PWM_FILES = dict(\
-  (i, [open(PWM_CTRL_DIR+PWM_PINS[i][2]+'request', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'run', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'duty_ns', 'r+'),
-       open(PWM_CTRL_DIR+PWM_PINS[i][2]+'period_freq', 'r+') ])\
-  for i in PWM_PINS.keys())
 
 # Indexes in PWM_FILES lists:
 PWM_REQUEST = 0

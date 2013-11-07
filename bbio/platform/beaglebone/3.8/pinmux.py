@@ -4,9 +4,10 @@
 # Apache 2.0 license
 # 
 # Beaglebone pinmux driver
+# For Beaglebone's with 3.8 kernel
 
 from config import *
-
+import glob, os, cape_manager
 
 def kernelFileIO(file_object, val=None):
   """ For reading/writing files open in 'r+' mode. When called just
@@ -20,17 +21,38 @@ def kernelFileIO(file_object, val=None):
   file_object.write(val)
   file_object.flush()
 
-def pinMux(fn, mode):
-  """ Uses kernel omap_mux files to set pin modes. """
-  # There's no simple way to write the control module registers from a 
-  # user-level process because it lacks the proper privileges, but it's 
-  # easy enough to just use the built-in file-based system and let the 
-  # kernel do the work. 
-  try:
-    with open(PINMUX_PATH+fn, 'wb') as f:
-      f.write(hex(mode)[2:]) # Write hex string (stripping off '0x')
-  except IOError:
-    print "*omap_mux file not found: '%s'" % (PINMUX_PATH+fn)
+def pinMux(register_name, mode):
+  """ Uses custom device tree overlays to set pin modes. """
+  gpio_pin = ''
+  for pin, config in GPIO.items():
+    if config[2] == register_name:
+      gpio_pin = pin.lower()
+      break
+  if not gpio_pin:
+    print "*unknown pinmux register: %s" % register_name
+    return
+  mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
+  if len(mux_file_glob) == 0:
+    cape_manager.load('PyBBIO-%s' % gpio_pin)
+    
+    
+  mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
+  if len(mux_file_glob) == 0:
+    print "*Could not load overlay for pin: %s" % gpio_pin
+    return 
+  mux_file = mux_file_glob[0]
+  # Convert mode to ocp mux name:
+  mode = 'mode_%s' % format(mode, '#010b') 
+  # Possible modes:
+  #  mode_0b00100111  # rx active | pull down
+  #  mode_0b00110111  # rx active | pull up
+  #  mode_0b00101111  # rx active | no pull
+  #  mode_0b00000111  # pull down
+  #  mode_0b00010111  # pull up
+  #  mode_0b00001111  # no pull
+  # See /lib/firmware/PyBBIO-src/*.dts for more info  
+  with open(mux_file, 'wb') as f:
+    f.write(mode)
 
 def export(gpio_pin):
   """ Reserves a pin for userspace use with sysfs /sys/class/gpio interface. 
@@ -61,3 +83,4 @@ def unexport(gpio_pin):
   with open(UNEXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
   return True
+
