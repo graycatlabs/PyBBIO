@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # PyBBIO setup script
 
-import fileinput, sys, os
+import sys, os
 
 
 # Earlier versions of PyBBIO used a shell script to install the 
