@@ -21,7 +21,7 @@ sys.path.append(config_path)
 
 from config_common import GPIO
 
-template = \
+gpio_template = \
 """
 /* 
  This file was generated as part of PyBBIO
@@ -115,23 +115,27 @@ def generateOverlays():
   else:
     print "Old PyBBIO device tree overlay directory found, overwriting..."
 
-  print "Generating and compiling overlays...",
+  print "Generating and compiling GPIO overlays...",
   version = '00A0'
   for pin, config in GPIO.items():
     gpio_pin = pin.lower()
     register_name = config[2]
     offset = str(config[3])
     overlay_name = 'PyBBIO-%s' % gpio_pin
-    dts = template.replace('{gpio_pin}', gpio_pin)\
-                  .replace('{name}', register_name)\
-                  .replace('{overlay_name}', overlay_name)\
-                  .replace('{version}', version)\
-                  .replace('{offset}', offset)
+    dts = gpio_template.replace('{gpio_pin}', gpio_pin)\
+                       .replace('{name}', register_name)\
+                       .replace('{overlay_name}', overlay_name)\
+                       .replace('{version}', version)\
+                       .replace('{offset}', offset)
     with open('%s/%s-%s.dts' % (firmware_source_path, overlay_name, version), 'wb') as f:
       f.write(dts)
     os.system(dtc_compile % ('%s/%s-%s' % (firmware_path, overlay_name, version),
                              '%s/%s-%s' % (firmware_source_path, overlay_name, 
                                            version)))
+
+  #print "Generating and compiling PWM overlays...",
+  #version = '00A0'
+                                           
   print "Done!"
       
 if __name__ == '__main__': 

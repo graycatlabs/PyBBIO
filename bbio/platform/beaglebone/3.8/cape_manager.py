@@ -11,6 +11,11 @@ from bbio.util import addToCleanup
 
 def load(overlay):
   """ Attempt to load an overlay with the given name. """ 
+  with open(SLOTS_FILE, 'rb') as f:
+    capes = f.read()
+  if overlay in capes:
+    # already loaded (this should do a better job checking)
+    return
   with open(SLOTS_FILE, 'wb') as f:
     f.write(overlay)
   addToCleanup(lambda: unload(overlay))
