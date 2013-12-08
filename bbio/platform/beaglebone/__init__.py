@@ -6,4 +6,4 @@ from gpio import *
 from interrupt import *
 from adc import *
 from pwm import *
-from uart import *
+from serial_port import *

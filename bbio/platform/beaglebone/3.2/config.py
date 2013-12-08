@@ -14,6 +14,9 @@ from config_common import *
 
 PINMUX_PATH = '/sys/kernel/debug/omap_mux/'
 
+CONF_UART_TX     = CONF_PULL_DISABLE
+CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
+
 ##--- End control module config ------##
 ########################################
 

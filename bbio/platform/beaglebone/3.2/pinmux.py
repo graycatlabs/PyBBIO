@@ -1,10 +1,10 @@
-# pinmux.py 
+# 3.2/pinmux.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
 # 
 # Beaglebone pinmux driver
-# For Beaglebone's with 3.2 kernel
+# For Beaglebones with 3.2 kernel
 
 from config import *
 

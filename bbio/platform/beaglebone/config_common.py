@@ -48,9 +48,6 @@ CONF_GPIO_OUTPUT = CONF_GPIO_MODE
 CONF_GPIO_INPUT  = CONF_GPIO_MODE | CONF_RX_ACTIVE
 CONF_ADC_PIN     = CONF_RX_ACTIVE | CONF_PULL_DISABLE
 
-CONF_UART_TX     = CONF_PULL_DISABLE
-CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
-
 ##--- End control module config ------##
 ########################################
 

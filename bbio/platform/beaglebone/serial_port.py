@@ -1,4 +1,4 @@
-# uart.py 
+# serial_port.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
@@ -6,7 +6,7 @@
 # Beaglebone serial driver
 
 
-import pinmux
+from uart import uartInit
 from config import *
 
 try:
@@ -30,15 +30,10 @@ class _UART_PORT(object):
 
   def begin(self, baud, timeout=1):
     """ Starts the serial port at the given baud rate. """
-    # Set proper pinmux to match expansion headers:
-    tx_pinmux_filename = UART[self.config][1]
-    tx_pinmux_mode     = UART[self.config][2] | CONF_UART_TX
-    pinmux.pinMux(tx_pinmux_filename, tx_pinmux_mode)
-
-    rx_pinmux_filename = UART[self.config][3]
-    rx_pinmux_mode     = UART[self.config][4] | CONF_UART_RX
-    pinmux.pinMux(rx_pinmux_filename, rx_pinmux_mode)    
-
+    if not uartInit(self.config):
+      print "*Could not open serial port defined by: %s" % self.config
+      self.ser_port = None
+      return
     port = UART[self.config][0]
     self.baud = baud
     self.ser_port = serial.Serial(port, baud, timeout=timeout)

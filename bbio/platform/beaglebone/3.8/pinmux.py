@@ -1,10 +1,10 @@
-# pinmux.py 
+# 3.8/pinmux.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
 # 
 # Beaglebone pinmux driver
-# For Beaglebone's with 3.8 kernel
+# For Beaglebones with 3.8 kernel
 
 from config import *
 import glob, os, cape_manager
@@ -34,7 +34,6 @@ def pinMux(register_name, mode):
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
     cape_manager.load('PyBBIO-%s' % gpio_pin)
-    
     
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
