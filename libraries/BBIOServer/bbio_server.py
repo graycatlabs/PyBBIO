@@ -4,13 +4,11 @@
  A dynamic web interface library for PyBBIO.
 """
 
-import os, sys, urlparse, traceback
-from multiprocessing import Process
+import os, sys, urlparse, traceback, threading
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from BaseHTTPServer import HTTPServer
 
 from bbio import *
-from SafeProcess import *
 
 BBIOSERVER_VERSION = "1.2"
 
@@ -165,12 +163,11 @@ class BBIOServer():
       with open(path, 'w') as f:
         f.write(str(page) % links)
 
-    # The server is started as a subprocess using PyBBIO's SafeProcess. 
-    # This way it will be non-blocking and stop automatically during
-    # PyBBIO's cleanup routine.
-    self._server_process = SafeProcess(target=self._server.serve_forever)
-    self._server_process.start()
-
+    # Start srver in a daemon thread:
+    server_thread = threading.Thread(target=self._server.serve_forever)
+    server_thread.daemon = True
+    server_thread.start()
+    
     if (self.blocking):
       try:
         while(True): delay(10000)
@@ -178,8 +175,7 @@ class BBIOServer():
         pass
 
   def stop(self):
-    self._server_process.terminate()
-
+    raise KeyboardInterrupt
 
 class Page(object):
   def __init__(self, title, stylesheet="style.css"):
