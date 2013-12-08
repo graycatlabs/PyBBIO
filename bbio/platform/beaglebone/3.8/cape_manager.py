@@ -27,6 +27,6 @@ def unload(overlay):
     slots = f.readlines()
   for slot in slots:
     if overlay in slot:
-      load('-%s' % slot.split(':')[0])
+      load('-%i' % int(slot.split(':')[0]))
       return True
   return False 
