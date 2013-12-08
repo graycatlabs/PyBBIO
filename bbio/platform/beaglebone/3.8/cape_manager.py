@@ -9,8 +9,10 @@
 from config import SLOTS_FILE
 from bbio.util import addToCleanup
 
-def load(overlay):
-  """ Attempt to load an overlay with the given name. """ 
+def load(overlay, auto_unload=True):
+  """ Attempt to load an overlay with the given name. If auto_unload=True it
+      will be auto-unloaded at program exit (the current cape manager crashes
+      when trying to unload certain overlay fragments). """
   with open(SLOTS_FILE, 'rb') as f:
     capes = f.read()
   if overlay in capes:
@@ -18,7 +20,8 @@ def load(overlay):
     return
   with open(SLOTS_FILE, 'wb') as f:
     f.write(overlay)
-  addToCleanup(lambda: unload(overlay))
+  if auto_unload:
+    addToCleanup(lambda: unload(overlay))
     
 def unload(overlay):
   """ Unload the first overlay matching the given name if present. Returns 
