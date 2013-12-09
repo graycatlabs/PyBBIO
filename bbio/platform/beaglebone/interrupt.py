@@ -11,7 +11,7 @@
 
 from config import *
 from gpio import *
-import select, threading
+import select, threading, os
 
 INTERRUPT_VALUE_FILES = {}
 
