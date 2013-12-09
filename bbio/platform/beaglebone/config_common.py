@@ -68,6 +68,9 @@ GPIO_SETDATAOUT   = 0x194
 # Digital IO keywords:
 INPUT    =  1
 OUTPUT   =  0
+PULLDOWN = -1
+NOPULL   =  0
+PULLUP   =  1
 HIGH     =  1
 LOW      =  0
 RISING   =  1
