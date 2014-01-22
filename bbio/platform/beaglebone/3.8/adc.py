@@ -35,5 +35,5 @@ def analogRead(adc_pin):
 def inVolts(mv):
   """ Converts millivolts to volts... you know, to keep the API 
       consistent. """
-  return mv*1000
+  return mv/1000.0
 
