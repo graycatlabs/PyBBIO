@@ -1,4 +1,4 @@
-### PyBBIO v0.6
+### PyBBIO v0.8
 http://github.com/alexanderhiam/PyBBIO  
 Copyright (c) 2012, 2013 - Alexander Hiam - hiamalexander@gmail.com    
 
@@ -11,7 +11,7 @@ keep checking the Github page for updates.
 #### Documentation at http://github.com/alexanderhiam/PyBBIO/wiki
 
 ***PyBBIO is not yet fully working with the 3.8 kernel which comes with the BeagleBone
-Black and newer Angstrom images. Currently only GPIO and serial are working.***
+Black and newer Angstrom images. Currently only GPIO, ADC, serial are working.***
 
 #Installing
 

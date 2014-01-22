@@ -18,7 +18,7 @@ firmware_source_path = '%s/PyBBIO-src' % firmware_path
 dtc_compile = ' dtc -O dtb -o %s.dtbo -b 0 -@ %s.dts'
 
 overlays_to_copy = [
-  '%s/overlays/PyBBIO-Enable-ADC-00A0.dts' % cwd
+  '%s/overlays/PyBBIO-ADC-00A0.dts' % cwd
 ]
 
 sys.path.append(config_path)

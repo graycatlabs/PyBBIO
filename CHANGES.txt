@@ -1,11 +1,15 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+
 #### version 0.8
+ * Added tools/ directory for install helpers
  * Support for Kernel >= 3.8:
    * GPIO
    * Serial
    * ADC
+   * Added tool to generate and compile DT overlays
+ * misc. fixes
 
 
 #### version 0.6
