@@ -3,7 +3,10 @@
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
 # 
-# Beaglebone ADC driver
+# Beaglebone ADC driver for kernels < 3.8.
+#
+# Uses direct memory access to configure and control the ADC
+# sampling. 
 
 import memory
 from config import *

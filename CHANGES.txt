@@ -1,6 +1,12 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.8
+ * Support for Kernel >= 3.8:
+   * GPIO
+   * Serial
+   * ADC
+
 
 #### version 0.6
  * Moved to multi-file package structure

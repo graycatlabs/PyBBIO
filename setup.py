@@ -127,6 +127,7 @@ try:
                    ('bbio/platform/beaglebone', 
                     ['bbio/platform/beaglebone/3.8/config.py',
                      'bbio/platform/beaglebone/3.8/pinmux.py',
+                     'bbio/platform/beaglebone/3.8/adc.py',
                      'bbio/platform/beaglebone/3.8/cape_manager.py',
                      'bbio/platform/beaglebone/3.8/uart.py'])]
 
@@ -143,6 +144,7 @@ try:
                    ('bbio/platform/beaglebone', 
                     ['bbio/platform/beaglebone/3.2/config.py', 
                      'bbio/platform/beaglebone/3.2/pinmux.py',
+                     'bbio/platform/beaglebone/3.2/adc.py',
                      'bbio/platform/beaglebone/3.2/uart.py'])]
 
     # Older Angstrom images only included support for one of the PWM modules
