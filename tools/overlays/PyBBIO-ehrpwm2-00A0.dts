@@ -1,0 +1,22 @@
+/* Enables the BeagleBone's PWM sub system 2's high resolution PWM
+ * 
+ * This overlay was created for PyBBIO:
+ * github.com/alexanderhiam/PyBBIO
+ * 
+ * This file is in the Public Domain.
+ */
+
+/dts-v1/;
+/plugin/;
+/{
+  compatible = "ti,beaglebone", "ti,beaglebone-black";
+  /* identification */
+  part-number = "PyBBIO-ehrpwm2";
+  version = "00A0";
+  fragment@0 {
+    target = <&ehrpwm2>;
+    __overlay__ {
+      status = "okay";
+    };
+  };
+};

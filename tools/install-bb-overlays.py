@@ -18,7 +18,17 @@ firmware_source_path = '%s/PyBBIO-src' % firmware_path
 dtc_compile = ' dtc -O dtb -o %s.dtbo -b 0 -@ %s.dts'
 
 overlays_to_copy = [
-  '%s/overlays/PyBBIO-ADC-00A0.dts' % cwd
+  '%s/overlays/PyBBIO-ADC-00A0.dts' % cwd,
+
+  '%s/overlays/PyBBIO-epwmss0-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-ecap0-00A0.dts' % cwd,
+
+  '%s/overlays/PyBBIO-epwmss1-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-ehrpwm1-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-ecap1-00A0.dts' % cwd,
+
+  '%s/overlays/PyBBIO-epwmss2-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-ehrpwm2-00A0.dts' % cwd,
 ]
 
 sys.path.append(config_path)
@@ -105,6 +115,6 @@ def generateOverlays():
                                            
   print "Done!"
       
-if __name__ == '__main__': 
-  copyOverlays()
+if __name__ == '__main__':
   generateOverlays()
+  copyOverlays()

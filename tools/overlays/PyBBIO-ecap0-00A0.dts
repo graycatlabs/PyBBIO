@@ -1,0 +1,22 @@
+/* Enables the BeagleBone's PWM sub system 0's eCAP
+ * 
+ * This overlay was created for PyBBIO:
+ * github.com/alexanderhiam/PyBBIO
+ * 
+ * This file is in the Public Domain.
+ */
+
+/dts-v1/;
+/plugin/;
+/{
+  compatible = "ti,beaglebone", "ti,beaglebone-black";
+  /* identification */
+  part-number = "PyBBIO-ecap0";
+  version = "00A0";
+  fragment@0 {
+    target = <&ecap0>;
+    __overlay__ {
+      status = "okay";
+    };
+  };
+};
