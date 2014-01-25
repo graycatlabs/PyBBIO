@@ -23,7 +23,7 @@
  limitations under the License.
 """
 
-import sys, time
+import sys
 
 from platform import *
 from util import *
@@ -33,8 +33,7 @@ sys.path.append(LIBRARIES_PATH)
 
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """
-  global START_TIME_MS
-  START_TIME_MS = time.time()*1000
+  util_init()
   platform_init()
 
 def bbio_cleanup():
@@ -49,17 +48,6 @@ def bbio_cleanup():
       print "*Exception raised trying to call cleanup routine '%s':\n  %s" %\
             (cleanup, e)
   platform_cleanup()
-
-def delay(ms):
-  """ Sleeps for given number of milliseconds. """
-  time.sleep(ms/1000.0)
-
-def delayMicroseconds(us):
-  """ Sleeps for given number of microseconds > ~30; still working 
-      on a more accurate method. """
-  t = time.time()
-  while (((time.time()-t)*1000000) < us): pass
-
 
 # The following code detects if Python is running interactively,
 # and if so initializes PyBBIO on import and registers PyBBIO's
