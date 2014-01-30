@@ -256,12 +256,6 @@ HEX = 'HEX'
 ##############################
 ##--- Start PWM config: ----##
 
-# Indexes in PWM_FILES lists:
-PWM_REQUEST = 0
-PWM_ENABLE  = 1
-PWM_DUTY    = 2
-PWM_FREQ    = 3
-
 # Predefined resolutions for analogWrite():
 RES_16BIT = 2**16
 RES_8BIT  = 2**8

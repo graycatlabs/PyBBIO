@@ -65,6 +65,50 @@ AIN7 = A7 = VSYS = 'AIN7'
 
 
 
+#############################
+##--- Start PWM config: ---##
+
+# PWM config dict in form:
+#  ['overlay_file', 'path/to/ocp_helper_dir', ['required', 'overlays']]
+
+PWM_PINS = {
+  'PWM1A' : ['bone_pwm_P9_14', '%s/pwm_test_P9_14.*' % OCP_PATH, 
+             ['PyBBIO-epwmss1', 'PyBBIO-ehrpwm1']],
+  'PWM1B' : ['bone_pwm_P9_16', '%s/pwm_test_P9_16.*' % OCP_PATH, 
+             ['PyBBIO-epwmss1', 'PyBBIO-ehrpwm1']],
+
+  'PWM2A' : ['bone_pwm_P8_19', '%s/pwm_test_P8_19.*' % OCP_PATH, 
+             ['PyBBIO-epwmss2', 'PyBBIO-ehrpwm2']],
+  'PWM2B' : ['bone_pwm_P8_13', '%s/pwm_test_P8_13.*' % OCP_PATH, 
+             ['PyBBIO-epwmss2', 'PyBBIO-ehrpwm2']],
+
+  'ECAP0' : ['bone_pwm_P8_42', '%s/pwm_test_P9_42.*' % OCP_PATH, 
+             ['PyBBIO-epwmss0', 'PyBBIO-ecap0']],
+  'ECAP1' : ['bone_pwm_P9_28', '%s/pwm_test_P9_28.*' % OCP_PATH, 
+             ['PyBBIO-epwmss1', 'PyBBIO-ecap1']],
+
+}
+# Using the built-in pin overlays for now, I see no need for custom ones 
+
+PWM1A = 'PWM1A'
+PWM1B = 'PWM1B'
+PWM2A = 'PWM2A'
+PWM2B = 'PWM2B'
+ECAP0 = 'ECAP0'
+ECAP1 = 'ECAP1'
+
+# ocp helper filenames:
+PWM_RUN      = 'run'
+PWM_DUTY     = 'duty'
+PWM_PERIOD   = 'period'
+PWM_POLARITY = 'polarity'
+
+PWM_DEFAULT_PERIOD = int(1e9/PWM_DEFAULT_FREQ)
+
+##--- End PWM config ------##
+#############################
+
+
 ##############################
 ##--- Start UART config: ---##
 
@@ -82,5 +126,3 @@ UART = {
 ##--- End UART config ------##
 ##############################
 
-
-PWM_PINS = {}
