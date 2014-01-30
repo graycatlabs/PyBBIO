@@ -68,12 +68,6 @@ def copyOverlays():
   print "Done!"
 
 def generateOverlays():
-  if not os.path.exists(firmware_source_path):
-    print "PyBBIO device tree overlay directory not found, creating..."
-    os.makedirs(firmware_source_path)
-  else:
-    print "Old PyBBIO device tree overlay directory found, overwriting..."
-
   print "Generating and compiling GPIO overlays...",
   version = '00A0'
   for pin, config in GPIO.items():
@@ -116,5 +110,11 @@ def generateOverlays():
   print "Done!"
       
 if __name__ == '__main__':
+  if not os.path.exists(firmware_source_path):
+    print "PyBBIO device tree overlay directory not found, creating..."
+    os.makedirs(firmware_source_path)
+  else:
+    print "Old PyBBIO device tree overlay directory found, overwriting..."
+
   generateOverlays()
   copyOverlays()
