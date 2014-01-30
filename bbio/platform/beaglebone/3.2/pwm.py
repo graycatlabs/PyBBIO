@@ -3,10 +3,11 @@
 # github.com/alexanderhiam/PyBBIO
 # Apache 2.0 license
 # 
-# Beaglebone PWM driver
+# Beaglebone PWM driver for kernel < 3.8
 
 
 import memory, pinmux
+from bbio.util import delay
 from config import *
 
 

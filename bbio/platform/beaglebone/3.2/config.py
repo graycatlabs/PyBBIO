@@ -193,5 +193,12 @@ PWM_FILES = dict(\
        open(PWM_CTRL_DIR+PWM_PINS[i][2]+'period_freq', 'r+') ])\
   for i in PWM_PINS.keys())
 
+
+# Indexes in PWM_FILES lists:
+PWM_REQUEST = 0
+PWM_ENABLE  = 1
+PWM_DUTY    = 2
+PWM_FREQ    = 3
+
 ##--- End PWM config: ------##
 ##############################

@@ -5,6 +5,7 @@
 # 
 # Helper routines for sysfs kernel drivers
 
+import glob
 
 def kernelFileIO(file_object, val=None):
   """ For reading/writing files open in 'r+' mode. When called just
@@ -17,3 +18,12 @@ def kernelFileIO(file_object, val=None):
   if (val == None): return file_object.read()
   file_object.write(val)
   file_object.flush()
+
+
+def kernelFilenameIO(fn, val=None):
+  """ Same as kernelFileIO() but takes a filename instead of an already
+      open file object. The filename should be a complete absolute path,
+      and may inlcued asterisks, e.g. /sys/devices/ocp.*/some/file. """
+  fn = glob.glob(fn)[0]
+  with open(fn, 'r+') as f:
+    return kernelFileIO(f, val)
