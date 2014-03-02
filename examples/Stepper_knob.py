@@ -19,6 +19,9 @@ from bbio import *
 # Then we can import Stepper:
 from Stepper import *
 
+import time
+start_time = time.time() 
+
 stepper = Stepper(100,GPIO01_17,GPIO03_21,GPIO03_19,GPIO03_15)
 
 def setup():
@@ -30,7 +33,7 @@ def loop():
 
 	#move a number of steps equal to the change in the
 	#sensor reading
-	stepper.step(val - previous)
+	stepper.step(val - previous , start_time)
 
 	#remember the previous value of the sensor
 	previous = val
