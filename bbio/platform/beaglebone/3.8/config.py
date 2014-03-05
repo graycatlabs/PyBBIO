@@ -132,9 +132,10 @@ UART = {
 # I2C bus address must be in form: 
 #    [dev-entry, I2C-overlay-name]
 # rather confusing bus address and dev-entry don't exactly match
-# i2c0, i2c2 buses are activated by default i.e. /dev/12c-0 and /dev/i2c1
-# NOTE : 1st I2C bus - i2c0 is used to read eeproms of capes - Don't use that!!
+# i2c0, i2c2 buses are activated by default i.e. /dev/12c-0 and /dev/i2c-1
 # more info - http://datko.net/2013/11/03/bbb_i2c/
+# NOTE : 1st I2C bus - i2c0 is used to read eeproms of capes - Don't use that for other purposes
+
 
 I2C = {
   'i2c0' : ['/dev/i2c-0', 'BB-I2C0'],
