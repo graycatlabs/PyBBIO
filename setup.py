@@ -162,7 +162,7 @@ try:
         version='0.8',
         description='A Python library for Arduino-style hardware IO support on single board Linux systems',
         author='Alexander Hiam',
-        author_email='ahiam@marlboro.edu',
+        author_email='hiamalexander@gmail.com',
         license='Apache 2.0',
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
         packages=['bbio', 'bbio.platform'] + driver_packages,
