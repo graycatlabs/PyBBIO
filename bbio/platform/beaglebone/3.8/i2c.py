@@ -1,4 +1,4 @@
-# serial_port.py 
+# i2c.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # This library - github.com/deepakkarki
@@ -12,15 +12,19 @@
 #		reference : http://datko.net/2013/11/03/bbb_i2c/
 
 ##
-##		NOTE : WORK IN PROGRESS. DO NOT USE CODE. CONTAINS LOTS OF COMMENTS TO SELF!!
+##		NOTE : UNTESTED CODE! DO NOT USE!
 ##
 
-import config
+from config import *
+import  cape_manager, bbio
 
 try:
   import smbus
 except:
   print "\n python-smbus module not found\n"
+
+
+
 
 class _I2C_BUS(object):
 
@@ -57,17 +61,39 @@ class _I2C_BUS(object):
 			return self.bus.write_byte(addr, val)
 
 		else:
-			return self._write_list(addr, self._process(val))
+			data = self._format(val)
+			written = 0 #bytes of data written
+			for unit in data:
+				written += self.bus.write_byte(addr, val)
+			return written
 
 
-	def _write_list(self, addr, val):
+	def _format(self, val):
 		'''
-		called from write when val is a string or list - this is internal to keep interface simple
-		addr : integer between (0-127) - Address of slave device
-		val : list - Of either characters or integers.
+		used to format values given to write into reqd format 
+		val : string or list (of integers or strings)
+		returns : list of integers, if bad paramater - returns None
 		'''
-		#remove this - insead have a recursive fn which will convert lists to list of integers - and returns it back to write
-		pass
+
+		if type(val) == str:
+			return map(lambda x: ord(x), list(val))
+
+		if type(val) == list and len(val):
+			#non empty list
+
+			if len(filter(lambda x: type(x) == int, val)) == len(val):
+				#all variables are integers
+				return val
+
+			if len(filter(lambda x: type(x) == str, val)) == len(val):
+				#all variables are strings
+				data = []
+				for unit in val:
+					data.extend(list(unit))
+				return map(lambda x: ord(x), list(data))
+
+		return None
+
 
 
 	def read(self, addr, size=1):
@@ -82,8 +108,6 @@ class _I2C_BUS(object):
 
 		if size == 1:
 			return self.bus.read_byte(addr)
-
-		
 
 		else:
 			read_data = []
@@ -102,7 +126,14 @@ class _I2C_BUS(object):
 		BBB exits the bus
 		'''
 		if self.bus:
-			self.bus.close()
+			result = self.bus.close()
+			if not result:
+				print "Failed to close i2c bus : %s" % self.config 
+				return False
+			self.open = False
+			return True
+		else:
+			print "i2c bus : %s - is not open. use begin() first" % self.config 
 
 
 
@@ -113,17 +144,6 @@ class _I2C_BUS(object):
 		returns a processed val that can be written to the I2C device
 		'''
 		# Keep this for prints, add the below check in write itself. All that is allowed is [int, str, list(int), list(str)]
-		if type(val) == str:
-			return map(lambda x: ord(x), list(val))
-			#convert string to list of ascii values
-
-
-
-	def available(self, addr):
-		'''
-		Master can query the slave and check if slave is ready to give data
-		'''
-		#don't know if it is possible as of now using smbus 
 		pass
 
 	def prints(self, addr, string):
@@ -133,4 +153,15 @@ class _I2C_BUS(object):
 		string : string - to be written to slave device
 		'''
 		pass
-		#make this just like serial.println - i.e. add formating and all
+		#fill this later - could be used to send formatted text across to some I2C based screens (?)
+
+def i2c_cleanup():
+	"""
+	Ensures that all i2c buses opened by current process are freed. 
+	"""
+	for bus in (Wire1, Wire2):
+		if bus.open:
+			bus.end()
+
+Wire1 = _I2C_BUS('i2c1')
+Wire2 = _I2C_BUS('i2c2')
