@@ -53,6 +53,7 @@ class _I2C_BUS(object):
 		self : _I2C_BUS object
 		bus : string - represents bus address eg. i2c1, i2c2
 		'''
+		assert bus in I2C, "Invalid bus address %s" %bus
 		self.config = bus
 		self.bus = None # This is the smbus object
 		self.open = False
@@ -64,7 +65,7 @@ class _I2C_BUS(object):
 		if not i2cInit(self.config):
 			print "Could not initialize i2c bus : %s" % self.config 
 			return
-		self.bus = smbus.SMBus(int(I2C[self.config][0][-1]))
+		self.bus = smbus.SMBus(int(self.config[-1]))
 		self.open = True
 
 	def write(self, addr, val):
@@ -163,7 +164,7 @@ class _I2C_BUS(object):
 		val - some object
 		returns a processed val that can be written to the I2C device
 		'''
-		# Keep this for prints, add the below check in write itself. All that is allowed is [int, str, list(int), list(str)]
+		# Keep this for prints
 		pass
 
 	def prints(self, addr, string):
@@ -183,5 +184,6 @@ def i2c_cleanup():
 		if bus.open:
 			bus.end()
 
+#For arduino like similariy 
 Wire1 = _I2C_BUS('i2c1')
 Wire2 = _I2C_BUS('i2c2')
