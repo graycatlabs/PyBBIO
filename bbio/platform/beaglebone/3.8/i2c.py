@@ -11,6 +11,10 @@
 #		to activate i2c1 bus; echo BB-I2C1 > /sys/devices/bone_capemgr.8/slots; will be now present at /dev/i2c-2
 #		reference : http://datko.net/2013/11/03/bbb_i2c/
 
+##
+##		NOTE : WORK IN PROGRESS. DO NOT USE CODE. CONTAINS LOTS OF COMMENTS TO SELF!!
+##
+
 import config
 
 try:
@@ -108,7 +112,7 @@ class _I2C_BUS(object):
 		val - some object
 		returns a processed val that can be written to the I2C device
 		'''
-		# Keep this for prints, add below check in write itself. All that is allowed is [int, str, list(int), list(str)]
+		# Keep this for prints, add the below check in write itself. All that is allowed is [int, str, list(int), list(str)]
 		if type(val) == str:
 			return map(lambda x: ord(x), list(val))
 			#convert string to list of ascii values
