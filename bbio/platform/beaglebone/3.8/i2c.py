@@ -62,6 +62,7 @@ class _I2C_BUS(object):
 		addr : integer between (0-127) - Address of slave device
 		val : list - Of either characters or integers.
 		'''
+		#remove this - insead have a recursive fn which will convert lists to list of integers - and returns it back to write
 		pass
 
 
@@ -78,9 +79,10 @@ class _I2C_BUS(object):
 		if size == 1:
 			return self.bus.read_byte(addr)
 
-		read_data = []
+		
 
 		else:
+			read_data = []
 			for i in range(size):
 				data = self.bus.read_byte(addr)
 				if data == -1: #No more data to be read
@@ -106,7 +108,12 @@ class _I2C_BUS(object):
 		val - some object
 		returns a processed val that can be written to the I2C device
 		'''
-		pass
+		# Keep this for prints, add below check in write itself. All that is allowed is [int, str, list(int), list(str)]
+		if type(val) == str:
+			return map(lambda x: ord(x), list(val))
+			#convert string to list of ascii values
+
+
 
 	def available(self, addr):
 		'''
@@ -122,6 +129,4 @@ class _I2C_BUS(object):
 		string : string - to be written to slave device
 		'''
 		pass
-
-
-
+		#make this just like serial.println - i.e. add formating and all
