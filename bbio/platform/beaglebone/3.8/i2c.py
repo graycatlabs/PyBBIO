@@ -22,6 +22,7 @@ try:
   import smbus
 except:
   print "\n python-smbus module not found\n"
+  print "~#opkg install python-smbus\n"
 
 #currently for kernel 3.8 only
 def i2cInit(bus):
@@ -79,16 +80,26 @@ class _I2C_BUS(object):
 		'''
 		if not self.open:
 			print "I2C bus : %s - not initialized" % self.config
+			return
 
-		if type(addr) == int:
-			return self.bus.write_byte(addr, val)
+		try:
+			if type(val) == int:
+				self.bus.write_byte(addr, val)
+				return 1
 
-		else:
-			data = self._format(val)
-			written = 0 #bytes of data written
-			for unit in data:
-				written += self.bus.write_byte(addr, val)
-			return written
+			else:
+				data = self._format(val)
+				if data:
+					for unit in data:
+						self.bus.write_byte(addr, unit)
+						bbio.delay(4) #4 microsecond delay
+						#delay reqd, otherwise loss of data
+					return len(data)
+				else: 
+					return 0
+
+		except IOError as e:
+			print "Bus is active : check if device with address %d is connected/activated" %addr
 
 
 	def _format(self, val):
@@ -129,19 +140,22 @@ class _I2C_BUS(object):
 		if not self.open:
 			print "I2C bus : %s - not initialized, open before read" % self.config
 
-		if size == 1:
-			return self.bus.read_byte(addr)
+		try:
 
-		else:
-			read_data = []
-			for i in range(size):
-				data = self.bus.read_byte(addr)
-				if data == -1: #No more data to be read
-					break
-				else :
+			if size == 1:
+				return self.bus.read_byte(addr)
+
+			else:
+				read_data = []
+				for i in range(size):
+					data = self.bus.read_byte(addr)
+					bbio.delay(4)
 					read_data.append(data)
 
-		return read_data
+			return read_data
+
+		except IOError as e:
+			print "Bus is active : check if device with address %d is connected/activated" %addr
 
 
 	def end(self):
@@ -150,13 +164,11 @@ class _I2C_BUS(object):
 		'''
 		if self.bus:
 			result = self.bus.close()
-			if not result:
-				print "Failed to close i2c bus : %s" % self.config 
-				return False
 			self.open = False
 			return True
 		else:
 			print "i2c bus : %s - is not open. use begin() first" % self.config 
+			return False
 
 
 
@@ -187,5 +199,9 @@ def i2c_cleanup():
 			bus.end()
 
 #For arduino like similariy 
-Wire1 = _I2C_BUS('i2c1')
-Wire2 = _I2C_BUS('i2c2')
+Wire1 = _I2C_BUS('i2c1') #pins 17-18 OR 24-26
+# ^ not initialized by default; /dev/i2c-2
+#need to apply overlay for this
+
+Wire2 = _I2C_BUS('i2c2') #pins 19-20 OR 21-22
+#initialized by default; /dev/i2c-1
