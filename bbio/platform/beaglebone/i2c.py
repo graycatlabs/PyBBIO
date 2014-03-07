@@ -14,9 +14,10 @@
 ##
 ##
 
-from config import *
+
 import bbio
-from i2c_setup import *
+from config import I2C
+from i2c_setup import i2cInit
 
 try:
   import smbus
