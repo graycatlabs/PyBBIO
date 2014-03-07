@@ -182,3 +182,4 @@ Wire1 = _I2C_BUS('i2c1') #pins 17-18 OR 24-26
 #need to apply overlay for this
 
 Wire2 = _I2C_BUS('i2c2') #pins 19-20 OR 21-22
+#initialized by default; /dev/i2c-1# i2c.py 
