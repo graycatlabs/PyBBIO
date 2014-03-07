@@ -22,8 +22,8 @@ try:
   import smbus
 except:
   print "\n python-smbus module not found\n"
-  print "on angstrom : ~#opkg install python-smbus\n"
-  print "on ubuntu : ~#apt-get install python-smbus"
+  print "on Angstrom Linux : ~#opkg install python-smbus\n"
+  print "on Ubuntu, Debian : ~#apt-get install python-smbus"
 
 
 class _I2C_BUS(object):
