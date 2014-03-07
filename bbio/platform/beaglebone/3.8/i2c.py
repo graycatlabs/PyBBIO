@@ -51,7 +51,7 @@ class _I2C_BUS(object):
 	def __init__(self, bus):
 		'''
 		self : _I2C_BUS object
-		bus : string - represents bus address eg. i2c1, i2c2
+		bus : string - represents bus address eg. i2c1, i2c2; not dev_file
 		'''
 		assert bus in I2C, "Invalid bus address %s" %bus
 		self.config = bus
@@ -65,7 +65,9 @@ class _I2C_BUS(object):
 		if not i2cInit(self.config):
 			print "Could not initialize i2c bus : %s" % self.config 
 			return
-		self.bus = smbus.SMBus(int(self.config[-1]))
+		self.bus = smbus.SMBus(int(I2C[self.config][0][-1]))
+		#smbus takes the dev_file number as parameter, not bus number
+		#so if I pass 1 as the parameter, is uses /dev/i2c-1 file not i2c1 bus
 		self.open = True
 
 	def write(self, addr, val):
