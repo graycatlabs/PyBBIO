@@ -51,10 +51,11 @@ class _I2C_BUS(object):
         #so if I pass 1 as the parameter, is uses /dev/i2c-1 file not i2c1 bus
         self.open = True
 
-    def write(self, addr, val):
+    def write(self, addr, reg, val):
         '''
         Writes value 'val' to address 'addr'
         addr : integer between (0-127) - Address of slave device
+        reg : register of the slave device you want to write to
         val : string, integer or list - if list, writes each value in the list
         returns number of bytes written
         '''
@@ -64,14 +65,14 @@ class _I2C_BUS(object):
 
         try:
             if type(val) == int:
-                self.bus.write_byte(addr, val)
+                self.bus.write_byte_data(addr, reg, val)
                 return 1
 
             else:
                 data = self._format(val)
                 if data:
                     for unit in data:
-                        self.bus.write_byte(addr, unit)
+                        self.bus.write_byte_data(addr, reg, unit)
                         bbio.delay(4) #4 microsecond delay
                         #delay reqd, otherwise loss of data
                     return len(data)
@@ -109,10 +110,11 @@ class _I2C_BUS(object):
         return None
 
 
-    def read(self, addr, size=1):
+    def read(self, addr, reg, size=1):
         '''
         Reads 'size' number of bytes from slave device 'addr'
         addr : integer between (0-127) - Address of slave device
+        reg : register of the slave device you want to read from
         size : integer - number of bytes to be read
         returns an int if size is 1; else list of integers
         '''
@@ -122,12 +124,12 @@ class _I2C_BUS(object):
         try:
 
             if size == 1:
-                return self.bus.read_byte(addr)
+                return self.bus.read_byte_data(addr, reg)
 
             else:
                 read_data = []
                 for i in range(size):
-                    data = self.bus.read_byte(addr)
+                    data = self.bus.read_byte_data(addr, reg)
                     bbio.delay(4)
                     read_data.append(data)
 
