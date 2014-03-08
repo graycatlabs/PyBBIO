@@ -71,8 +71,8 @@ class _I2C_BUS(object):
             else:
                 data = self._format(val)
                 if data:
-                    for unit in data:
-                        self.bus.write_byte_data(addr, reg, unit)
+                    for i, unit in enumerate(data):
+                        self.bus.write_byte_data(addr, reg+i, unit)
                         bbio.delay(4) #4 microsecond delay
                         #delay reqd, otherwise loss of data
                     return len(data)
@@ -129,7 +129,7 @@ class _I2C_BUS(object):
             else:
                 read_data = []
                 for i in range(size):
-                    data = self.bus.read_byte_data(addr, reg)
+                    data = self.bus.read_byte_data(addr, reg+i)
                     bbio.delay(4)
                     read_data.append(data)
 
