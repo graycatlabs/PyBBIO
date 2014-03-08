@@ -130,7 +130,8 @@ try:
                      'bbio/platform/beaglebone/3.8/adc.py',
                      'bbio/platform/beaglebone/3.8/pwm.py',
                      'bbio/platform/beaglebone/3.8/cape_manager.py',
-                     'bbio/platform/beaglebone/3.8/uart.py'])]
+                     'bbio/platform/beaglebone/3.8/uart.py',
+                     'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
 
     os.system('python tools/install-bb-overlays.py')
 
@@ -147,7 +148,8 @@ try:
                      'bbio/platform/beaglebone/3.2/pinmux.py',
                      'bbio/platform/beaglebone/3.2/adc.py',
                      'bbio/platform/beaglebone/3.2/pwm.py',
-                     'bbio/platform/beaglebone/3.2/uart.py'])]
+                     'bbio/platform/beaglebone/3.2/uart.py',
+                     'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
 
     # Older Angstrom images only included support for one of the PWM modules
     # broken out on the headers, check and warn if no support for PWM2 module:
