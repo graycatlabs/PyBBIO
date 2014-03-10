@@ -22,7 +22,7 @@ from Stepper import *
 import time
 start_time = time.time() 
 
-stepper = Stepper(100,GPIO01_17,GPIO03_21,GPIO03_19,GPIO03_15)
+stepper = Stepper(GPIO01_17,GPIO03_21,GPIO03_19,GPIO03_15,100)
 
 def setup():
 	stepper.setSpeed(30);
