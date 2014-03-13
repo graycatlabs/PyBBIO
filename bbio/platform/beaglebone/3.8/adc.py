@@ -34,7 +34,7 @@ def analogRead(adc_pin):
     try:
       with open(glob.glob(adc_file)[0], 'rb') as f: 
         mv = f.read()
-        return int(mv)
+      return int(mv)
     except IOError:
       continue
   raise Exception('*Could not open AIN file: %s' % adc_file)
