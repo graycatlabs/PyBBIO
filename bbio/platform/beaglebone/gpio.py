@@ -20,6 +20,10 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   if pinmux.export(gpio_pin) and preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
+
+  gpio_num = GPIO[gpio_pin][4]
+  direction_file = '%s/direction' % (GPIO_FILE_BASE + 'gpio%i' % gpio_num)
+
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
@@ -28,13 +32,15 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
     pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT | pull, 
                   preserve_mode_on_exit)
     # Set input:
-    memory.orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
+    with open(direction_file, 'wb') as f:
+      f.write('in')
     return
   # Pinmux:
   pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT,
                 preserve_mode_on_exit)
   # Set output:
-  memory.clearReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
+  with open(direction_file, 'wb') as f:
+    f.write('out')
 
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
