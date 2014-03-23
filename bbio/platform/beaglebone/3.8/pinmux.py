@@ -52,7 +52,7 @@ def export(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
     return False
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin][4]
   if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
     # Pin already under userspace control
     return False
