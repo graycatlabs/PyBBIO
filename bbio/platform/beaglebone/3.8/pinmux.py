@@ -9,8 +9,12 @@
 from config import *
 import glob, os, cape_manager
 
-def pinMux(register_name, mode):
-  """ Uses custom device tree overlays to set pin modes. """
+def pinMux(register_name, mode, preserve_mode_on_exit=False):
+  """ Uses custom device tree overlays to set pin modes.
+      If preserve_mode_on_exit=True the overlay will remain loaded
+      when the program exits, otherwise it will be unloaded before
+      exiting.
+      *This should generally not be called directly from user code. """
   gpio_pin = ''
   for pin, config in GPIO.items():
     if config[2] == register_name:
@@ -21,7 +25,7 @@ def pinMux(register_name, mode):
     return
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
-    cape_manager.load('PyBBIO-%s' % gpio_pin)
+    cape_manager.load('PyBBIO-%s' % gpio_pin, not preserve_mode_on_exit)
     
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:

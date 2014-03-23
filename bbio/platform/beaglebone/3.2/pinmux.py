@@ -9,7 +9,7 @@
 from config import *
 from sysfs import kernelFileIO
 
-def pinMux(fn, mode):
+def pinMux(fn, mode, preserve_mode_on_exit=False):
   """ Uses kernel omap_mux files to set pin modes. """
   # There's no simple way to write the control module registers from a 
   # user-level process because it lacks the proper privileges, but it's 
