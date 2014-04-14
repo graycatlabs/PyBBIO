@@ -25,7 +25,11 @@ def pinMux(register_name, mode, preserve_mode_on_exit=False):
     return
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
-    cape_manager.load('PyBBIO-%s' % gpio_pin, not preserve_mode_on_exit)
+    try:
+      cape_manager.load('PyBBIO-%s' % gpio_pin, not preserve_mode_on_exit)
+    except IOError:
+      print "*Could not load %s overlay, resource busy" % gpio_pin
+      return
     
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
