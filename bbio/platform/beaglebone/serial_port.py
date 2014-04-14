@@ -28,15 +28,18 @@ class _UART_PORT(object):
     self.ser_port = None
     self.peek_char = ''
 
-  def begin(self, baud, timeout=1):
-    """ Starts the serial port at the given baud rate. """
+  def begin(self, baud, timeout=1, **kwargs):
+    """ Starts the serial port at the given baud rate. 'timeout' as well
+        as any other given keyword arguments will be passed to the PySerial 
+        Serial class' __init__() method, see the PySerial docs for more info. 
+    """
     if not uartInit(self.config):
       print "*Could not open serial port defined by: %s" % self.config
       self.ser_port = None
       return
     port = UART[self.config][0]
     self.baud = baud
-    self.ser_port = serial.Serial(port, baud, timeout=timeout)
+    self.ser_port = serial.Serial(port, baud, timeout=timeout, **kwargs)
     self.open = True 
 
   def end(self):
