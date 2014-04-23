@@ -185,13 +185,14 @@ class WebCam(object):
 
     with file(filename, 'w') as fh:
       fh.write(str(buf))
-      print "done"
+      print "took a picture"
     self.fakesink.set_state(gst.STATE_PLAYING)
   
   def stopPipeline(self):
     '''
     stopPipeline()
-    Switches off your camera
+    Switches off your camera.
+    Can't use the same instance to switch ot back on
     '''
     self.pipeline.set_state(gst.STATE_NULL)
     self.streamsink.set_state(gst.STATE_NULL)
