@@ -657,7 +657,7 @@ SPI_set_msh(SPI *self, PyObject *val, void *closure)
 }
 
 static PyGetSetDef SPI_getset[] = {
-	{"mode", (getter)SPI_get_mode, (setter)SPI_set_mode,
+	{"md", (getter)SPI_get_mode, (setter)SPI_set_mode,
 			"SPI mode as two bit pattern of \n"
 			"Clock Polarity  and Phase [CPOL|CPHA]\n"
 			"min: 0b00 = 0 max: 0b11 = 3\n"},
