@@ -1,5 +1,4 @@
-#!/usr/bin/env python
-# PyBBIO setup script
+
 
 import sys, os
 
@@ -123,7 +122,9 @@ try:
                                    'bbio/platform/util/mmap_util.c'],
                                    include_dirs=['bbio/platform/util']),
                         Extension('bbio.platform._sysfs',
-                                   ['bbio/platform/util/_sysfs.c'])]
+                                   ['bbio/platform/util/_sysfs.c']),
+                        Extension('bbio.platform.spimodule,'
+                                   ['bbio/platform/util/spimodule.c'])]
     driver_packages = ['bbio.platform.beaglebone']
     driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
                    ('bbio/platform/beaglebone', 
@@ -133,7 +134,8 @@ try:
                      'bbio/platform/beaglebone/3.8/pwm.py',
                      'bbio/platform/beaglebone/3.8/cape_manager.py',
                      'bbio/platform/beaglebone/3.8/uart.py',
-                     'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
+                     'bbio/platform/beaglebone/3.8/i2c_setup.py',
+                     'bbio/platform/beaglebone/3.8/spi.py'])]
 
     os.system('python tools/install-bb-overlays.py')
 
@@ -186,4 +188,3 @@ except Exception, e:
 # from complaining when updating with 'git pull':
 with open(config_file, 'wb') as config:
   config.write(config_str.replace(new_config_line, old_config_line))
-
