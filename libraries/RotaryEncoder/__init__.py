@@ -1,3 +1,3 @@
 #__init__.py for Rotary Encoder
 
-from RotaryEncoder import *
+from rotary_encoder import RotaryEncoder
