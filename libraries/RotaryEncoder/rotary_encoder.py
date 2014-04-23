@@ -1,4 +1,5 @@
 
+import os
 from bbio.platform import sysfs
 from bbio import addToCleanup, cape_manager
 from bbio import OCP_PATH
@@ -13,15 +14,15 @@ class RotaryEncoder(object):
     
   def __init__(self, eqep_num):
     assert 0 <= eqep_num < 3, "eqep_num must be between 0 and 2"
- 
     
-    try:
-      cape_manager.load('PyBBIO-bone_epeq%s' % eqep_num, 1)
-      bbio.delay(250) # Give driver time to load
-    except IOError:
-      print "*Could not load bone_epeq%s overlay, resource busy" % eqep_num
-      return
+    overlay = 'bone_eqep%i' % eqep_num
+    assert os.path.exists('/lib/firmware/%s.dtbo' % overlay), \
+     "eQEP driver not present, update to a newer image to use the eQEP library"
     
+    cape_manager.load(overlay)
+    bbio.delay(250) # Give driver time to load 
+    
+
     self.eqep_num = eqep_num
     self.base_dir = self._eqep_dirs[eqep_num]
     self.mode = mode
