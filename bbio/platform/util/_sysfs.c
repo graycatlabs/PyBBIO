@@ -10,39 +10,35 @@ Returns NULL when python arguments aren't succesfully converted to C
 static PyObject* _kernelFileIO(PyObject *self, PyObject *args)
 { 
   FILE* fd;
-  int rd;
+  char rd[64];
   char *val;
   char *fn; 
 	
   //Converts the file path into a string
-  if(!(PyArg_ParseTuple(args,"s",&fn)))
-		return NULL;
-
-  //Converts the value to a C string	
-  if(!(PyArg_ParseTuple(&args[1],"s",&val)))
-		return NULL;
+  if(!(PyArg_ParseTuple(args,"ss",&fn, &val)))
+		return Py_BuildValue("");
 	
   fd = fopen(fn,"r+");
   if(fd==NULL)
-    return NULL;
+    		return Py_BuildValue("");
   fseek(fd,0,SEEK_SET);
 
   if (val!=NULL)
   {
     fprintf(fd,"%s",val);
   }
-  fscanf(fd,"%d",&rd);
-  return Py_BuildValue("i",rd);
+  fgets(rd,64,fd);
+  return Py_BuildValue("s",rd);
 }       
 
 static PyMethodDef sysfsMethods[]=
 {
-	{ "_kernelFileIO", _kernelFileIO, METH_VARARGS },
+	{ "_kernelFileIO", _kernelFileIO, METH_VARARGS, "function that opens and r/w to a file" },
 	{ NULL, NULL },
 };
 
 PyMODINIT_FUNC init_sysfs(void)
 {
-	Py_InitModule("_sysfs",sysfsMethods);
+	Py_InitModule( "_sysfs" , sysfsMethods , "Initiate Module" );
 }
 
