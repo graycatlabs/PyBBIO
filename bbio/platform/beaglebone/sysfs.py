@@ -6,24 +6,17 @@
 # Helper routines for sysfs kernel drivers
 
 import glob
-
-def kernelFileIO(file_object, val=None):
-  """ For reading/writing files open in 'r+' mode. When called just
-      with a file object, will return contents of file. When called 
-      with file object and 'val', the file will be overritten with 
-      new value and the changes flushed. 'val' must be type str.
-      Meant to be used with Kernel driver files for much more 
-      efficient IO (no need to reopen every time). """  
-  file_object.seek(0)
-  if (val == None): return file_object.read()
-  file_object.write(val)
-  file_object.flush()
+from bbio.platform._sysfs import _kernelFileIO
 
 
-def kernelFilenameIO(fn, val=None):
-  """ Same as kernelFileIO() but takes a filename instead of an already
-      open file object. The filename should be a complete absolute path,
-      and may inlcued asterisks, e.g. /sys/devices/ocp.*/some/file. """
+def kernelFilenameIO(fn, val=''):
+  """ Calls _kernelFileIO. The filename should be a complete absolute path,
+      and may inlcued asterisks, e.g. /sys/devices/ocp.*/some/file.
+      For reading/writing files open in 'r+' mode. When called just
+      with a file name, will return contents of file. When called
+      with file name and 'val', the file will be overritten with
+      new value and the changes flushed and returned. 'val' must be type str.
+      Meant to be used with Kernel driver files for much more
+      efficient IO (no need to reopen every time). """
   fn = glob.glob(fn)[0]
-  with open(fn, 'r+') as f:
-    return kernelFileIO(f, val)
+  return _kernelFileIO(fn, val)
