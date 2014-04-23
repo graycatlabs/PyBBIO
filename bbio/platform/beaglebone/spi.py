@@ -142,20 +142,22 @@ class SPI_Bus(object):
     else:
       return self.spidev_cs1.mode
       
-  def setBitOrder(self,cs,lsbf):
+  def setBitOrder(self,cs,order):
     '''
-    SPIx.setBitOrder(chip_select,lsbfirst)
+    SPIx.setBitOrder(chip_select,order)
     Sets the BitOrder of the SPI device specified by chip_select to LSB First or MSB First.
-    for LSB first : 1
-    for MSB first : 0 
+    order must be either LSBFIRST or MSBFIRST
     Returns the mode of SPI device.    
     '''
     assert self._running == True, "Must call SPIx.begin() before using setBitOrder()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
+    assert lsb == -1 lsb ==1 , "either LSBFIRST or MSBFIRST"
+    if order == LSBFIRST: 
+      order = 0
     if cs == 0:
-      self.spidev_cs0.lsbfirst=lsbf
+      self.spidev_cs0.lsbfirst=order
     else:
-      self.spidev_cs1.lsbfirst=lsbf
+      self.spidev_cs1.lsbfirst=order
       
   def getBitOrder(self,cs):
     '''
@@ -199,29 +201,29 @@ class SPI_Bus(object):
     else:
       return self.spidev_cs1.msh
 
-  def CShigh(self,cs):
+  def setCShigh(self,cs):
     '''
-    SPIx.CShigh(chip_select)
+    SPIx.setCShigh(chip_select)
     Makes Chip Select pin of the SPI device specified by chip_select active High
     '''
     assert self._running == True, "Must call SPIx.begin() before using CShigh()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
-      self.spidev_cs0.cshigh=1
+      self.spidev_cs0.cshigh = True
     else:
-      self.spidev_cs1.cshigh=1
+      self.spidev_cs1.cshigh = True
       
-  def CSlow(self,cs):
+  def setCSlow(self,cs):
     '''
-    SPIx.CSlow(chip_select)
+    SPIx.setCSlow(chip_select)
     Makes Chip Select pin of the SPI device specified by chip_select active Low
     '''
     assert self._running == True, "Must call SPIx.begin() before using CSlow()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
-      self.spidev_cs0.cshigh=0
+      self.spidev_cs0.cshigh = False
     else:
-      self.spidev_cs1.cshigh=0
+      self.spidev_cs1.cshigh= False
       
 
 # Initialize the global SPI  instances:
