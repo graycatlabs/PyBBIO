@@ -67,7 +67,6 @@ class ADT7310(object):
     setLowTemp(temp)
     Sets the Low Temperature below which the Interrupt pin will activate
     '''
-    t = self._encodeTemp(temp)
     self._exitContinuous()
     self.spidev.write(self.cs,[self.CMD_WRITE | self.ADDR_LOW_TEMP] + \
                        self._encodeTemp(temp))
@@ -168,9 +167,9 @@ class ADT7310(object):
     self._continuous == False
     
   def read(self, reg):
-    self.spidev.write(self.cs,[CMD_READ | reg<<3])
-    _t = self.spidev.read(self.cs,2)
     self._exitContinuous()
+    self.spidev.write(self.cs,[self.CMD_READ | reg<<3])
+    _t = self.spidev.read(self.cs,2)
     if ( _t[0] & 128 == 0):
       temp = (((_t[0]<<8)+_t[1])>>3)/16
     else:
