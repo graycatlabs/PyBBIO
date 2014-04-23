@@ -1,19 +1,24 @@
+'''
+ webcam_test.py 
+ Rekha Seethamraju
+
+ An example to demonstrate the use of the WebCam library
+ for PyBBIO.
+
+ This example program is in the public domain.
+'''
+
 from bbio import *
 from WebCam import WebCam
 
 cam = WebCam()
 
-cam.startStreaming()
-cam.startRecording("sample1")
+
+cam.startStreaming(5001)
 cam.takeSnapshot("sam1")
 delay(30000)
 cam.stopStreaming()
-cam.stopRecording()
-cam.takeSnapshot("sam2")
-delay(10000)
-cam.startStreaming()
-cam.startRecording("sample2")
 delay(30000)
+cam.startStreaming(5001)
+cam.takeSnapshot("../sam2")
 cam.stopStreaming()
-cam.stopRecording()
-cam.takeSnapshot("sam3")
