@@ -44,8 +44,7 @@ class MMA7660(object):
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_PD,self.PD_TAP_THRESH)
     pdet = self.PDET_TH | self.PDET_TAP_X | self.PDET_TAP_Y | self.PDET_TAP_Z
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_PDET,pdet)
-    print self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
-    
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)  
     addToCleanup(self.close)
     
   def getX(self):
@@ -70,8 +69,8 @@ class MMA7660(object):
     return z
     
   def getXYZ(self):
-    x,y,z = self.i2cdev.read(size=3)
-    #return map(lambda x : ((x<<2)-128)/4)
+    xyz = self.i2cdev.read(0x4c,0x00,3)
+    return list(map(lambda x : ((x<<2)-128)/4,xyz))
     
   def setInterrupt(self, cfg, pin, callback):
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
@@ -113,7 +112,6 @@ class MMA7660(object):
     status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
     while((status&0x40)>>6==1):
       status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    print "Status :"+status
     back_front = (status&0x03)
     portrait_landscape = (status&0x1C)>>2
     tap = (status&0x20)>>5
@@ -128,7 +126,3 @@ class MMA7660(object):
     self.removeInterrupt()
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
     self.i2cdev.end()
-    
-    
-    
-#set shake in? self.REG_INTSU,SHAKE_X | SHAKE_Y | SHAKE_Z 1<<7,1<<6,1<<5)
