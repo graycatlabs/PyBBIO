@@ -1,10 +1,7 @@
-#to do : docstrings
-# tap enables on x,y and z
-
 from bbio import *
-class MMA7660(object):
 
-  MMA7660_ADDR = 0x4c
+class MMA7660(object):
+  MMA7660_ADDR = 0x4C
   REG_X = 0x00
   REG_Y = 0x01
   REG_Z = 0x02
@@ -21,13 +18,18 @@ class MMA7660(object):
   SRATE_16 = 0x03
   SRATE_120 = 0x00
   SR_FLIT = 2<<5
-  INT_TAP = 1<<2
   PD_TAP_THRESH = 0x14
   PDET_TAP_X = 0<<5
   PDET_TAP_Y = 0<<6
   PDET_TAP_Z = 1<<7
   PDET_TH = 6
-
+  INT_FB = 1 
+  INT_PL = 1<<1
+  INT_PD = 1<<2
+  INT_SHX = 1<<5
+  INT_SHY = 1<<6
+  INT_SHZ = 1<<7
+  
   def __init__(self,i2c_no):
     assert 1 <= i2c_no <= 2, "i2c_no must be between 1 or 2"
     self.i2c_no = i2c_no
@@ -42,8 +44,9 @@ class MMA7660(object):
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_PD,self.PD_TAP_THRESH)
     pdet = self.PDET_TH | self.PDET_TAP_X | self.PDET_TAP_Y | self.PDET_TAP_Z
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_PDET,pdet)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
-    self.int_pin = None
+    print self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
+    
+    addToCleanup(self.close)
     
   def getX(self):
     x = self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)
@@ -66,73 +69,66 @@ class MMA7660(object):
     z = ((z<<2)-128)/4
     return z
     
-
-
-  def setTapAlarm(self,int_pin,callabck):
-    self._setAlarm(int_pin,callabck) 
+  def getXYZ(self):
+    x,y,z = self.i2cdev.read(size=3)
+    #return map(lambda x : ((x<<2)-128)/4)
+    
+  def setInterrupt(self, cfg, pin, callback):
     self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_INTSU,self.INT_TAP)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
-    
- 
-  def detectTap(self):
-    tap = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    print "TAP I: "+str(tap)
-    while((tap&0x40)>>6==1):
-      tap = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    tap = (tap&0x20)>>5
-    return tap
-    
-
-  def getOrientation(self):
-    orient = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    while((orient&0x40)>>6==1):
-      orient = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    pola = (orient&0x1C)>>2
-    bafro = orient&0x03
-    if pola == 1:
-      print "Orientation : Left: Equipment is in landscape mode to the left"
-    elif pola == 2:
-      print "Orientation : Right: Equipment is in landscape mode to the right"
-    elif pola == 5:
-      print "Orientation : Down: Equipment standing vertically in inverted orientation"
-    elif pola == 6:
-      print "Orientation : Up: Equipment standing vertically in normal orientation"
-    if bafro == 1 :
-      print "Orientation : Front: Equipment is lying on its front"
-    elif bafro == 2:
-      print "Orientation : Back: Equipment is lying on its back"
-   
-  def setShakeAlarm(self,int_pin,callabck):
-    self._setAlarm(int_pin,callabck) 
-    SHAKE_X = 1<<7
-    SHAKE_Y = 1<<6
-    SHAKE_Z = 1<<5
-    shake = SHAKE_X | SHAKE_Y | SHAKE_Z
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_SR,self.SRATE_120)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_INTSU,shake)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
-
-  def getShake(self):
-    shake = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    print "Shake I: "+str(shake)
-    while((shake&0x40)>>6==1):
-      shake = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
-    shake = (shake&0x80)>>7
-    return shake
-    
-  def _setAlarm(self,int_pin,callback):
-    self._removeAlarm()
-    self.int_pin = int_pin
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_INTSU,cfg)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE) 
+    self.usr_callback = callback
+    self.int_pin = pin
     pinMode(self.int_pin, INPUT, PULLUP)
-    attachInterrupt(self.int_pin,callback,FALLING) 
+    attachInterrupt(self.int_pin, self._int_callback)
     
-  def _removeAlarm(self):
+  def settapthreshold(self, value):
+    assert 0 <= value <= 31, "tap detection threshold must be between 0 and 31"
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PDET,value)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
+  
+  def settiltfilter(self, value):
+    assert 0 <= value <= 8, "Tilt debounce filtering must be between 0 and 8"
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_SR,value)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)		
+  
+  def setTapDebounce(self, value):
+    assert 0 <= value <= 256, "tap detection debounce filter must be between \
+                              0 and 256"
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PD,value)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
+  
+  def getOrientation(self):
+    status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    while((status&0x40)>>6==1):
+      status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    back_front = (status&0x03)
+    portrait_landscape = (status&0x1C)>>2
+    return [back_front, portrait_landscape]
+  
+  def _int_callback(self):
+    status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    while((status&0x40)>>6==1):
+      status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    print "Status :"+status
+    back_front = (status&0x03)
+    portrait_landscape = (status&0x1C)>>2
+    tap = (status&0x20)>>5
+    shake = (status&0x80)>>7
+    self.usr_callback(back_front, portrait_landscape, tap, shake)
+    
+  def removeInterrupt(self):
     if self.int_pin:
       detachInterrupt(self.int_pin)
+      
+  def close(self):
+    self.removeInterrupt()
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.end()
     
     
     
-    
-    
+#set shake in? self.REG_INTSU,SHAKE_X | SHAKE_Y | SHAKE_Z 1<<7,1<<6,1<<5)
