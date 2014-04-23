@@ -1,6 +1,6 @@
 
 from bbio import *
-from RotaryEncoder import RotaryEncoder
+from RotaryEncoder import *
 
 encoder = RotaryEncoder(1)
 
