@@ -1,8 +1,25 @@
+'''
+WebCam - v0.1
+Copyright 2014 Rekha Seethamraju
+
+Library for streaming video and taking a picture from a webcam connected to  
+the beaglebone black.
+
+WebCam is released as part of PyBBIO under its MIT license.
+See PyBBIO/LICENSE.txt
+'''
+
 from bbio import delay, addToCleanup
 import gst,sys, gobject, pygtk, gst.video
 class WebCam(object):
 
   def __init__(self,video_device=0):
+    '''
+    WebCam(video_device_num)
+    Initialises the WebCam object. 
+    video_device_num corresponds to the /dev/video number 
+    This switches on your camera until stopPipeline() is called.
+    '''
     self.video_num = video_device
     self.video_device = "/dev/video%i"%(video_device)
     self.pipeline = gst.Pipeline()
@@ -10,11 +27,13 @@ class WebCam(object):
     self.videocbin = self._videoconvertbin()
     
     self.streaming = 0
+    self.recording = 0
     
     self.fakesink = gst.element_factory_make("fakesink")
     self.fakestreamsink = gst.element_factory_make("fakesink")
     self.fakerecordsink = gst.element_factory_make("fakesink")
     self.streamsink = gst.element_factory_make("tcpserversink")
+    self.recordsink = gst.element_factory_make("filesink","record_sink")
     
     self.pic_tee = gst.element_factory_make("tee")
     self.pic_queue = gst.element_factory_make("queue")
@@ -64,7 +83,7 @@ class WebCam(object):
     self.fake_stream_pad = self.fakestreamsink.get_pad("sink")
     self.fake_record_pad = self.fakerecordsink.get_pad("sink")
     self.stream_sink_pad = self.streamsink.get_pad("sink")
-    
+    self.record_sink_pad = self.recordsink.get_pad("sink")
     
     if not (self.src_stream_pad and self.src_record_pad and self.fake_stream_pad and self.fake_record_pad and self.stream_sink_pad):
       raise Exception("this =(")  
@@ -77,6 +96,11 @@ class WebCam(object):
     addToCleanup(self.stopPipeline)
     
   def _sourcebin(self):
+    '''
+    _sourcebin()
+    Makes a bin : v4l2src ! image/jpeg,width=640,height=480,framerate=30/1 ! \
+                  jpegdec
+    '''
     bin = gst.Bin("srcbin")
     source = gst.element_factory_make("v4l2src")
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
@@ -93,6 +117,11 @@ class WebCam(object):
     return bin
     
   def _videoconvertbin(self):
+    '''
+    _videoconvertbin()
+    Makes a bin with :  
+    theoraenc ! queue ! oggmux
+    '''
     bin = gst.Bin("vconvertbin")
     theoraenc = gst.element_factory_make("theoraenc")
     buffer_queue = gst.element_factory_make("queue")
@@ -113,6 +142,12 @@ class WebCam(object):
     
       
   def startStreaming(self,port = 5000):
+    '''
+    startStreaming((optional)port)
+    starts streaming video from the webcam to http://your_bbb's_ip_sddress:port
+    port defaults to 5000
+    NOTE : Once port no. is set trying to change it will show an error.
+    '''
     self.streamsink.set_property("host","127.0.0.1")
     self.streamsink.set_property("port",int(port))
     self.streamsink.set_state(gst.STATE_PLAYING)
@@ -126,6 +161,10 @@ class WebCam(object):
     self.queue_stream_pad.set_blocked(False)
    
   def stopStreaming(self):
+    '''
+    stopStreaming()
+    stops the streaming
+    '''
     self.fakestreamsink.set_state(gst.STATE_PLAYING)
     self.queue_stream_pad.set_blocked(True)
     self.streamsink.set_state(gst.STATE_NULL)
@@ -133,28 +172,11 @@ class WebCam(object):
     self.src_stream_pad.link(self.fake_stream_pad)
     self.queue_stream_pad.set_blocked(False)
   
-  def startRecording(self,filename):
-    self.recordsink = gst.element_factory_make("filesink","record_sink")
-    self.recordsink.set_property("location",filename+".ogg")
-    self.record_sink_pad = self.recordsink.get_pad("sink")
-    self.recordsink.set_state(gst.STATE_PLAYING)
-    self.pipeline.add(self.recordsink)
-    self.queue_record_pad.set_blocked(True)
-    self.fakerecordsink.set_state(gst.STATE_NULL)
-    self.src_record_pad.unlink(self.fake_record_pad)
-    self.src_record_pad.link(self.record_sink_pad)
-    self.queue_record_pad.set_blocked(False)
-    
-  def stopRecording(self):
-    self.fakerecordsink.set_state(gst.STATE_PLAYING)
-    self.queue_record_pad.set_blocked(True)
-    self.recordsink.set_state(gst.STATE_NULL)
-    self.src_record_pad.unlink(self.record_sink_pad)
-    self.src_record_pad.link(self.fake_record_pad)
-    self.pipeline.remove(self.recordsink)
-    self.queue_record_pad.set_blocked(False)
-  
   def takeSnapshot(self,filename):
+    '''
+    takeSnapshot(filename)
+    takes a snap shot and stores it in filename.jpeg
+    '''
     filename = str(filename)+".jpeg"
     caps=gst.Caps('image/jpeg')
     self.fakesink.set_state(gst.STATE_PAUSED)
@@ -167,5 +189,9 @@ class WebCam(object):
     self.fakesink.set_state(gst.STATE_PLAYING)
   
   def stopPipeline(self):
+    '''
+    stopPipeline()
+    Switches off your camera
+    '''
     self.pipeline.set_state(gst.STATE_NULL)
     self.streamsink.set_state(gst.STATE_NULL)
