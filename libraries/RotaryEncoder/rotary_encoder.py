@@ -13,15 +13,17 @@ class RotaryEncoder(object):
   
     
   def __init__(self, eqep_num):
-    assert 0 <= eqep_num < 3, "eqep_num must be between 0 and 2"
-    
-    overlay = 'bone_eqep%i' % eqep_num
-    assert os.path.exists('/lib/firmware/%s.dtbo' % overlay), \
+    assert 0 <= eqep_num <= 3 , "eqep_num must be between 0 and 3"
+    if eqep_num == 3:
+    	overlay = 'bone_eqep2b'
+    	print ("1")
+    else:
+    	overlay = 'bone_eqep%i' % eqep_num
+    assert os.path.exists("/lib/firmware/bone_eqep2b-00A0.dtbo"), \
      "eQEP driver not present, update to a newer image to use the eQEP library"
     
-    cape_manager.load(overlay)
+    cape_manager.load(overlay, auto_unload=False)
     bbio.delay(250) # Give driver time to load 
-    
 
     self.eqep_num = eqep_num
     self.base_dir = self._eqep_dirs[eqep_num]
