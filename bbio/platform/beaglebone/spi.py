@@ -66,7 +66,7 @@ class SPI_Bus(object):
     Clock Polarity  and Phase [CPOL|CPHA]
 	min: 0b00 = 0 max: 0b11 = 3
     '''
-    self.spidev.md=mode
+    self.spidev.mode=mode
     
   def setBitOrder(self,lsbf):
     '''
