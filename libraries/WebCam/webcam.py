@@ -6,10 +6,10 @@ class WebCam(object):
     self.spipeline = gst.Pipeline("test-pipeline")
     self.rpipeline = gst.Pipeline("test-pipeline")
 
-  def startStreaming(self):
+  def startStreaming(self,port = 5000):
     # Create the elements
     source = gst.element_factory_make("v4l2src", "source")
-    caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
+    caps = gst.Caps("image/jpeg,width=640,height=480,framerate=60/1")
     capsfilter = gst.element_factory_make("capsfilter", "filter")
     jdecoder = gst.element_factory_make("jpegdec", "jdecoder")
     theoraenc = gst.element_factory_make("theoraenc", "theoraenc")
@@ -32,7 +32,7 @@ class WebCam(object):
     source.set_property("device","/dev/video0")
     capsfilter.set_property("caps", caps)
     sink.set_property("host","127.0.0.1")
-    sink.set_property("port",5000)
+    sink.set_property("port",int(port))
 
     ret = self.spipeline.set_state(gst.STATE_PLAYING)
     if ret ==  gst.STATE_CHANGE_FAILURE:
