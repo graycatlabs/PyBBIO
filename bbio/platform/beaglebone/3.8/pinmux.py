@@ -7,7 +7,7 @@
 # For Beaglebones with 3.8 kernel
 
 from config import *
-import glob, os, cape_manager
+import glob, os, cape_manager, bbio
 
 def pinMux(register_name, mode, preserve_mode_on_exit=False):
   """ Uses custom device tree overlays to set pin modes.
@@ -27,6 +27,7 @@ def pinMux(register_name, mode, preserve_mode_on_exit=False):
   if len(mux_file_glob) == 0:
     try:
       cape_manager.load('PyBBIO-%s' % gpio_pin, not preserve_mode_on_exit)
+      bbio.delay(250) # Give driver time to load
     except IOError:
       print "*Could not load %s overlay, resource busy" % gpio_pin
       return
