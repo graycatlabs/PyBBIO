@@ -57,8 +57,8 @@ def pwmFrequency(pwm_pin, freq_hz):
   pin_config = PWM_PINS[pwm_pin]
   helper_path = pin_config[1]
 
-  old_duty_ns = int(kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY)))
-  old_period_ns = int(kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD)))
+  old_duty_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY)))
+  old_period_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD)))
 
   duty_percent = old_duty_ns / old_period_ns
   new_period_ns = 1e9/freq_hz
