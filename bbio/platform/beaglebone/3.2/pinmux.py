@@ -9,7 +9,7 @@
 from config import *
 from sysfs import kernelFileIO
 
-def pinMux(fn, mode):
+def pinMux(fn, mode, preserve_mode_on_exit=False):
   """ Uses kernel omap_mux files to set pin modes. """
   # There's no simple way to write the control module registers from a 
   # user-level process because it lacks the proper privileges, but it's 
@@ -28,7 +28,7 @@ def export(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
     return False
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin][4]
   if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
     # Pin already under userspace control
     return False

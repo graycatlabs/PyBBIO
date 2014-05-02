@@ -28,9 +28,17 @@ def analogRead(adc_pin):
     # Overlay not loaded yet
     overlay = adc_pin[1]
     cape_manager.load(overlay, auto_unload=False)
-  with open(glob.glob(adc_file)[0], 'rb') as f: 
-    mv = f.read()
-  return int(mv)
+  # Occasionally the kernel will be writing to the file when you try 
+  # to read it, to avoid IOError try up to 5 times:
+  for i in range(5):
+    try:
+      with open(glob.glob(adc_file)[0], 'rb') as f: 
+        mv = f.read()
+      return int(mv)
+    except IOError:
+      continue
+  raise Exception('*Could not open AIN file: %s' % adc_file)
+
 
 def inVolts(mv):
   """ Converts millivolts to volts... you know, to keep the API 

@@ -9,8 +9,12 @@
 from config import *
 import glob, os, cape_manager
 
-def pinMux(register_name, mode):
-  """ Uses custom device tree overlays to set pin modes. """
+def pinMux(register_name, mode, preserve_mode_on_exit=False):
+  """ Uses custom device tree overlays to set pin modes.
+      If preserve_mode_on_exit=True the overlay will remain loaded
+      when the program exits, otherwise it will be unloaded before
+      exiting.
+      *This should generally not be called directly from user code. """
   gpio_pin = ''
   for pin, config in GPIO.items():
     if config[2] == register_name:
@@ -21,7 +25,11 @@ def pinMux(register_name, mode):
     return
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
-    cape_manager.load('PyBBIO-%s' % gpio_pin)
+    try:
+      cape_manager.load('PyBBIO-%s' % gpio_pin, not preserve_mode_on_exit)
+    except IOError:
+      print "*Could not load %s overlay, resource busy" % gpio_pin
+      return
     
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
@@ -48,7 +56,7 @@ def export(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
     return False
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin][4]
   if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
     # Pin already under userspace control
     return False

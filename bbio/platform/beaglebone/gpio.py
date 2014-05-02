@@ -10,26 +10,37 @@ from bbio.util import addToCleanup
 from config import *
 
 
-def pinMode(gpio_pin, direction, pull=0):
+def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   """ Sets given digital pin to input if direction=1, output otherwise.
       'pull' will set the pull up/down resistor if setting as an input:
-      pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. """
+      pull=-1 for pull-down, pull=1 for pull up, pull=0 for none. 
+      If preserve_mode_on_exit=True, the DT overlay and will remain 
+      loaded, the pin will remain exported to user-space control, and 
+      the INPUT/OUTPUT mode will be preserved when the program exits. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if pinmux.export(gpio_pin):
+  if pinmux.export(gpio_pin) and preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
+
+  gpio_num = GPIO[gpio_pin][4]
+  direction_file = '%s/direction' % (GPIO_FILE_BASE + 'gpio%i' % gpio_num)
+
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
     elif (pull < 0): pull = CONF_PULLDOWN
     else: pull = CONF_PULL_DISABLE
-    pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT | pull)
+    pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT | pull, 
+                  preserve_mode_on_exit)
     # Set input:
-    memory.orReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
+    with open(direction_file, 'wb') as f:
+      f.write('in')
     return
   # Pinmux:
-  pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT)
+  pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT,
+                preserve_mode_on_exit)
   # Set output:
-  memory.clearReg(GPIO[gpio_pin][0]+GPIO_OE, GPIO[gpio_pin][1])
+  with open(direction_file, 'wb') as f:
+    f.write('out')
 
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
