@@ -18,7 +18,11 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       loaded, the pin will remain exported to user-space control, and 
       the INPUT/OUTPUT mode will be preserved when the program exits. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if pinmux.export(gpio_pin) and preserve_mode_on_exit:
+  exported = pinmux.export(gpio_pin)
+  if not exported:
+    print "warning: could not export pin '%s', skipping pinMode()" % gpio_pin
+    return
+  elif preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
   gpio_num = GPIO[gpio_pin][4]
