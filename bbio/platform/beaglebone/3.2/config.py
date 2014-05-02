@@ -202,3 +202,18 @@ PWM_FREQ    = 3
 
 ##--- End PWM config: ------##
 ##############################
+
+##############################
+##--- Start I2C config: ---##
+
+# I2C bus address must be in form: 
+#    [dev-entry, I2C-overlay-name]
+
+I2C = {
+  'i2c1' : ['/dev/i2c-2', 'BB-I2C1'],
+  'i2c2' : ['/dev/i2c-1', 'BB-I2C2'],
+}
+
+##--- End I2C config ------##
+##############################
+
