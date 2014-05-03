@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # PyBBIO setup script
 
-import sys, os
+import sys, os, shutil
 
 
 # Earlier versions of PyBBIO used a shell script to install the 
@@ -76,15 +76,13 @@ if not os.path.exists(python_lib_path + 'py_compile.py'):
     raise e
 
 
-# A bit of a hack here; replace line in config file to point to
-# the libraries directory:
-lib_path = os.path.join(os.getcwd(), 'libraries')
-old_config_line = 'LIBRARIES_PATH = """Do not edit!"""\n'
-new_config_line = 'LIBRARIES_PATH = "%s"\n' % lib_path
-config_file = 'bbio/config.py'
-config_str = open(config_file, 'rb').read()
-with open(config_file, 'wb') as config:
-  config.write(config_str.replace(old_config_line, new_config_line))
+# Copy the libraries directory to /usr/local/lib:
+lib_dst = '/usr/local/lib/PyBBIO/libraries'
+lib_src = os.path.join(os.getcwd(), 'libraries')
+if os.path.exists(lib_dst):
+  print "Found old PyBBIO libraries directory, replacing"
+  shutil.rmtree(lib_dst)
+shutil.copytree(lib_src, lib_dst)
 
 
 # Finally we can install the package:
@@ -174,9 +172,4 @@ try:
   print "PyBBIO is now installed on your %s, enjoy!" % platform
 except Exception, e:
   print "Install failed with exception:\n%s" % e
-
-# Now replace the local config file to original state to keep git
-# from complaining when updating with 'git pull':
-with open(config_file, 'wb') as config:
-  config.write(config_str.replace(new_config_line, old_config_line))
 
