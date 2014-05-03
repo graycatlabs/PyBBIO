@@ -115,41 +115,36 @@ try:
   if ('3.8' in uname):
     platform += ' Black'
     
-
-  if (platform == 'BeagleBone Black'):
-    # BeagleBone or BeagleBone Black with kernel >= 3.8
-    driver_extensions = [Extension('bbio.platform.beaglebone.driver', 
+  if 'BeagleBone' in platform:
+    # 3.2 and 3.8, list common things:
+    driver_packages += ['bbio.platform.beaglebone']
+    driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
                                    ['bbio/platform/beaglebone/src/beaglebone.c', 
                                     'bbio/platform/util/mmap_util.c'],
                                    include_dirs=['bbio/platform/util'])]
-    driver_packages = ['bbio.platform.beaglebone']
-    driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
-                   ('bbio/platform/beaglebone', 
-                    ['bbio/platform/beaglebone/3.8/config.py',
-                     'bbio/platform/beaglebone/3.8/pinmux.py',
-                     'bbio/platform/beaglebone/3.8/adc.py',
-                     'bbio/platform/beaglebone/3.8/pwm.py',
-                     'bbio/platform/beaglebone/3.8/cape_manager.py',
-                     'bbio/platform/beaglebone/3.8/uart.py',
-                     'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
+    driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
 
+  if (platform == 'BeagleBone Black'):
+    # BeagleBone or BeagleBone Black with kernel >= 3.8  
+    driver_data += [('bbio/platform/beaglebone', 
+                     ['bbio/platform/beaglebone/3.8/config.py',
+                      'bbio/platform/beaglebone/3.8/pinmux.py',
+                      'bbio/platform/beaglebone/3.8/adc.py',
+                      'bbio/platform/beaglebone/3.8/pwm.py',
+                      'bbio/platform/beaglebone/3.8/cape_manager.py',
+                      'bbio/platform/beaglebone/3.8/uart.py',
+                      'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
     os.system('python tools/install-bb-overlays.py')
 
   elif (platform == 'BeagleBone'):
     # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
-    driver_extensions = [Extension('bbio.platform.beaglebone.driver', 
-                                   ['bbio/platform/beaglebone/src/beaglebone.c', 
-                                    'bbio/platform/util/mmap_util.c'],
-                                   include_dirs=['bbio/platform/util'])]
-    driver_packages = ['bbio.platform.beaglebone']
-    driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),
-                   ('bbio/platform/beaglebone', 
-                    ['bbio/platform/beaglebone/3.2/config.py', 
-                     'bbio/platform/beaglebone/3.2/pinmux.py',
-                     'bbio/platform/beaglebone/3.2/adc.py',
-                     'bbio/platform/beaglebone/3.2/pwm.py',
-                     'bbio/platform/beaglebone/3.2/uart.py',
-                     'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
+    driver_data += [('bbio/platform/beaglebone', 
+                     ['bbio/platform/beaglebone/3.2/config.py', 
+                      'bbio/platform/beaglebone/3.2/pinmux.py',
+                      'bbio/platform/beaglebone/3.2/adc.py',
+                      'bbio/platform/beaglebone/3.2/pwm.py',
+                      'bbio/platform/beaglebone/3.2/uart.py',
+                      'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
 
     # Older Angstrom images only included support for one of the PWM modules
     # broken out on the headers, check and warn if no support for PWM2 module:
