@@ -161,7 +161,7 @@ try:
 
 
   setup(name='PyBBIO',
-        version='0.8',
+        version='0.8.5',
         description='A Python library for Arduino-style hardware IO support on single board Linux systems',
         author='Alexander Hiam',
         author_email='hiamalexander@gmail.com',
