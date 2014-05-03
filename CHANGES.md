@@ -1,6 +1,11 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.8.5
+ * Dropped mmap GPIO, use Kernel drivers
+ * PWM fully working
+ * I2C support
+ * Fixed USR LEDs
 
 #### version 0.8
  * Added tools/ directory for install helpers
