@@ -82,7 +82,7 @@ PWM_PINS = {
   'PWM2B' : ['bone_pwm_P8_13', '%s/pwm_test_P8_13.*' % OCP_PATH, 
              ['PyBBIO-epwmss2', 'PyBBIO-ehrpwm2']],
 
-  'ECAP0' : ['bone_pwm_P8_42', '%s/pwm_test_P9_42.*' % OCP_PATH, 
+  'ECAP0' : ['bone_pwm_P9_42', '%s/pwm_test_P9_42.*' % OCP_PATH, 
              ['PyBBIO-epwmss0', 'PyBBIO-ecap0']],
   'ECAP1' : ['bone_pwm_P9_28', '%s/pwm_test_P9_28.*' % OCP_PATH, 
              ['PyBBIO-epwmss1', 'PyBBIO-ecap1']],
