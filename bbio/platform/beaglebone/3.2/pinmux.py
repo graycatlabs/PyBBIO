@@ -9,12 +9,13 @@
 from config import *
 from sysfs import kernelFileIO
 
-def pinMux(fn, mode, preserve_mode_on_exit=False):
+def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
   """ Uses kernel omap_mux files to set pin modes. """
   # There's no simple way to write the control module registers from a 
   # user-level process because it lacks the proper privileges, but it's 
   # easy enough to just use the built-in file-based system and let the 
   # kernel do the work. 
+  fn = GPIO[gpio_pin][0]
   try:
     with open(PINMUX_PATH+fn, 'wb') as f:
       f.write(hex(mode)[2:]) # Write hex string (stripping off '0x')
@@ -28,8 +29,9 @@ def export(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
     return False
-  gpio_num = GPIO[gpio_pin][4]
-  if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+  gpio_num = GPIO[gpio_pin][2]
+  gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+  if (os.path.exists(gpio_file)): 
     # Pin already under userspace control
     return False
   with open(EXPORT_FILE, 'wb') as f:
@@ -43,8 +45,9 @@ def unexport(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are always under userspace control
     return False
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
-  if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+  gpio_num = GPIO[gpio_pin][2]
+  gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+  if (not os.path.exists(gpio_file)): 
     # Pin not under userspace control
     return False
   with open(UNEXPORT_FILE, 'wb') as f:

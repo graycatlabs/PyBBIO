@@ -5,9 +5,36 @@
 # 
 # Beaglebone GPIO driver
 
-import memory, pinmux, math
+import os, pinmux, math, sysfs
 from bbio.util import addToCleanup
 from config import *
+
+
+def getGPIODirectory(gpio_pin):
+  """ Returns the sysfs kernel driver base directory for the given pin. """
+  if 'USR' in gpio_pin:
+    # USR LEDs use a different driver
+    return GET_USR_LED_DIRECTORY(gpio_pin)
+  gpio_num = GPIO[gpio_pin][2]
+  return '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+
+
+def getGPIODirectionFile(gpio_pin):
+  """ Returns the absolute path to the state control file for the given pin. """
+  if 'USR' in gpio_pin:
+    # USR LED driver doesn't have a direction file
+    return ''
+  d = getGPIODirectory(gpio_pin)
+  return '%s/direction' % d
+
+
+def getGPIOStateFile(gpio_pin):
+  """ Returns the absolute path to the state control file for the given pin. """
+  d = getGPIODirectory(gpio_pin)
+  if 'USR' in gpio_pin:
+    # USR LEDs use a different driver
+    return '%s/brightness' % d
+  return '%s/value' % d
 
 
 def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
@@ -17,6 +44,10 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       If preserve_mode_on_exit=True, the DT overlay and will remain 
       loaded, the pin will remain exported to user-space control, and 
       the INPUT/OUTPUT mode will be preserved when the program exits. """
+
+  if 'USR' in gpio_pin:
+    print 'warning: pinMode() not supported for USR LEDs'
+    return
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   exported = pinmux.export(gpio_pin)
   if not exported:
@@ -25,56 +56,57 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   elif preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
-  gpio_num = GPIO[gpio_pin][4]
-  direction_file = '%s/direction' % (GPIO_FILE_BASE + 'gpio%i' % gpio_num)
+  direction_file = getGPIODirectionFile(gpio_pin)
 
   if (direction == INPUT):
     # Pinmux:
     if (pull > 0): pull = CONF_PULLUP
     elif (pull < 0): pull = CONF_PULLDOWN
     else: pull = CONF_PULL_DISABLE
-    pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_INPUT | pull, 
-                  preserve_mode_on_exit)
+    pinmux.pinMux(gpio_pin, CONF_GPIO_INPUT | pull, preserve_mode_on_exit)
     # Set input:
     with open(direction_file, 'wb') as f:
       f.write('in')
     return
   # Pinmux:
-  pinmux.pinMux(GPIO[gpio_pin][2], CONF_GPIO_OUTPUT,
-                preserve_mode_on_exit)
+  pinmux.pinMux(gpio_pin, CONF_GPIO_OUTPUT, preserve_mode_on_exit)
   # Set output:
   with open(direction_file, 'wb') as f:
     f.write('out')
 
+
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if (state):
-    memory.setReg(GPIO[gpio_pin][0]+GPIO_SETDATAOUT, GPIO[gpio_pin][1])
+  gpio_file = getGPIOStateFile(gpio_pin)
+  if not os.path.exists(gpio_file):
+    print "warning: digitalWrite() failed, pin '%s' not exported." % gpio_pin +\
+          " Did you call pinMode()?" 
+    return
+  if (state):    
+    sysfs.kernelFilenameIO(gpio_file, '1')
   else:
-    memory.setReg(GPIO[gpio_pin][0]+GPIO_CLEARDATAOUT, GPIO[gpio_pin][1])
+    sysfs.kernelFilenameIO(gpio_file, '0')
 
-def toggle(gpio_pin):
-  """ Toggles the state of the given digital pin. """
-  assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  memory.xorReg(GPIO[gpio_pin][0]+GPIO_DATAOUT, GPIO[gpio_pin][1])
 
 def digitalRead(gpio_pin):
   """ Returns input pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if (memory.getReg(GPIO[gpio_pin][0]+GPIO_DATAIN) & GPIO[gpio_pin][1]):
-    return 1
-  return 0
+  gpio_file = getGPIOStateFile(gpio_pin)
+  return int(sysfs.kernelFilenameIO(gpio_file))
+
+
+def toggle(gpio_pin):
+  """ Toggles the state of the given digital pin. """
+  digitalWrite(gpio_pin, digitalRead(gpio_pin) ^ 1)
+
 
 def pinState(gpio_pin):
   """ Returns the state of a digital pin if it is configured as
       an output. Returns None if it is configuredas an input. """
-  assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  if (memory.getReg(GPIO[gpio_pin][0]+GPIO_OE) & GPIO[gpio_pin][1]):
-    return None
-  if (memory.getReg(GPIO[gpio_pin][0]+GPIO_DATAOUT) & GPIO[gpio_pin][1]):
-    return HIGH
-  return LOW
+  # With sysfs driver this is identical to digitalRead()
+  return digitalRead(gpio_pin)
+
 
 def shiftIn(data_pin, clk_pin, bit_order, n_bits=8, edge=FALLING):
   """ Implements software SPI on the given pins to receive given  number

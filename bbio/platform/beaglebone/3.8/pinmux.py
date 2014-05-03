@@ -9,19 +9,16 @@
 from config import *
 import glob, os, cape_manager, bbio
 
-def pinMux(register_name, mode, preserve_mode_on_exit=False):
+def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
   """ Uses custom device tree overlays to set pin modes.
       If preserve_mode_on_exit=True the overlay will remain loaded
       when the program exits, otherwise it will be unloaded before
       exiting.
       *This should generally not be called directly from user code. """
-  gpio_pin = ''
-  for pin, config in GPIO.items():
-    if config[2] == register_name:
-      gpio_pin = pin.lower()
-      break
+  gpio_pin = gpio_pin.lower()
+
   if not gpio_pin:
-    print "*unknown pinmux register: %s" % register_name
+    print "*unknown pinmux pin: %s" % gpio_pin
     return
   mux_file_glob = glob.glob('%s/*%s*/state' % (OCP_PATH, gpio_pin))
   if len(mux_file_glob) == 0:
@@ -56,11 +53,12 @@ def export(gpio_pin):
       userspace control. """
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
-    return False
-  gpio_num = GPIO[gpio_pin][4]
-  if (os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+    return True
+  gpio_num = GPIO[gpio_pin][2]
+  gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+  if (os.path.exists(gpio_file)): 
     # Pin already under userspace control
-    return False
+    return True
   with open(EXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
   return True
@@ -72,10 +70,13 @@ def unexport(gpio_pin):
   if ("USR" in gpio_pin):
     # The user LEDs are always under userspace control
     return False
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
-  if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+  gpio_num = GPIO[gpio_pin][2]
+  gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+  print gpio_file
+  if (not os.path.exists(gpio_file)): 
     # Pin not under userspace control
     return False
+  print UNEXPORT_FILE
   with open(UNEXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
   return True

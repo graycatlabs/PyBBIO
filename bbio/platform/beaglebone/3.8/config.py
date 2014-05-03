@@ -20,13 +20,13 @@ OCP_PATH = glob.glob('/sys/devices/ocp.*')[0]
 
 ##############################
 ##--- Start GPIO config: ---##
-GPIO_FILE_BASE = '/sys/class/gpio/'
-EXPORT_FILE = GPIO_FILE_BASE + 'export'
-UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
 
+GET_USR_LED_DIRECTORY = lambda USRX : \
+  "/sys/class/leds/beaglebone:green:%s" % USRX.lower()
 
-##--- End GPIO config ------## 
+##--- End GPIO config ------##
 ##############################
+
 
 
 #############################

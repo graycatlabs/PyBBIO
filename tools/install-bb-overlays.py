@@ -72,8 +72,8 @@ def generateOverlays():
   version = '00A0'
   for pin, config in GPIO.items():
     gpio_pin = pin.lower()
-    register_name = config[2]
-    offset = str(config[3])
+    register_name = config[0]
+    offset = str(config[1])
     overlay_name = 'PyBBIO-%s' % gpio_pin
     dts = gpio_template.replace('{gpio_pin}', gpio_pin)\
                        .replace('{name}', register_name)\

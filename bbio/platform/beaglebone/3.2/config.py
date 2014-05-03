@@ -9,6 +9,33 @@
 from config_common import *
 
 
+##############################
+##--- Start PRCM config: ---##
+## Power Management and Clock Module
+
+#--- Module clock control: ---
+CM_PER = 0x44e00000-MMAP_OFFSET
+CM_WKUP = 0x44e00400-MMAP_OFFSET
+
+CM_PER_EPWMSS0_CLKCTRL = 0xd4+CM_PER
+CM_PER_EPWMSS1_CLKCTRL = 0xcc+CM_PER
+CM_PER_EPWMSS2_CLKCTRL = 0xd8+CM_PER
+
+CM_WKUP_ADC_TSC_CLKCTRL = 0xbc+CM_WKUP
+
+MODULEMODE_ENABLE = 0x02
+IDLEST_MASK = 0x03<<16
+# To enable module clock:
+#  _setReg(CM_WKUP_module_CLKCTRL, MODULEMODE_ENABLE)
+#  while (_getReg(CM_WKUP_module_CLKCTRL) & IDLEST_MASK): pass
+# To disable module clock:
+#  _andReg(CM_WKUP_module_CLKCTRL, ~MODULEMODE_ENABLE)
+#-----------------------------
+
+##--- End PRCM config ------##
+##############################
+
+
 ########################################
 ##--- Start control module config: ---##
 
@@ -19,16 +46,6 @@ CONF_UART_RX     = CONF_PULLUP | CONF_RX_ACTIVE
 
 ##--- End control module config ------##
 ########################################
-
-##############################
-##--- Start GPIO config: ---##
-GPIO_FILE_BASE = '/sys/class/gpio/'
-EXPORT_FILE = GPIO_FILE_BASE + 'export'
-UNEXPORT_FILE = GPIO_FILE_BASE + 'unexport'
-
-
-##--- End GPIO config ------##
-##############################
 
 
 ##############################
