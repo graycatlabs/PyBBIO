@@ -26,7 +26,7 @@ TASK = ''
 if len(sys.argv) > 1:
   if sys.argv[1] == 'install':
     TASK = 'install'
-
+print sys.argv
 
 def preinstall():
 
