@@ -26,7 +26,11 @@ TASK = ''
 if len(sys.argv) > 1:
   if sys.argv[1] == 'install':
     TASK = 'install'
-print sys.argv
+  if sys.argv[1] == '-c':
+    # happens when called by pip
+    if len(sys.argv) > 2 and sys.argv[2] == 'develop':
+      # pip is installing the package
+      TASK = 'install'
 
 def preinstall():
 
