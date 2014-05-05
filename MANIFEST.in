@@ -2,5 +2,5 @@ include LICENSE.txt
 include README.md
 recursive-include bbio *.h *.py
 recursive-include examples *.*
-recursive-include libraries *.py *.md *.txt
+recursive-include libraries *.*
 recursive-include tools *.py *.txt *.dts
