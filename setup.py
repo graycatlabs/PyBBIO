@@ -11,14 +11,16 @@ if ('armv7' in cpuinfo and
     ('am335x' in cpuinfo or 'am33xx' in cpuinfo)):
   PLATFORM = 'BeagleBone'
 
-import commands
-uname_status, uname = commands.getstatusoutput('uname -a')
-if uname_status > 0:
-  exit('*uname failed, cannot detect kernel version! uname output:\n %s' % uname)
-if ('3.2' in uname):
-  PLATFORM += ' 3.2'
-else:
-  PLATFORM += ' >=3.8'
+  import commands
+  uname_status, uname = commands.getstatusoutput('uname -a')
+  if uname_status > 0:
+    exit('uname failed, cannot detect kernel version! uname output:\n %s' % uname)
+  if ('3.2' in uname):
+    PLATFORM += ' 3.2'
+  else:
+    PLATFORM += ' >=3.8'
+
+assert PLATFORM, "Could not detect a supported platform, aborting!"
 
 TASK = ''
 if len(sys.argv) > 1:
@@ -27,6 +29,11 @@ if len(sys.argv) > 1:
 
 
 def preinstall():
+
+  # Check for device tree compiler:
+  from distutils import spawn
+  assert spawn.find_executable('dtc'), "dtc not installed, aborting!"
+
   # Earlier versions of PyBBIO used a shell script to install the 
   # bbio module, and it was put in a different directory than this 
   # script will install it. The old install directory is before the 
@@ -126,6 +133,11 @@ if __name__ == '__main__':
   driver_extensions = []
   driver_packages = []
   driver_data = []
+
+  install_requires = [
+    'pyserial',
+    'smbus'
+  ]
     
   if 'BeagleBone' in PLATFORM:
     # 3.2 and 3.8, list common things:
@@ -178,12 +190,14 @@ if __name__ == '__main__':
         url='https://github.com/alexanderhiam/PyBBIO/wiki',
         packages=['bbio', 'bbio.platform'] + driver_packages,
         ext_modules=driver_extensions, 
-        data_files=driver_data)
-  
-  print "install finished with %i warnings" % len(warnings)
-  if (len(warnings)):
-    for i in range(len(warnings)):
-      print "*Warning [%i]: %s\n" % (i+1, warnings[i])
+        data_files=driver_data,
+        install_requires=install_requires)
 
-  print "PyBBIO is now installed on your %s, enjoy!" % PLATFORM
+  if TASK == 'install':
+    print "install finished with %i warnings" % len(warnings)
+    if (len(warnings)):
+      for i in range(len(warnings)):
+        print "*Warning [%i]: %s\n" % (i+1, warnings[i])
+
+    print "PyBBIO is now installed on your %s, enjoy!" % PLATFORM
 
