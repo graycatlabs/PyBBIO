@@ -3,27 +3,48 @@
 
 import sys, os, shutil
 
+# detect platform:
+PLATFORM = ''
+with open('/proc/cpuinfo', 'rb') as f:
+  cpuinfo = f.read().lower() 
+if ('armv7' in cpuinfo and 
+    ('am335x' in cpuinfo or 'am33xx' in cpuinfo)):
+  PLATFORM = 'BeagleBone'
 
-# Earlier versions of PyBBIO used a shell script to install the 
-# bbio module, and it was put in a different directory than this 
-# script will install it. The old install directory is before the 
-# new in the Python search path, so we have to make sure to remove
-# the old install if it is there:
-old_install = ("/usr/lib/python2.7/bbio.py", 
-               "/usr/lib/python2.7/bbio.pyo")
-removed_old_install = False
-for f in old_install:
-  if os.path.exists(f):
-    try:
-      os.remove(f)
-      removed_old_install = True
-    except Exception as e:
-      print ("**Error!**\nAn old PyBBIO install was found at %s\nbut could"+\
-            " not be removed. Exception raised:\n%s\nAborting install.") %\
-            (f, e)
-      sys.exit(0)
-if (removed_old_install):
-  print \
+import commands
+uname_status, uname = commands.getstatusoutput('uname -a')
+if uname_status > 0:
+  exit('*uname failed, cannot detect kernel version! uname output:\n %s' % uname)
+if ('3.8' in uname):
+  PLATFORM += ' Black'
+
+TASK = ''
+if len(sys.argv) > 1:
+  if sys.argv[1] == 'install':
+    TASK = 'install'
+
+
+def preinstall():
+  # Earlier versions of PyBBIO used a shell script to install the 
+  # bbio module, and it was put in a different directory than this 
+  # script will install it. The old install directory is before the 
+  # new in the Python search path, so we have to make sure to remove
+  # the old install if it is there:
+  old_install = ("/usr/lib/python2.7/bbio.py", 
+                 "/usr/lib/python2.7/bbio.pyo")
+  removed_old_install = False
+  for f in old_install:
+    if os.path.exists(f):
+      try:
+        os.remove(f)
+        removed_old_install = True
+      except Exception as e:
+        print ("**Error!**\nAn old PyBBIO install was found at %s\nbut could"+\
+              " not be removed. Exception raised:\n%s\nAborting install.") %\
+              (f, e)
+        sys.exit(0)
+  if (removed_old_install):
+    print \
 """
 An old installation of PyBBIO was removed, but its config file was
 preserved in ~/.pybbio/, in case any local customizations were made.
@@ -33,18 +54,18 @@ in the bbio package.
 """
 
 
-# Through version 0.5 distutils was used to install PyBBIO instead of 
-# setuptools, and PyBBIO was installed into a different directory. This
-# test looks for all the possible distutils install directories. If an
-# old distutils install is found, the user is notified that it should be 
-# removed and isntall is aborted:
-possible_old_install_paths = ["/usr/local/lib/python2.7/dist-packages/",
-                              "/usr/local/lib/python2.7/site-packages/",
-                              "/usr/lib/python2.7/site-packages/",
-                              "/usr/lib/python2.7/dist-packages/"]
-for p in possible_old_install_paths:
-  if os.path.exists(p + "bbio"):
-    print \
+  # Through version 0.5 distutils was used to install PyBBIO instead of 
+  # setuptools, and PyBBIO was installed into a different directory. This
+  # test looks for all the possible distutils install directories. If an
+  # old distutils install is found, the user is notified that it should be 
+  # removed and isntall is aborted:
+  possible_old_install_paths = ["/usr/local/lib/python2.7/dist-packages/",
+                                "/usr/local/lib/python2.7/site-packages/",
+                                "/usr/lib/python2.7/site-packages/",
+                                "/usr/lib/python2.7/dist-packages/"]
+  for p in possible_old_install_paths:
+    if os.path.exists(p + "bbio"):
+      print \
 """ 
 An old installation of PyBBIO was found which must be removed manually 
 before installation can continue. Remove old install with:
@@ -52,124 +73,109 @@ before installation can continue. Remove old install with:
   # rm -rf %sPyBBIO*
 Then run the setup.py script again.
 """ % (p, p)
-    sys.exit(0)
+      sys.exit(0)
 
-# Some Angstrom images are missing the py_compile module; get it if not
-# present:
-import random
-python_lib_path = random.__file__.split('random')[0]
-if not os.path.exists(python_lib_path + 'py_compile.py'):
-  print "py_compile module missing; installing to %spy_compile.py" %\
-                                                          python_lib_path
-  import urllib2
-  url = "http://hg.python.org/cpython/raw-file/4ebe1ede981e/Lib/py_compile.py"
-  py_compile = urllib2.urlopen(url)
-  with open(python_lib_path+'py_compile.py', 'w') as f:
-    f.write(py_compile.read())
-  print "testing py_compile..."
-  try:
-    import py_compile
-    print "py_compile installed successfully"
-  except Exception, e:
-    print "*py_compile install failed, could not import"
-    print "*Exception raised:"
-    raise e
+  # Some Angstrom images are missing the py_compile module; get it if not
+  # present:
+  import random
+  python_lib_path = random.__file__.split('random')[0]
+  if not os.path.exists(python_lib_path + 'py_compile.py'):
+    print "py_compile module missing; installing to %spy_compile.py" %\
+                                                            python_lib_path
+    import urllib2
+    url = "http://hg.python.org/cpython/raw-file/4ebe1ede981e/Lib/py_compile.py"
+    py_compile = urllib2.urlopen(url)
+    with open(python_lib_path+'py_compile.py', 'w') as f:
+      f.write(py_compile.read())
+    print "testing py_compile..."
+    try:
+      import py_compile
+      print "py_compile installed successfully"
+    except Exception, e:
+      print "*py_compile install failed, could not import"
+      print "*Exception raised:"
+      raise e
 
-
-# Copy the libraries directory to /usr/local/lib:
-lib_dst = '/usr/local/lib/PyBBIO/libraries'
-lib_src = os.path.join(os.getcwd(), 'libraries')
-if os.path.exists(lib_dst):
-  print "Found old PyBBIO libraries directory, replacing"
-  shutil.rmtree(lib_dst)
-shutil.copytree(lib_src, lib_dst)
-
-
-# Finally we can install the package:
-print "Installing PyBBIO..."
-
-try:
-  from setuptools import setup, Extension
-
-  warnings = []
-
-  driver_extensions = []
-  driver_packages = []
-  driver_data = []
+  # Copy the libraries directory to /usr/local/lib:
+  lib_dst = '/usr/local/lib/PyBBIO/libraries'
+  lib_src = os.path.join(os.getcwd(), 'libraries')
+  if os.path.exists(lib_dst):
+    print "Found old PyBBIO libraries directory, replacing"
+    shutil.rmtree(lib_dst)
+  shutil.copytree(lib_src, lib_dst)
 
 
-  # detect platform:
-  platform = ''
-  with open('/proc/cpuinfo', 'rb') as f:
-    cpuinfo = f.read().lower() 
-  if ('armv7' in cpuinfo and 
-      ('am335x' in cpuinfo or 'am33xx' in cpuinfo)):
-    platform = 'BeagleBone'
 
-  import commands
-  uname_status, uname = commands.getstatusoutput('uname -a')
-  if uname_status > 0:
-    exit('*uname failed, cannot detect kernel version! uname output:\n %s' % uname)
-  if ('3.8' in uname):
-    platform += ' Black'
+if TASK == 'install':
+  preinstall()
+  print "Installing PyBBIO..." 
+
+
+from setuptools import setup, Extension
+
+warnings = []
+
+driver_extensions = []
+driver_packages = []
+driver_data = []
     
-  if 'BeagleBone' in platform:
-    # 3.2 and 3.8, list common things:
-    driver_packages += ['bbio.platform.beaglebone']
-    driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
-                                   ['bbio/platform/beaglebone/src/beaglebone.c', 
-                                    'bbio/platform/util/mmap_util.c'],
-                                   include_dirs=['bbio/platform/util'])]
-    driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
+if 'BeagleBone' in PLATFORM:
+  # 3.2 and 3.8, list common things:
+  driver_packages += ['bbio.platform.beaglebone']
+  driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
+                                 ['bbio/platform/beaglebone/src/beaglebone.c', 
+                                  'bbio/platform/util/mmap_util.c'],
+                                 include_dirs=['bbio/platform/util'])]
+  driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
 
-  if (platform == 'BeagleBone Black'):
-    # BeagleBone or BeagleBone Black with kernel >= 3.8  
-    driver_data += [('bbio/platform/beaglebone', 
-                     ['bbio/platform/beaglebone/3.8/config.py',
-                      'bbio/platform/beaglebone/3.8/pinmux.py',
-                      'bbio/platform/beaglebone/3.8/adc.py',
-                      'bbio/platform/beaglebone/3.8/pwm.py',
-                      'bbio/platform/beaglebone/3.8/cape_manager.py',
-                      'bbio/platform/beaglebone/3.8/uart.py',
-                      'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
+if (PLATFORM == 'BeagleBone Black'):
+  # BeagleBone or BeagleBone Black with kernel >= 3.8  
+  driver_data += [('bbio/platform/beaglebone', 
+                   ['bbio/platform/beaglebone/3.8/config.py',
+                    'bbio/platform/beaglebone/3.8/pinmux.py',
+                    'bbio/platform/beaglebone/3.8/adc.py',
+                    'bbio/platform/beaglebone/3.8/pwm.py',
+                    'bbio/platform/beaglebone/3.8/cape_manager.py',
+                    'bbio/platform/beaglebone/3.8/uart.py',
+                    'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
+
+  if TASK == 'install':
     os.system('python tools/install-bb-overlays.py')
 
-  elif (platform == 'BeagleBone'):
-    # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
-    driver_data += [('bbio/platform/beaglebone', 
-                     ['bbio/platform/beaglebone/3.2/config.py', 
-                      'bbio/platform/beaglebone/3.2/pinmux.py',
-                      'bbio/platform/beaglebone/3.2/adc.py',
-                      'bbio/platform/beaglebone/3.2/pwm.py',
-                      'bbio/platform/beaglebone/3.2/uart.py',
-                      'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
+elif (PLATFORM == 'BeagleBone'):
+  # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
+  driver_data += [('bbio/platform/beaglebone', 
+                   ['bbio/platform/beaglebone/3.2/config.py', 
+                    'bbio/platform/beaglebone/3.2/pinmux.py',
+                    'bbio/platform/beaglebone/3.2/adc.py',
+                    'bbio/platform/beaglebone/3.2/pwm.py',
+                    'bbio/platform/beaglebone/3.2/uart.py',
+                    'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
 
-    # Older Angstrom images only included support for one of the PWM modules
-    # broken out on the headers, check and warn if no support for PWM2 module:
-    if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
-      w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
-          "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
-          "You should consider updating Angstrom!"
-      warnings.append(w)
+  # Older Angstrom images only included support for one of the PWM modules
+  # broken out on the headers, check and warn if no support for PWM2 module:
+  if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
+    w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
+        "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
+        "You should consider updating Angstrom!"
+    warnings.append(w)
 
 
-  setup(name='PyBBIO',
-        version='0.8.5',
-        description='A Python library for Arduino-style hardware IO support on single board Linux systems',
-        author='Alexander Hiam',
-        author_email='hiamalexander@gmail.com',
-        license='Apache 2.0',
-        url='https://github.com/alexanderhiam/PyBBIO/wiki',
-        packages=['bbio', 'bbio.platform'] + driver_packages,
-        ext_modules=driver_extensions, 
-        data_files=driver_data)
+setup(name='PyBBIO',
+      version='0.8.5',
+      description='A Python library for Arduino-style hardware IO support on single board Linux systems',
+      author='Alexander Hiam',
+      author_email='hiamalexander@gmail.com',
+      license='Apache 2.0',
+      url='https://github.com/alexanderhiam/PyBBIO/wiki',
+      packages=['bbio', 'bbio.platform'] + driver_packages,
+      ext_modules=driver_extensions, 
+      data_files=driver_data)
 
-  print "install finished with %i warnings" % len(warnings)
-  if (len(warnings)):
-    for i in range(len(warnings)):
-      print "*Warning [%i]: %s\n" % (i+1, warnings[i])
+print "install finished with %i warnings" % len(warnings)
+if (len(warnings)):
+  for i in range(len(warnings)):
+    print "*Warning [%i]: %s\n" % (i+1, warnings[i])
 
-  print "PyBBIO is now installed on your %s, enjoy!" % platform
-except Exception, e:
-  print "Install failed with exception:\n%s" % e
+print "PyBBIO is now installed on your %s, enjoy!" % PLATFORM
 
