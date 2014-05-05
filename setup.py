@@ -121,83 +121,82 @@ Then run the setup.py script again.
     shutil.copytree(src, dst)
 
 
-if __name__ == '__main__':
-  if TASK == 'install':
-    preinstall()
-    print "Installing PyBBIO..." 
+if TASK == 'install':
+  preinstall()
+  print "Installing PyBBIO..." 
 
-  from setuptools import setup, Extension
+from setuptools import setup, Extension
 
-  warnings = []
+warnings = []
 
-  driver_extensions = []
-  driver_packages = []
-  driver_data = []
+driver_extensions = []
+driver_packages = []
+driver_data = []
 
-  install_requires = [
-    'pyserial',
-    'smbus'
-  ]
+install_requires = [
+  'pyserial',
+  'smbus'
+]
     
-  if 'BeagleBone' in PLATFORM:
-    # 3.2 and 3.8, list common things:
-    driver_packages += ['bbio.platform.beaglebone']
-    driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
-                                    ['bbio/platform/beaglebone/src/beaglebone.c', 
-                                     'bbio/platform/util/mmap_util.c'],
-                                    include_dirs=['bbio/platform/util'])]
-    driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
+if 'BeagleBone' in PLATFORM:
+  # 3.2 and 3.8, list common things:
+  driver_packages += ['bbio.platform.beaglebone']
+  driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
+                                  ['bbio/platform/beaglebone/src/beaglebone.c', 
+                                   'bbio/platform/util/mmap_util.c'],
+                                  include_dirs=['bbio/platform/util'])]
+  driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
 
-  if (PLATFORM == 'BeagleBone >=3.8'):
-    # BeagleBone or BeagleBone Black with kernel >= 3.8  
-    driver_data += [('bbio/platform/beaglebone', 
-                     ['bbio/platform/beaglebone/3.8/config.py',
-                      'bbio/platform/beaglebone/3.8/pinmux.py',
-                      'bbio/platform/beaglebone/3.8/adc.py',
-                      'bbio/platform/beaglebone/3.8/pwm.py',
-                      'bbio/platform/beaglebone/3.8/cape_manager.py',
-                      'bbio/platform/beaglebone/3.8/uart.py',
-                      'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
-
-    if TASK == 'install':
-      os.system('python tools/install-bb-overlays.py')
-
-  elif (PLATFORM == 'BeagleBone 3.2'):
-    # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
-    driver_data += [('bbio/platform/beaglebone', 
-                     ['bbio/platform/beaglebone/3.2/config.py', 
-                      'bbio/platform/beaglebone/3.2/pinmux.py',
-                      'bbio/platform/beaglebone/3.2/adc.py',
-                      'bbio/platform/beaglebone/3.2/pwm.py',
-                      'bbio/platform/beaglebone/3.2/uart.py',
-                      'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
-
-    # Older Angstrom images only included support for one of the PWM modules
-    # broken out on the headers, check and warn if no support for PWM2 module:
-    if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
-      w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
-          "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
-          "You should consider updating Angstrom!"
-      warnings.append(w)
-
-
-  setup(name='PyBBIO',
-        version='0.8.5',
-        description='A Python library for Arduino-style hardware IO support on single board Linux systems',
-        author='Alexander Hiam',
-        author_email='hiamalexander@gmail.com',
-        license='Apache 2.0',
-        url='https://github.com/alexanderhiam/PyBBIO/wiki',
-        packages=['bbio', 'bbio.platform'] + driver_packages,
-        ext_modules=driver_extensions, 
-        data_files=driver_data,
-        install_requires=install_requires)
+if (PLATFORM == 'BeagleBone >=3.8'):
+  # BeagleBone or BeagleBone Black with kernel >= 3.8  
+  driver_data += [('bbio/platform/beaglebone', 
+                   ['bbio/platform/beaglebone/3.8/config.py',
+                    'bbio/platform/beaglebone/3.8/pinmux.py',
+                    'bbio/platform/beaglebone/3.8/adc.py',
+                    'bbio/platform/beaglebone/3.8/pwm.py',
+                    'bbio/platform/beaglebone/3.8/cape_manager.py',
+                    'bbio/platform/beaglebone/3.8/uart.py',
+                    'bbio/platform/beaglebone/3.8/i2c_setup.py'])]
 
   if TASK == 'install':
-    print "install finished with %i warnings" % len(warnings)
-    if (len(warnings)):
-      for i in range(len(warnings)):
-        print "*Warning [%i]: %s\n" % (i+1, warnings[i])
+    os.system('python tools/install-bb-overlays.py')
 
-    print "PyBBIO is now installed on your %s, enjoy!" % PLATFORM
+elif (PLATFORM == 'BeagleBone 3.2'):
+  # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
+  driver_data += [('bbio/platform/beaglebone', 
+                   ['bbio/platform/beaglebone/3.2/config.py', 
+                    'bbio/platform/beaglebone/3.2/pinmux.py',
+                    'bbio/platform/beaglebone/3.2/adc.py',
+                    'bbio/platform/beaglebone/3.2/pwm.py',
+                    'bbio/platform/beaglebone/3.2/uart.py',
+                    'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
+
+# Older Angstrom images only included support for one of the PWM modules
+# broken out on the headers, check and warn if no support for PWM2 module:
+if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
+  w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
+      "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
+      "You should consider updating Angstrom!"
+  warnings.append(w)
+
+
+setup(name='PyBBIO',
+      version='0.8.5',
+      description='A Python library for Arduino-style hardware IO support on single board Linux systems',
+      author='Alexander Hiam',
+      author_email='hiamalexander@gmail.com',
+      license='Apache 2.0',
+      url='https://github.com/alexanderhiam/PyBBIO/wiki',
+      packages=['bbio', 'bbio.platform'] + driver_packages,
+      ext_modules=driver_extensions, 
+      data_files=driver_data,
+      install_requires=install_requires)
+
+if TASK == 'install':
+  print "install finished with %i warnings" % len(warnings)
+  if (len(warnings)):
+    for i in range(len(warnings)):
+      print "*Warning [%i]: %s\n" % (i+1, warnings[i])
+
+  print "PyBBIO is now installed on your %s, enjoy!" % PLATFORM
 
