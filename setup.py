@@ -171,13 +171,13 @@ elif (PLATFORM == 'BeagleBone 3.2'):
                     'bbio/platform/beaglebone/3.2/uart.py',
                     'bbio/platform/beaglebone/3.2/i2c_setup.py'])]
 
-# Older Angstrom images only included support for one of the PWM modules
-# broken out on the headers, check and warn if no support for PWM2 module:
-if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
-  w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
-      "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
-      "You should consider updating Angstrom!"
-  warnings.append(w)
+  # Older Angstrom images only included support for one of the PWM modules
+  # broken out on the headers, check and warn if no support for PWM2 module:
+  if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
+    w = "you seem to have an old BeagleBone image which only has drivers for\n"+\
+        "the PWM1 module, PWM2A and PWM2B will not be available in PyBBIO.\n"+\
+        "You should consider updating Angstrom!"
+    warnings.append(w)
 
 
 setup(name='PyBBIO',
