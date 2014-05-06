@@ -23,14 +23,12 @@ if ('armv7' in cpuinfo and
 assert PLATFORM, "Could not detect a supported platform, aborting!"
 
 TASK = ''
-print sys.argv
-
 if len(sys.argv) > 1:
   if sys.argv[1] == 'install':
     TASK = 'install'
-  if sys.argv[1] == '-c':
+  if sys.argv[0] == '-c':
     # happens when called by pip
-    if len(sys.argv) > 2 and sys.argv[2] == 'develop':
+    if len(sys.argv) > 2 and sys.argv[1] == 'develop':
       # pip is installing the package
       TASK = 'install'
 
