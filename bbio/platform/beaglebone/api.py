@@ -6,7 +6,7 @@
 # Beaglebone platform API file.
 
 
-from bbio.platform.beaglebone import *
+from bbio.platform import *
 
 def platform_init():
   analog_init()

@@ -135,6 +135,7 @@ warnings = []
 
 driver_extensions = []
 driver_packages = []
+driver_package_dirs = {}
 driver_data = []
 
 install_requires = [
@@ -149,10 +150,17 @@ if 'BeagleBone' in PLATFORM:
                                   ['bbio/platform/beaglebone/src/beaglebone.c', 
                                    'bbio/platform/util/mmap_util.c'],
                                   include_dirs=['bbio/platform/util'])]
-  driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])]
+
+  driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])
+]
+  driver_package_dirs['bbio.platform.'] = 'bbio/platform/beaglebone/'
 
 if (PLATFORM == 'BeagleBone >=3.8'):
   # BeagleBone or BeagleBone Black with kernel >= 3.8  
+
+  
+
+
   driver_data += [('bbio/platform/beaglebone', 
                    ['bbio/platform/beaglebone/3.8/config.py',
                     'bbio/platform/beaglebone/3.8/pinmux.py',
@@ -192,9 +200,11 @@ setup(name='PyBBIO',
       license='Apache 2.0',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
       packages=['bbio', 'bbio.platform'] + driver_packages,
+      py_modules = ['bbio.test'],
+      package_dir=driver_package_dirs,
       ext_modules=driver_extensions, 
-      data_files=driver_data,
       install_requires=install_requires)
+#data_files=driver_data,
 
 if TASK == 'install':
   print "install finished with %i warnings" % len(warnings)
