@@ -6,6 +6,7 @@ Returns NULL when python arguments aren't succesfully converted to C
 ***/
 
 #include "Python.h"
+#include <stdio.h>
 
 static PyObject* _kernelFileIO(PyObject *self, PyObject *args)
 { 
@@ -26,6 +27,7 @@ static PyObject* _kernelFileIO(PyObject *self, PyObject *args)
   if (val!=NULL)
   {
     fprintf(fd,"%s",val);
+  return Py_BuildValue("s",val);
   }
   fgets(rd,64,fd);
   return Py_BuildValue("s",rd);
@@ -39,6 +41,6 @@ static PyMethodDef sysfsMethods[]=
 
 PyMODINIT_FUNC init_sysfs(void)
 {
-	Py_InitModule( "_sysfs" , sysfsMethods , "Initiate Module" );
+	Py_InitModule( "_sysfs" , sysfsMethods );
 }
 
