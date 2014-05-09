@@ -61,7 +61,7 @@ def pwmFrequency(pwm_pin, freq_hz):
   old_period_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD)))
 
   duty_percent = old_duty_ns / old_period_ns
-  new_period_ns = 1e9/freq_hz
+  new_period_ns = int(1e9/freq_hz)
   # Todo: round values properly!:
   new_duty_ns = int(duty_percent * new_period_ns)
 
@@ -74,6 +74,7 @@ def pwmFrequency(pwm_pin, freq_hz):
     sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY), str(new_duty_ns))
   except IOError:
     print "*PWM pin '%s' reserved by another process!" % pwm_pin
+    # that's probably not the best way to handle this error...
   
 def pwmEnable(pwm_pin):
   """ Ensures PWM module for the given pin is enabled and its ocp helper
