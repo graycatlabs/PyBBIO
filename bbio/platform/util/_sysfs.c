@@ -6,30 +6,35 @@ Returns NULL when python arguments aren't succesfully converted to C
 ***/
 
 #include "Python.h"
+#include <stdio.h>
+#include <string.h>
 
 static PyObject* _kernelFileIO(PyObject *self, PyObject *args)
-{ 
+{
   FILE* fd;
   char rd[64];
   char *val;
-  char *fn; 
-	
+  char *fn;
+
   //Converts the file path into a string
   if(!(PyArg_ParseTuple(args,"ss",&fn, &val)))
-		return Py_BuildValue("");
-	
+    return Py_None;
+
   fd = fopen(fn,"r+");
   if(fd==NULL)
-    		return Py_BuildValue("");
+    return Py_None;
   fseek(fd,0,SEEK_SET);
 
-  if (val!=NULL)
+  if (strlen(val) > 0)
   {
     fprintf(fd,"%s",val);
+    fclose(fd);
+    return Py_BuildValue("s",val);
   }
   fgets(rd,64,fd);
+  fclose(fd);
   return Py_BuildValue("s",rd);
-}       
+}
 
 static PyMethodDef sysfsMethods[]=
 {
@@ -39,6 +44,6 @@ static PyMethodDef sysfsMethods[]=
 
 PyMODINIT_FUNC init_sysfs(void)
 {
-	Py_InitModule( "_sysfs" , sysfsMethods , "Initiate Module" );
+	Py_InitModule( "_sysfs" , sysfsMethods );
 }
 
