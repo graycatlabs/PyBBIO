@@ -23,7 +23,7 @@
  limitations under the License.
 """
 
-import sys
+import sys, atexit
 
 from platform import *
 from util import *
@@ -59,13 +59,15 @@ if not hasattr(__main__, '__file__'):
   #  http://stackoverflow.com/questions/2356399/tell-if-python-is-in-interactive-mode
   bbio_init()
   print "PyBBIO initialized"
-  import atexit
   def interactive_cleanup():
     bbio_cleanup()
     print "Finished PyBBIO cleanup"
   atexit.register(interactive_cleanup)
 
 else:
+  bbio_init()
+  atexit.register(bbio_cleanup)
+
   # Imported in a Python file, define run() and stop():
   def run(setup, loop):
     """ The main loop; must be passed a setup and a loop function.
@@ -74,18 +76,13 @@ else:
         raised, e.g. CTRL-C or a call to the stop() function from 
         within the loop. """
     try:
-      bbio_init()
       setup()
       while (True):
         loop()
     except KeyboardInterrupt:
       # Manual exit signal, clean up and exit happy
-      bbio_cleanup()
-    except Exception, e:
-      # Something may have gone wrong, clean up and re-raise exception
-      bbio_cleanup()
-      raise 
+      exit(0)
       
   def stop():
-    """ Preffered way for a program to stop itself. """
+    """ Preferred way for a program to stop itself. """
     raise KeyboardInterrupt # Expected happy stop condition in run()
