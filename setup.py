@@ -123,7 +123,7 @@ try:
                                    include_dirs=['bbio/platform/util']),
                         Extension('bbio.platform._sysfs',
                                    ['bbio/platform/util/_sysfs.c']),
-                        Extension('bbio.platform.spimodule',
+                        Extension('bbio.platform._spi',
                                    ['bbio/platform/util/spimodule.c'])]
     driver_packages = ['bbio.platform.beaglebone']
     driver_data = [('bbio/platform', ['bbio/platform/beaglebone/api.py']),

@@ -2,6 +2,10 @@
  * spimodule.c - Python bindings for Linux SPI access through spidev
  * Copyright (C) 2009 Volker Thoms <unconnected@gmx.de>
  *
+ * Modified 6/2014 by Rekha Seethamraju for PyBBIO
+ * https://github.com/alexanderhiam/PyBBIO
+ *  - changed module name to _spi
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; version 2 of the License.
@@ -808,14 +812,14 @@ static PyMethodDef SPI_module_methods[] = {
 #define PyMODINIT_FUNC void
 #endif
 PyMODINIT_FUNC
-initspi(void)
+init_spi(void)
 {
 	PyObject* m;
 
 	if (PyType_Ready(&SPI_type) < 0)
 		return;
 
-	m = Py_InitModule3("spi", SPI_module_methods, SPI_module_doc);
+	m = Py_InitModule3("_spi", SPI_module_methods, SPI_module_doc);
 	Py_INCREF(&SPI_type);
 	PyModule_AddObject(m, "SPI", (PyObject *)&SPI_type);
 }
