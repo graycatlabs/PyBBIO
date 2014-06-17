@@ -5,9 +5,9 @@
 
 import bbio, os, cape_manager
 
-def spi_init(spidev):
-  overlay = 'BB-SPIDEV%i-00A0' % spi_num
-  assert os.path.exists('/lib/firmware/%s.dtbo' % overlay), \
+def spi_init(spi_num):
+  overlay = 'BB-SPIDEV%i' % spi_num
+  assert os.path.exists('/lib/firmware/%s-00A0.dtbo' % overlay), \
     "SPI driver not present"
   cape_manager.load(overlay, auto_unload=False)
   bbio.delay(250) # Give driver time to load

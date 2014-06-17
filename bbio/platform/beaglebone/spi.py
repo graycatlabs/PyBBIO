@@ -1,79 +1,66 @@
-import os, glob, cape_manager
-from bbio.platform.spimodule import SPI
 
-'''
-BB-SPIDEV0-00A0.dtbo	      
-BB-SPIDEV1-00A0.dtbo	      
-BB-SPIDEV1A1-00A0.dtbo
-ADAFRUIT-SPI0-00A0.dtbo   
-ADAFRUIT-SPI1-00A0.dtbo
-'''
+from bbio.platform import _spi
+from spi_init import spi_init
 
-class spi(object):
+class SPI_Bus(object):
     
-  def __init__(self, spi_num):
+  def __init__(self, spi_bus, spi_dev):
       
-      self.spi_num = spi_num
-      
-      assert 0 <= spi_num < 2, "SPI must be between 0 or 1"
+    self.spi_bus = spi_bus
+    self.spi_dev = spi_dev
+    assert 0 <= spi_bus < 2, "spi_bus must be between 0 or 1"
+    assert 0 <= spi_dev < 2, "spi_dev must be between 0 or 1"
     
-      overlay = 'BB-SPIDEV%i-00A0' % spi_num
-      assert os.path.exists('/lib/firmware/%s.dtbo' % overlay), \
-       "SPI driver not present"
+    self.spidev = _spi.SPI()
     
-      cape_manager.load(overlay)
-      bbio.delay(250) # Give driver time to load
-    
-    
+  def begin(self):
+    '''
+    begin(device no)
+    Connects the BBB to the specified SPI device
+    '''
+    spi_init(self.spi_bus)
 
-  def begin(self,device):
-      '''
-      begin(device no)
-      Connects the BBB to the specified SPI device
-      '''
-      return open(spi_num,device)
+    self.spidev.open(self.spi_bus+1, self.spi_dev)
 
   def end(self):
-     '''
-     end()
-     Disconnects the object from the interface
-     ''' 
-     return close()
+    '''
+    end()
+    Disconnects the object from the interface
+    ''' 
+    self.spidev.close()
      
   def read(self,noofbytes):
-      '''
-      read(len)
-      Read len bytes from SPI device
-      '''
-      return readbytes(noofbytes)
+    '''
+    read(len)
+    Read len bytes from SPI device
+    '''
+    return self.spidev.readbytes(noofbytes)
 
   def write(self,list):
-      '''
-      write([list])
-      Write bytes to SPI device
-      '''
-      return writebytes(list)
+    '''
+    write([list])
+    Write bytes to SPI device
+    '''
+    self.spidev.writebytes(list)
       
   def transfer2(self,list,delay):
-      '''
-      transfer1([list],delay)
-      Perform SPI transaction.
-      CS will be released and reactivated between blocks.
-      delay specifies delay in usec between blocks.
-      '''
-      return xfer(list,delay)
+    '''
+    transfer1([list],delay)
+    Perform SPI transaction.
+    CS will be released and reactivated between blocks.
+    delay specifies delay in usec between blocks.
+    '''
+    return self.spidev.xfer(list,delay)
       
   def transfer(self,list):
-      '''
-      transfer1([list])
-      Perform SPI transaction.
-      CS will be held active between blocks.
-      '''
-      return xfer2(list)
+    '''
+    transfer1([list])
+    Perform SPI transaction.
+    CS will be held active between blocks.
+    '''
+    return self.spidev.xfer2(list)
 
-      
-     
 
 # Initialize the global SPI  instances:
-SPI0 = spi('0')
-SPI0 = spi('1')
+SPI0 = SPI_Bus(0, 0)
+SPI1 = SPI_Bus(1, 0)
