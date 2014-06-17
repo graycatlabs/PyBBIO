@@ -182,8 +182,10 @@ try:
 
   print "PyBBIO is now installed on your %s, enjoy!" % platform
 except Exception, e:
-  print "Install failed with exception:\n%s" % e
-
+  import sys, traceback
+  print "Install failed with exception:"
+  traceback.print_exc()
+  
 # Now replace the local config file to original state to keep git
 # from complaining when updating with 'git pull':
 with open(config_file, 'wb') as config:
