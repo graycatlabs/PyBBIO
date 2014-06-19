@@ -143,13 +143,16 @@ install_requires = [
   'smbus'
 ]
     
+<<<<<<< HEAD
 if 'BeagleBone' in PLATFORM:
   # 3.2 and 3.8, list common things:
   driver_packages += ['bbio.platform.beaglebone']
   driver_extensions += [Extension('bbio.platform.beaglebone.driver', 
                                   ['bbio/platform/beaglebone/src/beaglebone.c', 
                                    'bbio/platform/util/mmap_util.c'],
-                                  include_dirs=['bbio/platform/util'])]
+                                  include_dirs=['bbio/platform/util']),
+                        Extension('bbio.platform._sysfs',
+                                  ['bbio/platform/util/_sysfs.c'])]
 
   driver_data += [('bbio/platform', ['bbio/platform/beaglebone/api.py'])
 ]

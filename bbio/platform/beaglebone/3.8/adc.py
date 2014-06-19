@@ -21,20 +21,30 @@ def analog_cleanup():
   pass
 
 def analogRead(adc_pin):
-  """ Returns voltage read on given analog input pin in millivolts. """
-  if adc_pin in ADC: adc_pin = ADC[adc_pin]
-  adc_file = adc_pin[0]
-  if not os.path.exists(adc_file):
-    # Overlay not loaded yet
-    overlay = adc_pin[1]
-    cape_manager.load(overlay, auto_unload=False)
+  """ Returns voltage read on given analog input pin. If passed one of 
+      PyBBIO's AIN0-AIN5 keywords the voltage will be returned in millivolts.
+      May also be passed the path to an AIN file as created by a cape overlay,
+      in which case the value will be returned as found in the file. """
+  if adc_pin in ADC: 
+    adc_pin = ADC[adc_pin]
+    adc_file = glob.glob(adc_pin[0])
+    if len(adc_file) == 0:
+      overlay = adc_pin[1]
+      # Overlay not loaded yet
+      cape_manager.load(overlay, auto_unload=False)
+    adc_file = glob.glob(adc_pin[0])
+  else:
+    adc_file = glob.glob(adc_pin)
+  if len(adc_file) == 0:
+    raise Exception('*Could load overlay for adc_pin: %s' % adc_pin)
+  adc_file = adc_file[0]
   # Occasionally the kernel will be writing to the file when you try 
   # to read it, to avoid IOError try up to 5 times:
   for i in range(5):
     try:
-      with open(glob.glob(adc_file)[0], 'rb') as f: 
-        mv = f.read()
-      return int(mv)
+      with open(adc_file, 'rb') as f: 
+        val = f.read()
+      return int(val)
     except IOError:
       continue
   raise Exception('*Could not open AIN file: %s' % adc_file)
