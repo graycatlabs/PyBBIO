@@ -11,10 +11,6 @@
 #       to activate i2c1 bus; echo BB-I2C1 > /sys/devices/bone_capemgr.8/slots; will be now present at /dev/i2c-2
 #       reference : http://datko.net/2013/11/03/bbb_i2c/
 
-##
-##
-
-
 import bbio
 from config import I2C
 from i2c_setup import i2cInit

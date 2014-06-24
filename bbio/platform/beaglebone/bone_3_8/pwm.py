@@ -5,7 +5,8 @@
 # 
 # Beaglebone PWM driver for kernel >= 3.8
 
-import cape_manager, sysfs
+from bbio.platform.beaglebone.bone_3_8 import cape_manager
+from bbio.platform.beaglebone import sysfs
 from bbio.util import delay, addToCleanup
 from config import *
 

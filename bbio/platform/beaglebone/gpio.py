@@ -5,10 +5,20 @@
 # 
 # Beaglebone GPIO driver
 
-import os, pinmux, math, sysfs
+import os, math, sysfs
 from bbio.util import addToCleanup
-from config import *
+from config_common import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
+                   CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
+                   CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
+                   MSBFIRST
 
+from bbio.platform.platform import detect_platform 
+_platform = detect_platform()
+if "3.8" in _platform:
+  from bone_3_8 import pinmux
+elif "3.2" in _platform:
+  from bone_3_2 import pinmux
+del _platform
 
 def getGPIODirectory(gpio_pin):
   """ Returns the sysfs kernel driver base directory for the given pin. """
