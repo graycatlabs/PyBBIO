@@ -51,15 +51,6 @@ class SPI_Bus(object):
     '''
     self.spidev.writebytes(list)
       
-  def transfer2(self,list,delay):
-    '''
-    transfer1([list],delay)
-    Perform SPI transaction.
-    CS will be released and reactivated between blocks.
-    delay specifies delay in usec between blocks.
-    '''
-    return self.spidev.xfer(list,delay)
-      
   def transfer(self,list):
     '''
     transfer1([list])
@@ -67,6 +58,37 @@ class SPI_Bus(object):
     CS will be held active between blocks.
     '''
     return self.spidev.xfer2(list)
+
+  def setDataMode(self,mode):
+    '''
+    setDataMode(mode)
+    SPI mode as two bit pattern of 
+    Clock Polarity  and Phase [CPOL|CPHA]
+	min: 0b00 = 0 max: 0b11 = 3
+    '''
+    self.spidev.md()=md
+    
+  def setBitOrder(self,lsbf):
+    '''
+    setBitOrder(lsbfirst)
+    for lsb first 1
+    for msb first 0     
+    '''
+    self.spidev.lsbfirst=lsbf
+    
+  def setMaxFreq(self,freq):
+    '''
+    setMaxFreq(freq)
+    maximum speed in Hz
+    '''
+    self.spidev.msh=freq
+    
+  def CShigh(self):
+    '''
+    CShigh()
+    makes CS active high
+    '''
+    self.spidev.cshigh=1
 
 
 # Initialize the global SPI  instances:
