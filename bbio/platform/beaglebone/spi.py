@@ -1,6 +1,14 @@
 
-from bbio.platform import _spi
-from spi_init import spi_init
+from bbio.platform.util import _spi
+
+from bbio.platform.platform import detect_platform 
+_platform = detect_platform()
+if "3.8" in _platform:
+  from bone_3_8.spi_init import spi_init
+elif "3.2" in _platform:
+  from bone_3_2.spi_init import spi_init
+del _platform
+
 
 class SPI_Bus(object):
     
