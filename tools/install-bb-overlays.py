@@ -31,7 +31,7 @@ overlays_to_copy = [
   '%s/overlays/PyBBIO-ehrpwm2-00A0.dts' % cwd,
 ]
 
-sys.path.append(config_path)
+sys.path = [config_path] + sys.path
 from config_common import GPIO
 
 sys.path.append("%s/bone_3_8" % config_path)
