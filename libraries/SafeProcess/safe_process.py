@@ -1,7 +1,7 @@
 """
  SafeProcess - v0.1
- Copyright 2012 - Alexander Hiam <ahiam@marlboro.edu>
- Apache 2.0 license
+ Copyright 2012 - Alexander Hiam <hiamalexander@gmail.com>
+ MIT license
 
  Provides a wrapper for Python's mutliprocessing.Process class
  which will be terminated during PyBBIO's cleanup.

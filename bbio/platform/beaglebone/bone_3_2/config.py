@@ -6,7 +6,7 @@
 #---------------------------------------------------#
 
 # Load the common beaglebone configuration:
-from config_common import *
+from bbio.platform.beaglebone.config_common import *
 
 
 ##############################

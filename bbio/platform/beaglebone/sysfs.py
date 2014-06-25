@@ -1,12 +1,12 @@
 # sysfs.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Helper routines for sysfs kernel drivers
 
 import glob
-from bbio.platform._sysfs import _kernelFileIO
+from bbio.platform.util._sysfs import _kernelFileIO
 
 
 def kernelFilenameIO(fn, val=''):
