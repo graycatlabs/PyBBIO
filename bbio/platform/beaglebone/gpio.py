@@ -56,7 +56,8 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       the INPUT/OUTPUT mode will be preserved when the program exits. """
 
   if 'USR' in gpio_pin:
-    print 'warning: pinMode() not supported for USR LEDs'
+    if direction == INPUT:
+      print 'warning: cannot set USR LEDs to INPUT'
     return
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   exported = pinmux.export(gpio_pin)
