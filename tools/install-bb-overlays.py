@@ -34,7 +34,7 @@ overlays_to_copy = [
 sys.path = [config_path] + sys.path
 from config_common import GPIO
 
-sys.path.append("%s/bone_3_8" % config_path)
+sys.path = ["%s/bone_3_8" % config_path] + sys.path
 from config import ADC
 
 with open('%s/overlays/gpio-template.txt' % cwd, 'rb') as f:

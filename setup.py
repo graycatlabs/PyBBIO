@@ -142,7 +142,7 @@ install_requires = [
   'pyserial',
   'smbus'
 ]
-    
+
 if 'BeagleBone' in PLATFORM:
   # 3.2 and 3.8, list common things:
   driver_packages += ['bbio.platform.beaglebone']
