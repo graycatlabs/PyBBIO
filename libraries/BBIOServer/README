@@ -1,7 +1,7 @@
 BBIOServer - v1.2
 
 Copyright 2012 Alexander Hiam
-ahiam@marlboro.edu
+hiamalexander@gmail.com
 
 BBIOServer is a dynamic web interface library for PyBBIO.
 
@@ -12,7 +12,7 @@ As well as the included example programs:
 and 
  PyBBIO/examples/BBIOServer_mobile_test.py
 
-BBIOServer is released as part of PyBBIO under its Apache 2.0 license.
+BBIOServer is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt
 
 ---------------------------------------------------

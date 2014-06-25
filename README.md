@@ -1,26 +1,31 @@
-### PyBBIO v0.8.5
+### PyBBIO v0.9
 http://github.com/alexanderhiam/PyBBIO  
-Copyright (c) 2012-2014 - Alexander Hiam <hiamalexander@gmail.com>    
+Copyright (c) 2012-2014 - Alexander Hiam <hiamalexander@gmail.com>
+Released under the MIT license  
 
-PyBBIO is a Python library for Arduino-style hardware IO support on the TI 
-Beaglebone. It currently supports basic digital IO through digitalRead() 
-and digitalWrite() functions, ADC support through analogRead(), PWM support 
-analogWrite() as well as a few utility functions for changing PWM frequency
-etc., and an Arduino-style UART interface. SPI and I2C are on the way, so 
-keep checking the Github page for updates.  
+PyBBIO is a Python library for Arduino-style hardware IO support on the 
+BeagleBone and BeagleBone Black. It supports the GPIO, ADC, PWM, UART
+and I2C modules, and also includes a number of additional libraries for 
+added functionality.  
 
 #### Documentation can be found at http://github.com/alexanderhiam/PyBBIO/wiki  
 
-#License
+# License
 
-    PyBBIO is licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
 
-      http://www.apache.org/licenses/LICENSE-2.0
+    The above copyright notice and this permission notice shall be included in
+    all copies or substantial portions of the Software.
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+    THE SOFTWARE.

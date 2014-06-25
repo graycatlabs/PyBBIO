@@ -2,7 +2,7 @@
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # This library - github.com/deepakkarki
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone i2c driver
 

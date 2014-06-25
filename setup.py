@@ -174,11 +174,11 @@ elif (PLATFORM == 'BeagleBone 3.2'):
 
 
 setup(name='PyBBIO',
-      version='0.8.5',
-      description='A Python library for Arduino-style hardware IO support on single board Linux systems',
+      version='0.9',
+      description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
       author='Alexander Hiam',
       author_email='hiamalexander@gmail.com',
-      license='Apache 2.0',
+      license='MIT',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
       packages=['bbio', 'bbio.platform'] + driver_packages,
       package_dir=driver_package_dirs,

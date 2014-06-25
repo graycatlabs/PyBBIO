@@ -1,7 +1,7 @@
 # cape_manager.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone Cape Manager driver
 # For Beaglebone's with 3.8 kernel or greater

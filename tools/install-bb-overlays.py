@@ -2,7 +2,7 @@
  install-overlays.py
  Part of PyBBIO
  github.com/alexanderhiam/PyBBIO
- Apache 2.0 license
+ MIT license
 
  Generates and installs device tree overlays used for pinmuxing on 
  BeagleBones running a 3.8 or newer kernel.

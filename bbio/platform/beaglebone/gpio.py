@@ -1,8 +1,8 @@
 # gpio.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
-# 
+# MIT License
+#
 # Beaglebone GPIO driver
 
 import os, math, sysfs

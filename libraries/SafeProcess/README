@@ -1,6 +1,6 @@
 SafeProcess - v0.1
 
-Copyright 2012 Alexander Hiam <ahiam@marlboro.edu>
+Copyright 2012 Alexander Hiam <hiamalexander@gmail.com>
 
 For PyBBIO - https://github.com/alexanderhiam/PyBBIO
 
@@ -16,6 +16,6 @@ Example program:
 See the Python docs for multiprocessing.Process:
   http://docs.python.org/library/multiprocessing.html#multiprocessing.Process
 
-SafeProcess is released as part of PyBBIO under its Apache 2.0
+SafeProcess is released as part of PyBBIO under its MIT License
 license. See PyBBIO/LICENSE.txt
 
