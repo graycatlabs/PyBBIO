@@ -181,7 +181,6 @@ setup(name='PyBBIO',
       license='Apache 2.0',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
       packages=['bbio', 'bbio.platform'] + driver_packages,
-      py_modules = ['bbio.test'],
       package_dir=driver_package_dirs,
       ext_modules=driver_extensions, 
       install_requires=install_requires)
