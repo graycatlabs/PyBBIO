@@ -1,16 +1,22 @@
-### PyBBIO v0.9
-http://github.com/alexanderhiam/PyBBIO  
+======
+PyBBIO
+======
+
+http://github.com/alexanderhiam/PyBBIO
+
 Copyright (c) 2012-2014 - Alexander Hiam <hiamalexander@gmail.com>
-Released under the MIT license  
+
+Released under the MIT license
 
 PyBBIO is a Python library for Arduino-style hardware IO support on the 
 BeagleBone and BeagleBone Black. It supports the GPIO, ADC, PWM, UART
 and I2C modules, and also includes a number of additional libraries for 
-added functionality.  
+added functionality.
 
-#### Documentation can be found at http://github.com/alexanderhiam/PyBBIO/wiki  
+Documentation can be found at http://github.com/alexanderhiam/PyBBIO/wiki
 
-# License
+License
+=======
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
