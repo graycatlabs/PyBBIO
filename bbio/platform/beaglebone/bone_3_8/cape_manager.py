@@ -6,7 +6,7 @@
 # Beaglebone Cape Manager driver
 # For Beaglebone's with 3.8 kernel or greater
 
-from config import SLOTS_FILE
+from bbio.platform.beaglebone.config import SLOTS_FILE
 from bbio.util import addToCleanup
 
 def load(overlay, auto_unload=True):

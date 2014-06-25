@@ -7,7 +7,7 @@
 
 import os, math, sysfs
 from bbio.util import addToCleanup
-from config_common import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
+from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
                    CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
                    MSBFIRST
