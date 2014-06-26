@@ -159,7 +159,12 @@ if (PLATFORM == 'BeagleBone >=3.8'):
 elif (PLATFORM == 'BeagleBone 3.2'):
   # BeagleBone or BeagleBone Black with kernel < 3.8 (probably 3.2)
   driver_packages += ['bbio.platform.beaglebone.bone_3_2']
-
+  
+  driver_extensions += [Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
+                        ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
+                         'bbio/platform/util/mmap_util.c'],
+                         include_dirs=['bbio/platform/util'])]
+                                   
   # Older Angstrom images only included support for one of the PWM modules
   # broken out on the headers, check and warn if no support for PWM2 module:
   if (not os.path.exists('/sys/class/pwm/ehrpwm.2:0')):
