@@ -179,14 +179,21 @@ setup(name='PyBBIO',
       long_description=open('README.md').read(),
       author='Alexander Hiam',
       author_email='hiamalexander@gmail.com',
-      license='MIT License',#open('LICENSE.txt').read(),
+      license='MIT License',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
       download_url='https://github.com/alexanderhiam/PyBBIO/tarball/v0.9',
       keywords=['BeagleBone', 'BeagleBone Black', 'IO', 'GPIO', 'ADC', 'PWM', 'I2C', 'bbio'],
       packages=['bbio', 'bbio.platform', 'bbio.platform.util'] + driver_packages,
       package_dir=driver_package_dirs,
       ext_modules=driver_extensions, 
-      install_requires=install_requires)
+      install_requires=install_requires,
+      classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX :: Linux',
+        'Topic :: Software Development :: Embedded Systems',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Topic :: System :: Hardware'
+      ])
 #data_files=driver_data,
 
 if TASK == 'install':
