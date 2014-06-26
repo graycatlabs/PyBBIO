@@ -7,9 +7,9 @@
 
 import sys, atexit
 
-from platform import *
-from util import *
-from config import LIBRARIES_PATH
+from .platform import platform_init, platform_cleanup
+from .util import ADDITIONAL_CLEANUP, util_init
+from .config import LIBRARIES_PATH
 
 sys.path.append(LIBRARIES_PATH)
 

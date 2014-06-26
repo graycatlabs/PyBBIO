@@ -37,7 +37,8 @@ from config import USR0, USR1, USR2, USR3, GPIO0_2, GPIO0_3, GPIO0_4, GPIO0_5,\
 from config import INPUT, OUTPUT, PULLDOWN, NOPULL, PULLUP, HIGH, LOW, RISING,\
                    FALLING, BOTH, MSBFIRST, LSBFIRST
 
-from config import AIN0, AIN1, AIN2, AIN3, AIN4, AIN5, AIN6, AIN7
+from config import AIN0, AIN1, AIN2, AIN3, AIN4, AIN5, AIN6, AIN7,\
+                   A0, A1, A2, A3, A4, A5, A6, A7, VSYS
 
 from config import PWM1A, PWM1B, PWM2A, PWM2B
 if "3.8" in PLATFORM:
