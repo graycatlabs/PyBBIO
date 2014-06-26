@@ -1,5 +1,4 @@
 
-
 import sys, os, shutil
 
 # detect platform:
@@ -187,6 +186,7 @@ setup(name='PyBBIO',
       package_dir=driver_package_dirs,
       ext_modules=driver_extensions, 
       install_requires=install_requires,
+      platforms=['BeagleBone', 'BeagleBone Black'],
       classifiers=[
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX :: Linux',
