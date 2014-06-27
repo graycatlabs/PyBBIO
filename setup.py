@@ -36,55 +36,6 @@ def preinstall():
   from distutils import spawn
   assert spawn.find_executable('dtc'), "dtc not installed, aborting!"
 
-  # Earlier versions of PyBBIO used a shell script to install the 
-  # bbio module, and it was put in a different directory than this 
-  # script will install it. The old install directory is before the 
-  # new in the Python search path, so we have to make sure to remove
-  # the old install if it is there:
-  old_install = ("/usr/lib/python2.7/bbio.py", 
-                 "/usr/lib/python2.7/bbio.pyo")
-  removed_old_install = False
-  for f in old_install:
-    if os.path.exists(f):
-      try:
-        os.remove(f)
-        removed_old_install = True
-      except Exception as e:
-        print ("**Error!**\nAn old PyBBIO install was found at %s\nbut could"+\
-              " not be removed. Exception raised:\n%s\nAborting install.") %\
-              (f, e)
-        sys.exit(0)
-  if (removed_old_install):
-    print \
-"""
-An old installation of PyBBIO was removed, but its config file was
-preserved in ~/.pybbio/, in case any local customizations were made.
-If you have no need to save the old config file you can delete the
-entire ~/.pybbio/ directory, as all configuration is now contained 
-in the bbio package.
-"""
-
-  # Through version 0.5 distutils was used to install PyBBIO instead of 
-  # setuptools, and PyBBIO was installed into a different directory. This
-  # test looks for all the possible distutils install directories. If an
-  # old distutils install is found, the user is notified that it should be 
-  # removed and isntall is aborted:
-  possible_old_install_paths = ["/usr/local/lib/python2.7/dist-packages/",
-                                "/usr/local/lib/python2.7/site-packages/",
-                                "/usr/lib/python2.7/site-packages/",
-                                "/usr/lib/python2.7/dist-packages/"]
-  for p in possible_old_install_paths:
-    if os.path.exists(p + "bbio"):
-      print \
-""" 
-An old installation of PyBBIO was found which must be removed manually 
-before installation can continue. Remove old install with:
-  # rm -rf %sbbio
-  # rm -rf %sPyBBIO*
-Then run the setup.py script again.
-""" % (p, p)
-      sys.exit(0)
-
   # Some Angstrom images are missing the py_compile module; get it if not
   # present:
   import random
