@@ -14,8 +14,8 @@ class ADT7310(object):
     self.spidev.setDataMode(self.cs,3)
     
   def getTemp(self):
-    self.spidev.write(0x54)
-    _t = self.spidev.read(0,2)
+    self.spidev.write(self.cs,0x54)
+    _t = self.spidev.read(self.cs,2)
     if ( _t[0] & 128 == 0):
       temp = (((_t[0]<<8)+_t[1])>>3)/16
     else:
