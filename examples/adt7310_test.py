@@ -1,10 +1,14 @@
 from bbio import *
 from ADT7310 import *
 
+adt = ADT7310(0,0) 
+
 def setup():
-  adt = ADT7310(0,0)
+  pass
   
 def loop():
-  temp = getTemp() 
+  temp = adt.getTemp() 
   print(temp)
   delay(500)  
+  
+run(setup,loop)
