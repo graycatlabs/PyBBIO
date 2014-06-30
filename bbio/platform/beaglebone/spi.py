@@ -103,14 +103,10 @@ class SPI_Bus(object):
     Sets the Mode of the SPI device specified by chip_select.
     SPI mode as two bit pattern of Clock Polarity  and Phase [CPOL|CPHA].
 	It can take a value between 0<= chip_select <=3.
-	Mode 0 : base value of the clock is zero, data are captured on the clock's rising edge (low→high transition)\ 
-	          and data is propagated on a falling edge (high→low clock transition).
-	Mode 1 : the base value of the clock is zero, data are captured on the clock's falling edge \
-	          and data is propagated on a rising edge.
-	Mode 2 : the base value of the clock is one, data are captured on clock's falling edge\ 
-	          and data is propagated on a rising edge.
-	Mode 3 : the base value of the clock is one, data are captured on clock's rising edge\ 
-	          and data is propagated on a falling edge.
+	Mode 0 : base value of the clock is zero, data are captured on the clock's rising edge and data is propagated on a falling edge (high→low clock transition).
+	Mode 1 : the base value of the clock is zero, data are captured on the clock's falling edge and data is propagated on a rising edge.
+	Mode 2 : the base value of the clock is one, data are captured on clock's falling edge and data is propagated on a rising edge.
+	Mode 3 : the base value of the clock is one, data are captured on clock's rising edge and data is propagated on a falling edge.
     '''
     assert self._running == True, "Must call SPIx.begin() before using setDataMode()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
@@ -125,14 +121,10 @@ class SPI_Bus(object):
     SPIx.getDataMode(chip_select)
     Gets the Mode of the SPI device specified by chip_select.
     SPI mode has two bit pattern of Clock Polarity  and Phase [CPOL|CPHA].
-	Mode 0 : base value of the clock is zero, data are captured on the clock's rising edge (low→high transition)\ 
-	          and data is propagated on a falling edge (high→low clock transition).
-	Mode 1 : the base value of the clock is zero, data are captured on the clock's falling edge \
-	          and data is propagated on a rising edge.
-	Mode 2 : the base value of the clock is one, data are captured on clock's falling edge\ 
-	          and data is propagated on a rising edge.
-	Mode 3 : the base value of the clock is one, data are captured on clock's rising edge\ 
-	          and data is propagated on a falling edge.
+	Mode 0 : base value of the clock is zero, data are captured on the clock's rising edge and data is propagated on a falling edge (high→low clock transition).
+	Mode 1 : the base value of the clock is zero, data are captured on the clock's falling edge and data is propagated on a rising edge.
+	Mode 2 : the base value of the clock is one, data are captured on clock's falling edge and data is propagated on a rising edge.
+	Mode 3 : the base value of the clock is one, data are captured on clock's rising edge and data is propagated on a falling edge.
 	Returns the mode of SPI device.
     '''
     assert self._running == True, "Must call SPIx.begin() before using getDataMode()"
@@ -151,7 +143,7 @@ class SPI_Bus(object):
     '''
     assert self._running == True, "Must call SPIx.begin() before using setBitOrder()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
-    assert lsb == -1 lsb ==1 , "either LSBFIRST or MSBFIRST"
+    assert lsb == -1 | lsb ==1 , "either LSBFIRST or MSBFIRST"
     if order == LSBFIRST: 
       order = 0
     if cs == 0:
