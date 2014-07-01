@@ -1,11 +1,18 @@
 from bbio import *
 from ADT7310 import *
 
-adt = ADT7310(0,0) 
+adt = ADT7310(0,0)
+pin = GPIO1_28  
+
+def alarm():
+  print("Too Hot or Cold!")
 
 def setup():
-  pass
-  
+  adt.setLowTemp(-10)
+  adt.setHighTemp(45)
+  adt.setCriticalTemp(40)
+  adt.setAlarm(pin,alarm)
+    
 def loop():
   temp = adt.getTemp() 
   print(temp)
