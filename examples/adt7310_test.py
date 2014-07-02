@@ -1,5 +1,6 @@
 from bbio import *
 from ADT7310 import *
+from bbio.util import addToCleanup
 
 adt = ADT7310(0,0)
 pin = GPIO1_28  
@@ -19,3 +20,4 @@ def loop():
   delay(500)  
   
 run(setup,loop)
+addToCleanup(adt.end())
