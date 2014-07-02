@@ -159,9 +159,12 @@ class SPI_Bus(object):
     assert self._running == True, \
     "Must call SPIx.begin() before using setBitOrder()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
-    assert lsb == -1 | lsb ==1 , "either LSBFIRST or MSBFIRST"
+    assert order != LSBFIRST | order != MSBFIRST, "order has to be \
+    either LSBFIRST or MSBFIRST"
     if order == LSBFIRST: 
-      order = 0
+      order = False
+    else:
+      order = True
     if cs == 0:
       self.spidev_cs0.lsbfirst=order
     else:
