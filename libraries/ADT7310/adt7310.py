@@ -12,7 +12,7 @@ class ADT7310(object):
   ADDR_HIGH_TEMP    = (0x06<<3)
   ADDR_HYST_TEMP    = (0x05<<3)
   ADDR_CRT_TEMP     = (0x04<<3)
-  CONFIG_COMPARATOR = (0x02<<4)
+  CONFIG_COMPARATOR = (0x01<<4)
 
   def __init__(self, spi_no, cs):
     assert 0 <= spi_no < 2, "spi_no must be between 0 or 1"
@@ -26,20 +26,32 @@ class ADT7310(object):
     self.cs = cs
     self.spidev.begin()
     self.spidev.setDataMode(self.cs,3)
+    self.spidev.setBitOrder(self.cs,MSBFIRST)
+    self.spidev.write(self.cs,[0xff,0xff,0xff,0xff])
+    delay(500)
+    self.spidev.write(self.cs,[0x50])
+    self._cont = False
+    
     
   def getTemp(self):
     '''
     getTemp()
     Reads the temperature value
     '''
-    self.spidev.write(self.cs, [self.CMD_READ | self.ADDR_TEMP | \
+    if self._cont == False:
+      self.spidev.write(self.cs, [self.CMD_READ | self.ADDR_TEMP | \
                       self.CMD_CONTINUOUS])
+      self._cont == True
     _t = self.spidev.read(self.cs,2)
     if ( _t[0] & 128 == 0):
       temp = (((_t[0]<<8)+_t[1])>>3)/16
     else:
       temp = ((((_t[0]<<8)+_t[1])>>3)-4096)/16
     return temp
+    
+  def _exitCont(self):
+    if self._cont == True:
+      self.spidev.write(self.cs,[0x50])
 
   def _encodeTemp(self,temp):
     '''
@@ -54,6 +66,7 @@ class ADT7310(object):
     Sets the Low Temperature below which the Interrupt pin will activate
     '''
     t = self._encodeTemp(temp)
+    self._exitCont()
     self.spidev.write(self.cs,[self.CMD_WRITE | self.ADDR_LOW_TEMP] + \
                        self._encodeTemp(temp))
     
@@ -62,6 +75,7 @@ class ADT7310(object):
     setHighTemp(temp)
     Sets the High Temperature above which the Interrupt pin will activate.
     '''
+    self._exitCont()
     self.spidev.write(self.cs,[self.CMD_WRITE | self.ADDR_HIGH_TEMP] + \
                        self._encodeTemp(temp))
     
@@ -70,6 +84,7 @@ class ADT7310(object):
     setCriticalTemp(temp)
     Sets the Critical Temperature below which the CT pin will activate.
     '''
+    self._exitCont()
     t = self._encodeTemp(temp)
     self.spidev.write(self.cs, [self.CMD_WRITE | self.ADDR_CRT_TEMP]+\
                       self._encodeTemp(temp))
@@ -79,6 +94,7 @@ class ADT7310(object):
     setCriticalTemp(temp)
     Sets the Critical Temperature below which the CT pin will activate.
     '''
+    self._exitCont()
     t = self._encodeTemp(temp)
     self.spidev.write(self.cs, [self.CMD_WRITE | self.ADDR_HYST_TEMP]+\
                       self._encodeTemp(temp))
@@ -88,6 +104,7 @@ class ADT7310(object):
     enableAlarm()
     enables the Comparator mode for interrupts.
     '''
+    self._exitCont()
     self.spidev.write(self.cs,[self.CMD_WRITE | self.ADDR_CONFIG] +\
                 [self.CONFIG_COMPARATOR])
     
@@ -141,4 +158,19 @@ class ADT7310(object):
       Removes critical alarm on CT pin.
       '''
       detachInterrupt(self.critical_pin)
+      
+  def end(self):
+    self.removeAlarm()
+    self.removeCriticalAlarm()
+    self.spidev.end()
+    
+  def read(self, reg):
+    self.spidev.write(self.cs,[CMD_READ | reg<<3])
+    _t = self.spidev.read(self.cs,2)
+    self._exitCont()
+    if ( _t[0] & 128 == 0):
+      temp = (((_t[0]<<8)+_t[1])>>3)/16
+    else:
+      temp = ((((_t[0]<<8)+_t[1])>>3)-4096)/16
+    return temp
     
