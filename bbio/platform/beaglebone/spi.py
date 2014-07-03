@@ -49,7 +49,7 @@ class SPI_Bus(object):
     Returns the data read from the device 
     as a list whose each element contains 1 byte 
     '''
-    assert self._running == True, "Must call SPIx.begin() before using read()"
+    assert self._running, "Must call SPIx.begin() before using read()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       return self.spidev_cs0.readbytes(n_bytes)
@@ -63,14 +63,14 @@ class SPI_Bus(object):
     Writes each element in the list to SPI device specified by the chip_select
     Does not return anything.
     '''
-    assert self._running == True, "Must call SPIx.begin() before using write()"
+    assert self._running, "Must call SPIx.begin() before using write()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if type(data) == str:
       data = [ord(c) for c in data]
     elif type(data) == int:
       data = [data & 0xff]
-    elif type(data) == list or type(data) == tuple:
-      data = map(lambda x: int(x) & 0xff, data)
+    #elif type(data) == list or type(data) == tuple:
+    # data = map(lambda x: int(x) & 0xff, data)
     if cs == 0:
       self.spidev_cs0.writebytes(data)
     else:
@@ -86,8 +86,7 @@ class SPI_Bus(object):
     Returns the data read from the device as a list
     whose each element contains 1 byte.
     '''
-    assert self._running == True, \
-    "Must call SPIx.begin() before using transfer()"
+    assert self._running, "Must call SPIx.begin() before using transfer()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if type(data) == str:
       data = [ord(c) for c in data]
@@ -116,8 +115,7 @@ class SPI_Bus(object):
       Mode 3 : the base value of the clock is one, data are captured on 
                clock's rising edge and data is propagated on a falling edge.
     '''
-    assert self._running == True,\
-        "Must call SPIx.begin() before using setDataMode()"
+    assert self._running,"Must call SPIx.begin() before using setDataMode()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     assert 0 <= mode < 4, "Mode must be between 0 and 3"
     if cs == 0:
@@ -140,8 +138,7 @@ class SPI_Bus(object):
              clock's rising edge and data is propagated on a falling edge.
     Returns the mode of SPI device.
     '''
-    assert self._running == True, \
-    "Must call SPIx.begin() before using getDataMode()"
+    assert self._running, "Must call SPIx.begin() before using getDataMode()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       return self.spidev_cs0.mode
@@ -156,11 +153,10 @@ class SPI_Bus(object):
     order must be either LSBFIRST or MSBFIRST
     Returns the mode of SPI device.    
     '''
-    assert self._running == True, \
-    "Must call SPIx.begin() before using setBitOrder()"
+    assert self._running, "Must call SPIx.begin() before using setBitOrder()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
-    assert order != LSBFIRST | order != MSBFIRST, "order has to be \
-    either LSBFIRST or MSBFIRST"
+    assert order == LSBFIRST or order == MSBFIRST, "order has to be \
+                 either LSBFIRST or MSBFIRST"
     if order == LSBFIRST: 
       order = False
     else:
@@ -179,7 +175,7 @@ class SPI_Bus(object):
     for MSB first : 0  
     Returns the Bit Order of SPI device.   
     '''
-    assert self._running == True, \
+    assert self._running, \
     "Must call SPIx.begin() before using getBitOrder()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
@@ -194,8 +190,7 @@ class SPI_Bus(object):
     specified by chip_select to freq in HZ.
     frequency has to be specified in Hz.
     '''
-    assert self._running == True,\
-         "Must call SPIx.begin() before using setMaxFreq()"
+    assert self._running, "Must call SPIx.begin() before using setMaxFreq()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       self.spidev_cs0.msh=freq
@@ -209,32 +204,31 @@ class SPI_Bus(object):
     maximum speed in Hz
     Returns the maximum frequency in Hz.
     '''
-    assert self._running == True,\
-          "Must call SPIx.begin() before using getMaxFreq()"
+    assert self._running,"Must call SPIx.begin() before using getMaxFreq()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       return self.spidev_cs0.msh
     else:
       return self.spidev_cs1.msh
 
-  def setCShigh(self,cs):
+  def setCSActiveHigh(self,cs):
     '''
-    SPIx.setCShigh(chip_select)
+    SPIx.setCSActiveHigh(chip_select)
     Makes Chip Select pin of the SPI device given by chip_select active High
     '''
-    assert self._running == True,"Must call SPIx.begin() before using CShigh()"
+    assert self._running,"Must call SPIx.begin() before using CShigh()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       self.spidev_cs0.cshigh = True
     else:
       self.spidev_cs1.cshigh = True
       
-  def setCSlow(self,cs):
+  def setCSActiveLow(self,cs):
     '''
-    SPIx.setCSlow(chip_select)
+    SPIx.setCSActiveLow(chip_select)
     Makes Chip Select pin of the SPI device given by chip_select Active Low
     '''
-    assert self._running == True, "Must call SPIx.begin() before using CSlow()"
+    assert self._running, "Must call SPIx.begin() before using CSlow()"
     assert 0 <= cs < 2, "Chip Select must be 0 or 1"
     if cs == 0:
       self.spidev_cs0.cshigh = False
