@@ -1,8 +1,8 @@
 
 from bbio import *
-from RotaryEncoder import *
+from RotaryEncoder import RotaryEncoder
 
-encoder = RotaryEncoder(1)
+encoder = RotaryEncoder(RotaryEncoder.EQEP2b)
 
 def setup():
   encoder.setAbsolute()
