@@ -1,0 +1,1 @@
+from adt7310 import ADT7310
