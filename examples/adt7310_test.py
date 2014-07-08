@@ -9,8 +9,8 @@ def alarm():
   print("Too Hot or Cold!")
 
 def setup():
-  adt.setLowTemp(-10)
-  adt.setHighTemp(45)
+  adt.setLowTemp(5)
+  adt.setHighTemp(50)
   adt.setCriticalTemp(40)
   adt.setAlarm(pin,alarm)
     
@@ -20,4 +20,3 @@ def loop():
   delay(500)  
   
 run(setup,loop)
-addToCleanup(adt.end())
