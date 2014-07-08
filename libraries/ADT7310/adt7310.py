@@ -67,7 +67,7 @@ class ADT7310(object):
     _encodeTemp(temp)
     encodes the temp to a 2 byte value msb first
     '''
-    if temp<0:
+    if (temp<0):
       temp = temp*128
     else:
       temp = temp*128 + 65536
