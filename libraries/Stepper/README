@@ -1,0 +1,17 @@
+Stepper - v0.1
+
+Copyright 2012 Alexander Hiam
+agwatic@gmail.com
+
+Library for controlling stepper motors with the BeagleBone's pins.
+
+See documentation here:
+ 
+As well as the included example programs:
+ PyBBIO/examples/Stepper_knob.py
+
+Based on the Arduino Servo library:
+ http://www.arduino.cc/en/Reference/Stepper
+
+Servo is released as part of PyBBIO under its Apache 2.0 license.
+See PyBBIO/LICENSE.txt
