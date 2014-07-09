@@ -27,9 +27,10 @@ class RotaryEncoder(object):
     cape_manager.load(overlay, auto_unload=False)
     delay(250) # Give driver time to load 
     self.base_dir = self._eqep_dirs[eqep_num]
+    self.enable()
     addToCleanup(self.disable)
     
-  def enable(self,m):
+  def enable(self):
     enable_file = "%s/enabled" % self.base_dir
     return sysfs.kernelFilenameIO(enable_file, 1) 
     
@@ -41,18 +42,18 @@ class RotaryEncoder(object):
     '''
     Set mode as Absolute
     '''
-    set_mode = "%s/mode" % self.base_dir
-    return sysfs.kernelFilenameIO(set_mode, 0)
+    mode_file = "%s/mode" % self.base_dir
+    return sysfs.kernelFilenameIO(mode_file, 0)
     
   def setRelative(self):
     '''
     Set mode as Relative
     '''
-    set_mode = "%s/mode" % self.base_dir
-    return sysfs.kernelFilenameIO(enable_file, 1)
+    mode_file = "%s/mode" % self.base_dir
+    return sysfs.kernelFilenameIO(mode_file, 1)
     
   def getMode(self):
-    mode_file = "%s/enabled" % self.base_dir
+    mode_file = "%s/mode" % self.base_dir
     return sysfs.kernelFilenameIO(mode_file)
 
   def getPosition(self):
