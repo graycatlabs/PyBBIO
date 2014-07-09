@@ -1,3 +1,13 @@
+'''
+ADT7310 - v0.1
+Copyright 2014 Rekha Seethamraju
+
+Library for controlling temperature sensor, ADT7310 with 
+the Beaglebone Black's SPI pins.
+
+ADT7310 is released as part of PyBBIO under its MIT license.
+See PyBBIO/LICENSE.txt
+'''
 from bbio import *
 class ADT7310(object):
   CONFIG_COMPARATOR = (1<<4)
@@ -36,19 +46,27 @@ class ADT7310(object):
     addToCleanup(self.close)
     
   def close(self):
+  '''
+  close()
+  removes alarms if set and closes the SPI connection
+  '''
     self.removeAlarm()
     self.removeCriticalAlarm()
     self.spidev.end()
     self._continuous == False
 
   def reset(self):
+    '''
+    reset()
+    resets the sensor to default values.
+    '''
     self.spidev.write(self.cs,[0xff,0xff,0xff,0xff])
     delay(1)
   
   def getTemp(self):
     '''
     getTemp()
-    Reads the temperature value
+    Reads the 13-bit temperature value
     '''
     if self._continuous == False:
       self.spidev.write(self.cs, [self.CMD_READ | self.R_TEMP | \
@@ -95,7 +113,7 @@ class ADT7310(object):
     '''
     setHystTemp(temp)
     Sets the Hystersis Temperature below which determines the tolerance.
-      Must be between 0 and 15 C
+    Must be between 0 and 15 C
     '''
     self.spidev.write(self.cs,[self.CMD_WRITE | self.R_HYST]+\
                       self._encodeTemp(temp))
@@ -165,6 +183,3 @@ class ADT7310(object):
     '''
     if self.critical_pin:
       detachInterrupt(self.critical_pin)
-    
-#removed the enable alarm and fixed configuration stuff 240 ms at the start a
-#nd read?
