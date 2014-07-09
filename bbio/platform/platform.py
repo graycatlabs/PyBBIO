@@ -1,7 +1,8 @@
 
 
 def detect_platform():
-  """  """
+  """ Attempt to the current platform. Returns one of: 'BeagleBone 3.2',
+      'BeagleBone >=3.8'. """
   platform = ''
   with open('/proc/cpuinfo', 'rb') as f:
     cpuinfo = f.read().lower() 

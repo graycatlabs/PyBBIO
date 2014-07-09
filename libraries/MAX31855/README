@@ -1,7 +1,7 @@
 MAX31855 - v0.2
 
 Copyright 2012 Alexander Hiam
-ahiam@marlboro.edu
+hiamalexander@gmail.com
 
 MAX31855 is a library for PyBBIO to interface with Maxim's MAX31855 
 thermocouple amplifier.
@@ -11,5 +11,5 @@ See documentation here:
 As well as the included example program:
  PyBBIO/examples/MAX31855_test.py
 
-MAX31855 is released as part of PyBBIO under its Apache 2.0 license.
+MAX31855 is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt

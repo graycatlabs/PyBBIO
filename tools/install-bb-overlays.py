@@ -2,7 +2,7 @@
  install-overlays.py
  Part of PyBBIO
  github.com/alexanderhiam/PyBBIO
- Apache 2.0 license
+ MIT license
 
  Generates and installs device tree overlays used for pinmuxing on 
  BeagleBones running a 3.8 or newer kernel.
@@ -31,10 +31,10 @@ overlays_to_copy = [
   '%s/overlays/PyBBIO-ehrpwm2-00A0.dts' % cwd,
 ]
 
-sys.path.append(config_path)
+sys.path = [config_path] + sys.path
 from config_common import GPIO
 
-sys.path.append("%s/bone_3_8" % config_path)
+sys.path = ["%s/bone_3_8" % config_path] + sys.path
 from config import ADC
 
 with open('%s/overlays/gpio-template.txt' % cwd, 'rb') as f:

@@ -1,7 +1,7 @@
 # interrupt.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone GPIO interrupt driver
 #
@@ -9,8 +9,7 @@
 # Alan Christopher Thomas - https://github.com/alanctkc
 # Thanks!
 
-from config import *
-from gpio import *
+from config import GPIO_FILE_BASE, RISING, FALLING, BOTH
 import select, threading, os
 
 

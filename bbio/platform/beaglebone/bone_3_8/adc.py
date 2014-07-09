@@ -1,7 +1,7 @@
 # adc.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone ADC driver for kernels >= 3.8.
 #
@@ -11,11 +11,11 @@ import os, glob
 import cape_manager
 from config import *
 
+_ADC_INITIALIZED = False
+
 def analog_init():
   """ Initializes the on-board 8ch 12bit ADC. """
-  cape_manager.load(ADC_ENABLE_DTS_OVERLAY, auto_unload=False)
-  # Don't unload the overlay on exit for now because it can 
-  # cause kernel panic.
+  pass
 
 def analog_cleanup():
   pass
@@ -25,6 +25,9 @@ def analogRead(adc_pin):
       PyBBIO's AIN0-AIN5 keywords the voltage will be returned in millivolts.
       May also be passed the path to an AIN file as created by a cape overlay,
       in which case the value will be returned as found in the file. """
+  global _ADC_INITIALIZED      
+  if not _ADC_INITIALIZED:
+    _ADC_INITIALIZED = True
   if adc_pin in ADC: 
     adc_pin = ADC[adc_pin]
     adc_file = glob.glob(adc_pin[0])

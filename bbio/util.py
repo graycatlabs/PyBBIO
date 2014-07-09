@@ -1,7 +1,7 @@
 # util.py
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 #
 # This file contains routines and variables that may need to be
 # accessed by internal drivers, which cannot import the bbio.py

@@ -1,13 +1,13 @@
 # gpio.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
-# 
+# MIT License
+#
 # Beaglebone GPIO driver
 
 import os, math, sysfs
 from bbio.util import addToCleanup
-from config_common import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
+from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
                    CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
                    MSBFIRST
@@ -56,7 +56,8 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       the INPUT/OUTPUT mode will be preserved when the program exits. """
 
   if 'USR' in gpio_pin:
-    print 'warning: pinMode() not supported for USR LEDs'
+    if direction == INPUT:
+      print 'warning: cannot set USR LEDs to INPUT'
     return
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   exported = pinmux.export(gpio_pin)

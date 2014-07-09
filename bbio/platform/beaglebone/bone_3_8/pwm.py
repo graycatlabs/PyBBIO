@@ -1,7 +1,7 @@
 # pwm.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone PWM driver for kernel >= 3.8
 

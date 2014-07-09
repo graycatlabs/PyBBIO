@@ -2,7 +2,7 @@
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # This library - github.com/deepakkarki
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone i2c driver
 
@@ -13,7 +13,14 @@
 
 import bbio
 from config import I2C
-from i2c_setup import i2cInit
+
+from bbio.platform.platform import detect_platform 
+_platform = detect_platform()
+if "3.8" in _platform:
+  from bone_3_8.i2c_setup import i2cInit
+elif "3.2" in _platform:
+  from bone_3_2.i2c_setup import i2cInit
+del _platform
 
 try:
   import smbus

@@ -1,7 +1,6 @@
 
 from platform import detect_platform
-
-platform = detect_platform()
-
-if "BeagleBone" in platform:
+_platform = detect_platform()
+if "BeagleBone" in _platform:
   from beaglebone import *
+del _platform
