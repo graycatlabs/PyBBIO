@@ -1,7 +1,9 @@
 
 import os
 from bbio.platform import sysfs
-from bbio import addToCleanup, cape_manager, OCP_PATH, delay
+from bbio.platform.beaglebone.bone_3_8 import cape_manager
+from bbio import addToCleanup, delay
+from bbio.platform.beaglebone.config import OCP_PATH
 
 class RotaryEncoder(object):
   _eqep_dirs = [
