@@ -67,10 +67,11 @@ def _edge(gpio_pin, mode):
   """ Sets an edge-triggered interrupt with sysfs /sys/class/gpio
       interface. Returns True if successful, False if unsuccessful. """
   gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
-  if (not os.path.exists(GPIO_FILE_BASE + 'gpio%i' % gpio_num)): 
+  gpio_base = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num)
+  if (not os.path.exists(gpio_base)): 
     # Pin not under userspace control
     return False
-  edge_file = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'edge')
+  edge_file = os.path.join(gpio_base, 'edge')
   with open(edge_file, 'wb') as f:
     if mode == RISING:
       f.write('rising')
