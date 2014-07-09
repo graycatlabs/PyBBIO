@@ -9,7 +9,7 @@
 
 import os, glob, bbio
 import cape_manager
-from config import *
+from config import ADC, ADC_ENABLE_DTS_OVERLAY
 
 _ADC_INITIALIZED = False
 
