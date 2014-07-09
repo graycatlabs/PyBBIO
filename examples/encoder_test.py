@@ -1,4 +1,12 @@
+"""
+ encoder_test.py 
+ Rekha Seethamraju
 
+ An example to demonstrate the use of the eQEP library
+ for PyBBIO.
+
+ This example program is in the public domain.
+"""
 from bbio import *
 from RotaryEncoder import RotaryEncoder
 
