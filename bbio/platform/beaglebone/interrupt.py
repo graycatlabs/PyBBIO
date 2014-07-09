@@ -10,7 +10,7 @@
 # Thanks!
 
 from config import GPIO_FILE_BASE, RISING, FALLING, BOTH
-import select, threading, os
+import bbio, select, threading, os
 
 
 INTERRUPT_VALUE_FILES = {}
@@ -19,11 +19,20 @@ class EpollListener(threading.Thread):
   def __init__(self):
     self.epoll = select.epoll()
     self.epoll_callbacks = {}
+    self.first_interrupt_registered = False
     super(EpollListener, self).__init__()
 
   def run(self):
     while True:
-      if len(self.epoll_callbacks) == 0: break
+      if len(self.epoll_callbacks) == 0: 
+        if self.first_interrupt_registered:
+          # At least one interrupt gas been registered in the past
+          # and now all have been unregistered; stop thread:
+          break
+        else:
+          # If we're here then the thread was just created and the
+          # first interrupt hasn't been registered yet; wait for it:
+          bbio.delay(100)
       events = self.epoll.poll()
       for fileno, event in events:
         if fileno in self.epoll_callbacks:
@@ -35,6 +44,8 @@ class EpollListener(threading.Thread):
     fileno = INTERRUPT_VALUE_FILES[gpio_pin].fileno()
     self.epoll.register(fileno, select.EPOLLIN | select.EPOLLET)
     self.epoll_callbacks[fileno] = callback
+    if not self.first_interrupt_registered:
+      self.first_interrupt_registered = True
     
   def unregister(self, gpio_pin):
     fileno = INTERRUPT_VALUE_FILES[gpio_pin].fileno()
@@ -43,15 +54,19 @@ class EpollListener(threading.Thread):
     del INTERRUPT_VALUE_FILES[gpio_pin]
     del self.epoll_callbacks[fileno]  
 
-EPOLL_LISTENER = EpollListener()
-EPOLL_LISTENER.daemon = True
+EPOLL_LISTENER = None
+def _start_epoll_listener():
+  global EPOLL_LISTENER
+  if not EPOLL_LISTENER or not EPOLL_LISTENER.is_alive():
+    EPOLL_LISTENER = EpollListener()
+    EPOLL_LISTENER.daemon = True
+    EPOLL_LISTENER.start()
 
 def attachInterrupt(gpio_pin, callback, mode=BOTH):
   """ Sets an interrupt on the specified pin. 'mode' can be RISING, FALLING,
       or BOTH. 'callback' is the method called when an event is triggered. """
   # Start the listener thread
-  if not EPOLL_LISTENER.is_alive():
-    EPOLL_LISTENER.start()
+  _start_epoll_listener()
   gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
   INTERRUPT_VALUE_FILES[gpio_pin] = open(
     os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value'), 'r')
