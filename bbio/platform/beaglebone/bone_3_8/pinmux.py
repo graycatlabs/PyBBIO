@@ -72,7 +72,6 @@ def unexport(gpio_pin):
     return False
   gpio_num = GPIO[gpio_pin][2]
   gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
-  print gpio_file
   if (not os.path.exists(gpio_file)): 
     # Pin not under userspace control
     return False
