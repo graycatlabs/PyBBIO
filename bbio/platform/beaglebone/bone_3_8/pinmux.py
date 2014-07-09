@@ -76,7 +76,6 @@ def unexport(gpio_pin):
   if (not os.path.exists(gpio_file)): 
     # Pin not under userspace control
     return False
-  print UNEXPORT_FILE
   with open(UNEXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
   return True
