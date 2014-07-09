@@ -6,7 +6,7 @@
 # Beaglebone pinmux driver
 # For Beaglebones with 3.8 kernel
 
-from config import *
+from config import OCP_PATH, GPIO, GPIO_FILE_BASE, EXPORT_FILE, UNEXPORT_FILE
 import glob, os, cape_manager, bbio
 
 def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
