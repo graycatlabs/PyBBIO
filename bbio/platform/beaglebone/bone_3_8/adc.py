@@ -7,7 +7,7 @@
 #
 # Just a wrapper for the sysfs ADC driver for the time being. 
 
-import os, glob
+import os, glob, bbio
 import cape_manager
 from config import *
 
@@ -27,6 +27,10 @@ def analogRead(adc_pin):
       in which case the value will be returned as found in the file. """
   global _ADC_INITIALIZED      
   if not _ADC_INITIALIZED:
+    cape_manager.load(ADC_ENABLE_DTS_OVERLAY, auto_unload=False)
+    # Don't unload the overlay on exit for now because it can
+    # cause kernel panic.
+    bbio.delay(100)
     _ADC_INITIALIZED = True
   if adc_pin in ADC: 
     adc_pin = ADC[adc_pin]
