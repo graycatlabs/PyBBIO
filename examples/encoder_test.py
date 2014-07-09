@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
  encoder_test.py 
  Rekha Seethamraju

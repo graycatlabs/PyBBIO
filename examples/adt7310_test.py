@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 """
  adt7310_test.py 
  Rekha Seethamraju
