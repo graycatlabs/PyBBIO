@@ -19,4 +19,4 @@ def kernelFilenameIO(fn, val=''):
       Meant to be used with Kernel driver files for much more
       efficient IO (no need to reopen every time). """
   fn = glob.glob(fn)[0]
-  return _kernelFileIO(fn, val)
+  return _kernelFileIO(fn, str(val))
