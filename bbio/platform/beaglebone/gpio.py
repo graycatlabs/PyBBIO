@@ -64,7 +64,7 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   if not exported:
     print "warning: could not export pin '%s', skipping pinMode()" % gpio_pin
     return
-  elif preserve_mode_on_exit:
+  elif not preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
   direction_file = getGPIODirectionFile(gpio_pin)
