@@ -1,6 +1,15 @@
+#!/usr/bin/env python
+"""
+ adt7310_test.py 
+ Rekha Seethamraju
+
+ An example to demonstrate the use of the ADT7310 library
+ for PyBBIO.
+
+ This example program is in the public domain.
+"""
 from bbio import *
 from ADT7310 import *
-from bbio.util import addToCleanup
 
 adt = ADT7310(0,0)
 pin = GPIO1_28  
