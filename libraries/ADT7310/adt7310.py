@@ -46,10 +46,10 @@ class ADT7310(object):
     addToCleanup(self.close)
     
   def close(self):
-  '''
-  close()
-  removes alarms if set and closes the SPI connection
-  '''
+    '''
+    close()
+    removes alarms if set and closes the SPI connection
+    '''
     self.removeAlarm()
     self.removeCriticalAlarm()
     self.spidev.end()
@@ -63,10 +63,10 @@ class ADT7310(object):
     self.spidev.write(self.cs,[0xff,0xff,0xff,0xff])
     delay(1)
   
-  def getTemp(self):
+  def getTempinC(self):
     '''
-    getTemp()
-    Reads the 13-bit temperature value
+    getTempinC()
+    Returns the 13-bit temperature value in Celsius 
     '''
     if self._continuous == False:
       self.spidev.write(self.cs, [self.CMD_READ | self.R_TEMP | \
@@ -79,6 +79,14 @@ class ADT7310(object):
       temp = ((((_t[0]<<8)+_t[1])>>3)-8192)/16.0
     delay(240)
     return temp
+    
+  def getTempinF(self):
+    '''
+    getTempinF()
+    Returns the 13-bit temperature value in Fahrenheit 
+    '''
+    return getTempinC()*33.8
+    
   
   def _encodeTemp(self,temp):
     '''
