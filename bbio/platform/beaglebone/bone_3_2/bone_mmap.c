@@ -1,13 +1,13 @@
-/* beaglebone.c
+/* bone_mmap.c
  * Part of PyBBIO
- * Apache 2.0 License
+ * MIT License
  * 
  * A Python C extension to help speed up IO on the Beaglebone.
  */
 
 
 #include <Python.h>
-#include "beaglebone.h"
+#include "bone_mmap.h"
 #include <mmap_util.h>
 #include <stdio.h>
 
@@ -67,8 +67,8 @@ static PyMethodDef functions[] = {
   { NULL }
 };
 
-void initdriver(void) {
+void initbone_mmap(void) {
   mmapInit(MMAP_FILE, MMAP_OFFSET, MMAP_SIZE);
-  Py_InitModule3("driver", functions, "Test module");
+  Py_InitModule3("bone_mmap", functions, "BeagleBone mmap driver");
 }
 

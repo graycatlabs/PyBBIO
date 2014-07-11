@@ -5,9 +5,6 @@
 # to you Beaglebone, edit with care.                #
 #---------------------------------------------------#
 
-MMAP_OFFSET = 0x44c00000 
-MMAP_SIZE   = 0x48ffffff-MMAP_OFFSET
-
 
 ########################################
 ##--- Start control module config: ---##

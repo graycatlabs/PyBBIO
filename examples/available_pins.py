@@ -7,17 +7,18 @@
 
 # Import PyBBIO library:
 from bbio import *
+from bbio.platform.beaglebone import config
 
 # Create a setup function:
 def setup():
   print "\n GPIO pins:" 
-  for i in GPIO.keys(): 
+  for i in config.GPIO.keys(): 
     print "   %s" % i
   print "\n ADC pins:" 
-  for i in ADC.keys():
+  for i in config.ADC.keys():
     print "   %s" % i
   print "\n PWM pins:" 
-  for i in PWM_PINS.keys():
+  for i in config.PWM_PINS.keys():
     print "   %s" % i
 
 

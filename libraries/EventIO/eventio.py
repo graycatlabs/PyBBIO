@@ -1,7 +1,7 @@
 """
  EventIO - v0.2
  Copyright 2012 - Alexander Hiam <ahiam@marlboro.edu>
- Apache 2.0 license
+ MIT license
 
  Basic multi-process event-driven programming for PyBBIO.
 """

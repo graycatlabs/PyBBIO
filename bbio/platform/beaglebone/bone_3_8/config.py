@@ -6,7 +6,12 @@
 #---------------------------------------------------#
 
 # Load the common beaglebone configuration:
-from config_common import *
+try:
+  from bbio.platform.beaglebone.config_common import *
+except ImportError:
+  # Probably imported by install_bb_overlays during installation, 
+  # in which case config_common is already in the import path:
+  from config_common import *
 import glob
 
 ########################################

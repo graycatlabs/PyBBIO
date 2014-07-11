@@ -1,7 +1,7 @@
 Servo - v0.1
 
 Copyright 2012 Alexander Hiam
-ahiam@marlboro.edu
+hiamalexander@gmail.com
 
 Library for controlling servo motors with the BeagleBone's PWM pins.
 
@@ -13,6 +13,6 @@ As well as the included example programs:
 Based on the Arduino Servo library:
  http://www.arduino.cc/en/Reference/Servo
 
-Servo is released as part of PyBBIO under its Apache 2.0 license.
+Servo is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt
 

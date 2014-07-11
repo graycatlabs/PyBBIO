@@ -1,6 +1,6 @@
-/* beaglebone.h
+/* bone_mmap.h
  * Part of PyBBIO
- * Apache 2.0 License
+ * MIT License
  * 
  * PyBBIO configuration for Beaglebone driver.
  */

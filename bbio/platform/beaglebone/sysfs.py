@@ -1,12 +1,12 @@
 # sysfs.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Helper routines for sysfs kernel drivers
 
 import glob
-from bbio.platform._sysfs import _kernelFileIO
+from bbio.platform.util._sysfs import _kernelFileIO
 
 
 def kernelFilenameIO(fn, val=''):
@@ -19,4 +19,4 @@ def kernelFilenameIO(fn, val=''):
       Meant to be used with Kernel driver files for much more
       efficient IO (no need to reopen every time). """
   fn = glob.glob(fn)[0]
-  return _kernelFileIO(fn, val)
+  return _kernelFileIO(fn, str(val))

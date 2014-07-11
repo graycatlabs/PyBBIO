@@ -1,6 +1,6 @@
 /* mmap_uitl.c
  * Part of PyBBIO
- * Apache 2.0 License
+ * MIT License
  * 
  * A C utility for memory access through mmap.
  */

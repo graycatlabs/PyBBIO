@@ -1,13 +1,19 @@
 # serial_port.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone serial driver
 
+from bbio.platform.platform import detect_platform 
+_platform = detect_platform()
+if "3.8" in _platform:
+  from bone_3_8.uart import uartInit
+elif "3.2" in _platform:
+  from bone_3_2.uart import uartInit
+del _platform
 
-from uart import uartInit
-from config import *
+from config import UART, DEC, BIN, OCT, HEX
 
 try:
   import serial

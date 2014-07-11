@@ -1,12 +1,12 @@
 # 3.8/pinmux.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
+# MIT License
 # 
 # Beaglebone pinmux driver
 # For Beaglebones with 3.8 kernel
 
-from config import *
+from config import OCP_PATH, GPIO, GPIO_FILE_BASE, EXPORT_FILE, UNEXPORT_FILE
 import glob, os, cape_manager, bbio
 
 def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
@@ -43,9 +43,20 @@ def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
   #  mode_0b00000111  # pull down
   #  mode_0b00010111  # pull up
   #  mode_0b00001111  # no pull
-  # See /lib/firmware/PyBBIO-src/*.dts for more info  
-  with open(mux_file, 'wb') as f:
-    f.write(mode)
+  # See /lib/firmware/PyBBIO-src/*.dts for more info 
+  for i in range(3):
+    # If the pin's overlay was just loaded there may not have been enough 
+    # time for the driver to get fully initialized, which causes an IOError
+    # when trying to write the mode; try up to 3 times to avoid this:
+    try:
+      with open(mux_file, 'wb') as f:
+        f.write(mode)
+      return
+    except IOError:
+      # Wait a bit between attempts
+      bbio.delay(10)
+  # If we get here then it didn't work 3 times in a row; raise the IOError:
+  raise
 
 def export(gpio_pin):
   """ Reserves a pin for userspace use with sysfs /sys/class/gpio interface. 
@@ -72,11 +83,9 @@ def unexport(gpio_pin):
     return False
   gpio_num = GPIO[gpio_pin][2]
   gpio_file = '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
-  print gpio_file
   if (not os.path.exists(gpio_file)): 
     # Pin not under userspace control
     return False
-  print UNEXPORT_FILE
   with open(UNEXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
   return True

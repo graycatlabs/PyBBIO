@@ -1,14 +1,24 @@
 # gpio.py 
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
-# Apache 2.0 license
-# 
+# MIT License
+#
 # Beaglebone GPIO driver
 
-import os, pinmux, math, sysfs
+import os, math, sysfs
 from bbio.util import addToCleanup
-from config import *
+from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
+                   CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
+                   CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
+                   MSBFIRST
 
+from bbio.platform.platform import detect_platform 
+_platform = detect_platform()
+if "3.8" in _platform:
+  from bone_3_8 import pinmux
+elif "3.2" in _platform:
+  from bone_3_2 import pinmux
+del _platform
 
 def getGPIODirectory(gpio_pin):
   """ Returns the sysfs kernel driver base directory for the given pin. """
@@ -46,14 +56,15 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       the INPUT/OUTPUT mode will be preserved when the program exits. """
 
   if 'USR' in gpio_pin:
-    print 'warning: pinMode() not supported for USR LEDs'
+    if direction == INPUT:
+      print 'warning: cannot set USR LEDs to INPUT'
     return
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   exported = pinmux.export(gpio_pin)
   if not exported:
     print "warning: could not export pin '%s', skipping pinMode()" % gpio_pin
     return
-  elif preserve_mode_on_exit:
+  elif not preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
   direction_file = getGPIODirectionFile(gpio_pin)
