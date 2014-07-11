@@ -24,7 +24,7 @@ def setup():
   adt.setAlarm(pin,alarm)
     
 def loop():
-  temp = adt.getTemp() 
+  temp = adt.getTempinC() 
   print(temp)
   delay(500)  
   
