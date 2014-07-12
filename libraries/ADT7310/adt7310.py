@@ -137,15 +137,27 @@ class ADT7310(object):
     self._continuous = False
   
   def read(self, reg):
-    assert 0 <= cs < 8, "register values must be between 0 and 7"
+    '''
+    read(register)
+    Returns the value of the register. 
+    register has to be between 0 to 7.
+    '''
+    assert 0 <= reg < 8, "register values must be between 0 and 7"
     self.spidev.write(self.cs,[CMD_READ | reg<<3])
-    _t = self.spidev.read(self.cs,2)
-    if ( _t[0] & 128 == 0):
-      temp = (((_t[0]<<8)+_t[1])>>3)/16
-    else:
-      temp = ((((_t[0]<<8)+_t[1])>>3)-4096)/16
+    temp = self.spidev.read(self.cs,2)
     return temp
-  
+    
+  def write(self,reg,data):
+    '''
+    write(register,[data])
+    Write [data] to the register.
+    register has to be between 0 to 7.
+    data has to be a list.
+    '''
+    assert 0 <= reg < 8, "register values must be between 0 and 7"
+    assert type(data) == list, "data must be a list"
+    self.write(self.cs,[CMD_WRITE | reg<<3] + data)
+    
   def setAlarm(self, pin, callback, return_callback=None):
     '''
     setAlarm(alarm_pin , callback, (optional)return_callback)
