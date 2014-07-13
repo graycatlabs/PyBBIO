@@ -46,10 +46,10 @@ class ADT7310(object):
     addToCleanup(self.close)
     
   def close(self):
-  '''
-  close()
-  removes alarms if set and closes the SPI connection
-  '''
+    '''
+    close()
+    removes alarms if set and closes the SPI connection
+    '''
     self.removeAlarm()
     self.removeCriticalAlarm()
     self.spidev.end()
