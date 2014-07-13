@@ -1,0 +1,60 @@
+/*
+ * Enabled the eQEP2 module and muxes the A and B input pins. Requires epwmss2
+ * to be enabled.
+ *
+ * Based on bone_eqep2.dts
+     https://github.com/Teknoman117/beaglebot/blob/master/encoders/dts/bone_eqep2.dts
+ * Original copyright:
+ * Copyright (C) 2013 Nathaniel R. Lewis - http://nathanielrlewis.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Enable eQEP2 on the Beaglebone White and Black
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone-black";
+
+    /* identification */
+    part-number = "PyBBIO-eqep2";
+    version = "00A0";
+
+    exclusive-use = 
+      "P8.41",
+      "P8.42",
+      "eqep2";
+
+    fragment@0 {
+        target = <&am33xx_pinmux>;
+        __overlay__ {
+         pinctrl_eqep2: pinctrl_eqep2_pins {
+         pinctrl-single,pins = <
+                        0x0B0 0x33 /* P8_41 = GPIO2_10 = EQEP2A_in, MODE3 */
+                        0x0B4 0x33 /* P8_42 = GPIO2_11 = EQEP2B_in, MODE3 */
+         >;
+         };
+        };
+    };
+    
+    
+    fragment@2 {
+     target = <&eqep2>;
+     __overlay__ {
+            pinctrl-names = "default";
+            pinctrl-0 = <&pinctrl_eqep2>;
+            
+            count_mode = <0>; /* 0 - Quadrature mode, normal 90 phase offset cha & chb. 1 - Direction mode. cha input = clock, chb input = direction */
+            swap_inputs = <0>; /* Are channel A and channel B swapped? (0 - no, 1 - yes) */
+            invert_qa = <1>; /* Should we invert the channel A input? */
+            invert_qb = <1>; /* Should we invert the channel B input? I invert these because my encoder outputs drive transistors that pull down the pins */
+            invert_qi = <0>; /* Should we invert the index input? */
+            invert_qs = <0>; /* Should we invert the strobe input? */
+            
+status = "okay";
+     };
+    };
+};

@@ -1,0 +1,61 @@
+/*
+ * Enabled the eQEP0 module and muxes the A and B input pins. Requires epwmss0
+ * to be enabled.
+ *
+ * Based on bone_eqep0.dts 
+     https://github.com/Teknoman117/beaglebot/blob/master/encoders/dts/bone_eqep0.dts
+ * Original copyright:
+ * Copyright (C) 2013 Nathaniel R. Lewis - http://nathanielrlewis.com/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ *
+ * Enable eQEP0 on the Beaglebone Black - incompatible with BB White because
+ * most of the eQEP0 pins on Beaglebone white are not broken out.
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+    compatible = "ti,beaglebone-black";
+
+    /* identification */
+    part-number = "PyBBIO-eqep0";
+    version = "00A0";
+
+    exclusive-use = 
+      "P9.42",
+      "P9.27",
+      "eqep0";
+
+    fragment@0 {
+        target = <&am33xx_pinmux>;
+        __overlay__ {
+         pinctrl_eqep0: pinctrl_eqep0_pins {
+         pinctrl-single,pins = <
+                        0x1A0 0x31 /* P9_42 = GPIO3_18 = EQEP0A_in, MODE1 */
+                        0x1A4 0x31 /* P9_27 = GPIO3_19 = EQEP0B_in, MODE1 */
+         >;
+         };
+        };
+    };
+    
+    
+    fragment@2 {
+     target = <&eqep0>;
+     __overlay__ {
+            pinctrl-names = "default";
+            pinctrl-0 = <&pinctrl_eqep0>;
+            
+            count_mode = <0>; /* 0 - Quadrature mode, normal 90 phase offset cha & chb. 1 - Direction mode. cha input = clock, chb input = direction */
+            swap_inputs = <0>; /* Are channel A and channel B swapped? (0 - no, 1 - yes) */
+            invert_qa = <1>; /* Should we invert the channel A input? */
+            invert_qb = <1>; /* Should we invert the channel B input? I invert these because my encoder outputs drive transistors that pull down the pins */
+            invert_qi = <0>; /* Should we invert the index input? */
+            invert_qs = <0>; /* Should we invert the strobe input? */
+            
+status = "okay";
+     };
+    };
+};

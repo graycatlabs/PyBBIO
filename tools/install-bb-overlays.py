@@ -29,6 +29,11 @@ overlays_to_copy = [
 
   '%s/overlays/PyBBIO-epwmss2-00A0.dts' % cwd,
   '%s/overlays/PyBBIO-ehrpwm2-00A0.dts' % cwd,
+
+  '%s/overlays/PyBBIO-eqep0-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-eqep1-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-eqep2-00A0.dts' % cwd,
+  '%s/overlays/PyBBIO-eqep2b-00A0.dts' % cwd,
 ]
 
 sys.path = [config_path] + sys.path
