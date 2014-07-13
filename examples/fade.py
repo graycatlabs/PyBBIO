@@ -7,10 +7,10 @@
 # Import PyBBIO library:
 from bbio import *
 
-LED = PWM2B 
+LED = PWM1A 
 brightness = 0  # Global variable to store brightness level
 inc = 1         # How much to increment the brightness by
-pause = 10      # Delay in ms between each step 
+pause = 1       # Delay in ms between each step 
 
 # Create a setup function:
 def setup():
