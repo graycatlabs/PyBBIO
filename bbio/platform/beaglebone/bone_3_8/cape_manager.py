@@ -15,8 +15,8 @@ def load(overlay, auto_unload=True):
       when trying to unload certain overlay fragments). """
   with open(SLOTS_FILE, 'rb') as f:
     capes = f.read()
-  if overlay in capes:
-    # already loaded (this should do a better job checking)
+  if (',%s\n' % overlay) in capes:
+    # already loaded
     return
   with open(SLOTS_FILE, 'wb') as f:
     f.write(overlay)
