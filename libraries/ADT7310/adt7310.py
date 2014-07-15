@@ -167,7 +167,7 @@ class ADT7310(object):
     self.removeAlarm()
     self.alarm_pin = pin
     pinMode(self.alarm_pin, INPUT, PULLUP)
-    attachInterrupt(self.alarm_pin, callback)
+    attachInterrupt(self.alarm_pin, callback, FALLING)
 
   def setCriticalAlarm(pin, callback):
     '''
@@ -180,7 +180,7 @@ class ADT7310(object):
     self.removeCriticalAlarm()
     self.critical_pin = pin
     pinMode(self.critical_pin, INPUT, PULLUP)
-    attachInterrupt(self.critical_pin , callback)
+    attachInterrupt(self.critical_pin , callback, FALLING)
 
   def removeAlarm(self):
     '''
