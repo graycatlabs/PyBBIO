@@ -158,22 +158,18 @@ class ADT7310(object):
     assert type(data) == list, "data must be a list"
     self.write(self.cs,[CMD_WRITE | reg<<3] + data)
     
-  def setAlarm(self, pin, callback, return_callback=None):
+  def setAlarm(self, pin, callback):
     '''
     setAlarm(alarm_pin , callback, (optional)return_callback)
     Sets the alarm_pin to an interrupt pin and calls callback() 
     when interrupt occurs as required.
-    return_callback is called when the temperature falls 
-    back below threshold-hysteresis.
     '''
     self.removeAlarm()
     self.alarm_pin = pin
     pinMode(self.alarm_pin, INPUT, PULLUP)
-    attachInterrupt(self.alarm_pin, callback, FALLING)
-    if return_callback!=None:
-      attachInterrupt(self.alarm_pin, return_callback, RISING)
+    attachInterrupt(self.alarm_pin, callback)
 
-  def setCriticalAlarm(pin, callback, return_callback=None):
+  def setCriticalAlarm(pin, callback):
     '''
     setCriticalAlarm(alarm_pin , callback, (optional)return_callback)
     Sets the critical_pin to be an interrupt and calls callback() 
@@ -184,9 +180,7 @@ class ADT7310(object):
     self.removeCriticalAlarm()
     self.critical_pin = pin
     pinMode(self.critical_pin, INPUT, PULLUP)
-    attachInterrupt(self.critical_pin , callback, FALLING)
-    if return_callback!=None:
-      attachInterrupt(self.critical_pin , return_callback, RISING)
+    attachInterrupt(self.critical_pin , callback)
 
   def removeAlarm(self):
     '''
