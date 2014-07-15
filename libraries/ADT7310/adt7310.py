@@ -63,10 +63,10 @@ class ADT7310(object):
     self.spidev.write(self.cs,[0xff,0xff,0xff,0xff])
     delay(1)
   
-  def getTemp(self):
+  def getTempinC(self):
     '''
-    getTemp()
-    Reads the 13-bit temperature value
+    getTempinC()
+    Returns the 13-bit temperature value in Celsius 
     '''
     if self._continuous == False:
       self.spidev.write(self.cs, [self.CMD_READ | self.R_TEMP | \
@@ -79,6 +79,14 @@ class ADT7310(object):
       temp = ((((_t[0]<<8)+_t[1])>>3)-8192)/16.0
     delay(240)
     return temp
+    
+  def getTempinF(self):
+    '''
+    getTempinF()
+    Returns the 13-bit temperature value in Fahrenheit 
+    '''
+    return getTempinC()*33.8
+    
   
   def _encodeTemp(self,temp):
     '''
@@ -129,31 +137,39 @@ class ADT7310(object):
     self._continuous = False
   
   def read(self, reg):
-    assert 0 <= cs < 8, "register values must be between 0 and 7"
+    '''
+    read(register)
+    Returns the value of the register. 
+    register has to be between 0 to 7.
+    '''
+    assert 0 <= reg < 8, "register values must be between 0 and 7"
     self.spidev.write(self.cs,[CMD_READ | reg<<3])
-    _t = self.spidev.read(self.cs,2)
-    if ( _t[0] & 128 == 0):
-      temp = (((_t[0]<<8)+_t[1])>>3)/16
-    else:
-      temp = ((((_t[0]<<8)+_t[1])>>3)-4096)/16
+    temp = self.spidev.read(self.cs,2)
     return temp
-  
-  def setAlarm(self, pin, callback, return_callback=None):
+    
+  def write(self,reg,data):
+    '''
+    write(register,[data])
+    Write [data] to the register.
+    register has to be between 0 to 7.
+    data has to be a list.
+    '''
+    assert 0 <= reg < 8, "register values must be between 0 and 7"
+    assert type(data) == list, "data must be a list"
+    self.write(self.cs,[CMD_WRITE | reg<<3] + data)
+    
+  def setAlarm(self, pin, callback):
     '''
     setAlarm(alarm_pin , callback, (optional)return_callback)
     Sets the alarm_pin to an interrupt pin and calls callback() 
     when interrupt occurs as required.
-    return_callback is called when the temperature falls 
-    back below threshold-hysteresis.
     '''
     self.removeAlarm()
     self.alarm_pin = pin
     pinMode(self.alarm_pin, INPUT, PULLUP)
-    attachInterrupt(self.alarm_pin, callback, FALLING)
-    if return_callback!=None:
-      attachInterrupt(self.alarm_pin, return_callback, RISING)
+    attachInterrupt(self.alarm_pin, callback)
 
-  def setCriticalAlarm(pin, callback, return_callback=None):
+  def setCriticalAlarm(pin, callback):
     '''
     setCriticalAlarm(alarm_pin , callback, (optional)return_callback)
     Sets the critical_pin to be an interrupt and calls callback() 
@@ -164,9 +180,7 @@ class ADT7310(object):
     self.removeCriticalAlarm()
     self.critical_pin = pin
     pinMode(self.critical_pin, INPUT, PULLUP)
-    attachInterrupt(self.critical_pin , callback, FALLING)
-    if return_callback!=None:
-      attachInterrupt(self.critical_pin , return_callback, RISING)
+    attachInterrupt(self.critical_pin , callback)
 
   def removeAlarm(self):
     '''
