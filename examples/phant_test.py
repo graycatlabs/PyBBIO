@@ -6,6 +6,7 @@
 
  An example to demonstrate the use of the PhantStream library
  for PyBBIO.
+ It reads from the analog pin and 
 
  This example program is in the public domain.
 
@@ -20,6 +21,7 @@ PhantStream("*public key*",(optional)"*private key*"\
 if the stream is being hosted on Spark Fun's server, 
 it can be left blank. 
 For additional information read the wiki page.
+https://github.com/alexanderhiam/PyBBIO/wiki/PhantStream
 '''
 from bbio import *
 from PhantStream import *
@@ -32,8 +34,8 @@ def setup():
   
 def loop():
   val = analogRead(pot)
-  voltage = inVolts(val)
-  p.send(volts=voltage)
-  delay(500)
+  v = inVolts(val)
+  p.send(voltage=v)
+  delay(1000)
   
 run(setup,loop)
