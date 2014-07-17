@@ -35,7 +35,7 @@ def setup():
   #sets the function to call when interrupt pin in active.
   adt.setAlarm(pin,alarm)
   #sets the function to call when interrupt pin in active.
-  adt.setCriticalAlarm(pin,criticalalarm)
+  adt.setCriticalAlarm(pinc,criticalalarm)
     
 def loop():
   temp = adt.getTemp() 
