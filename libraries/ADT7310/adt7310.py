@@ -63,7 +63,7 @@ class ADT7310(object):
     self.spidev.write(self.cs,[0xff,0xff,0xff,0xff])
     delay(1)
   
-  def getTempinC(self):
+  def getTemp(self):
     '''
     getTempinC()
     Returns the 13-bit temperature value in Celsius 
@@ -80,7 +80,7 @@ class ADT7310(object):
     delay(240)
     return temp
     
-  def getTempinF(self):
+  def getTempF(self):
     '''
     getTempinF()
     Returns the 13-bit temperature value in Fahrenheit 
@@ -160,7 +160,7 @@ class ADT7310(object):
     
   def setAlarm(self, pin, callback):
     '''
-    setAlarm(alarm_pin , callback, (optional)return_callback)
+    setAlarm(alarm_pin , callback)
     Sets the alarm_pin to an interrupt pin and calls callback() 
     when interrupt occurs as required.
     '''
@@ -172,11 +172,9 @@ class ADT7310(object):
 
   def setCriticalAlarm(pin, callback):
     '''
-    setCriticalAlarm(alarm_pin , callback, (optional)return_callback)
+    setCriticalAlarm(alarm_pin , callback)
     Sets the critical_pin to be an interrupt and calls callback() 
     when over-temperature event occurs as required.
-    return_callback() is optionally called when the temperature falls 
-    back below threshold-hysteresis.
     '''
     self.removeCriticalAlarm()
     self.critical_pin = pin
