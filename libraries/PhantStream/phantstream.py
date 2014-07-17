@@ -26,10 +26,10 @@ class PhantStream(object):
     self.url_read = os.path.join(url,"output",self.public_key)
     self.url_send = os.path.join(url,"input",self.public_key)
     
-  def send(self,**samples):
+  def send(self,samples):
     '''
     send(samples)
-    samples must be of the format (field = value, field = value,...)
+    samples must be a dictionary
     requires the private key
     returns successful if log was successful else returns error message
     '''
