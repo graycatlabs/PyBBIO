@@ -16,16 +16,23 @@ pin = GPIO1_28
 pinc = GPIO0_4
 
 def alarm():
+  '''executed when temp crosses threshold temperatures - high and low '''
   print("Too Hot or Cold!")
 
 def criticalalarm():
+ '''executed when temp crossed critical temperature '''
   print("Over Critical Temperature")
 
 def setup():
+  #sets low temperature threshold
   adt.setLowTemp(5)
+  #sets high temperature threshold
   adt.setHighTemp(50)
+  #sets high temperature threshold
   adt.setCriticalTemp(60)
+  #sets the function to call when interrupt pin in active.
   adt.setAlarm(pin,alarm)
+  #sets the function to call when interrupt pin in active.
   adt.setCriticalAlarm(pin,criticalalarm)
     
 def loop():
