@@ -36,21 +36,14 @@ class EpollListener(threading.Thread):
       events = self.epoll.poll()
       for fileno, event in events:
         if fileno in self.epoll_callbacks:
-          if not self.epoll_callbacks[fileno]['has_fired']:
-            # This is the first time an event has been reported for this
-            # file; there is always an initial false event, so ignore:
-            self.epoll_callbacks[fileno]['has_fired'] = True
-            continue
-          self.epoll_callbacks[fileno]['callback']()
+          self.epoll_callbacks[fileno]()
         
   def register(self, gpio_pin, callback):
     """ Register an epoll trigger for the specified fileno, and store
         the callback for that trigger. """
     fileno = INTERRUPT_VALUE_FILES[gpio_pin].fileno()
     self.epoll.register(fileno, select.EPOLLIN | select.EPOLLET)
-    self.epoll_callbacks[fileno] = {}
-    self.epoll_callbacks[fileno]['callback'] = callback
-    self.epoll_callbacks[fileno]['has_fired'] = False
+    self.epoll_callbacks[fileno] = callback
     if not self.first_interrupt_registered:
       self.first_interrupt_registered = True
     
@@ -75,8 +68,8 @@ def attachInterrupt(gpio_pin, callback, mode=BOTH):
   # Start the listener thread
   _start_epoll_listener()
   gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
-  value_file = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value')
-  INTERRUPT_VALUE_FILES[gpio_pin] = open(value_file, 'r')
+  INTERRUPT_VALUE_FILES[gpio_pin] = open(
+    os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value'), 'r')
   _edge(gpio_pin, mode)
   EPOLL_LISTENER.register(gpio_pin, callback)
 
