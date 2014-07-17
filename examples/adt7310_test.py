@@ -12,8 +12,10 @@ from bbio import *
 from ADT7310 import *
 
 adt = ADT7310(0,0)
-pin = GPIO1_28  
-pinc = GPIO0_4
+#interrput pin
+pin = GPIO1_28
+#critical pin
+pinc = GPIO1_10
 
 def alarm():
   '''executed when temp crosses threshold temperatures - high and low '''
