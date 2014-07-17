@@ -9,7 +9,7 @@ PhantStream is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt
 '''
 from bbio import *
-import json, urllib, os, urllib2,urllib
+import json, urllib, os, urllib2
 
 class PhantStream(object):
   def __init__(self, public_key, private_key="", url="https://data.sparkfun.com/"):
@@ -25,7 +25,7 @@ class PhantStream(object):
     self.url = url
     self.url_read = os.path.join(url,"output",self.public_key)
     self.url_send = os.path.join(url,"input",self.public_key)
-
+    
   def send(self,**samples):
     '''
     send(samples)
@@ -35,10 +35,14 @@ class PhantStream(object):
     '''
     try:
       assert self.private_key!="", "private key required for logging"
-      url_send = self.url_send+"?private_key="+self.private_key+"&"
-      url_send = url_send+urllib.urlencode(samples)
-      f = urllib2.urlopen(url_send)
-      return f.read()
+      data =urllib.urlencode(samples)
+      headers = {
+         'Phant-Private-Key' : self.private_key,
+         'Content-type': 'application/x-www-form-urlencoded'
+          }
+      req = urllib2.Request(self.url_send, data, headers)
+      response = urllib2.urlopen(req)
+      return response.read()
       
     except urllib2.HTTPError as hpe:
       print hpe
@@ -70,9 +74,9 @@ class PhantStream(object):
     getJSONinFile("file_name")
     writes the logged data in .json to the file specified by file_name
     '''
-    json = self.getJSON()
+    data = self.getJSON()
     with open(file_name, 'w') as outfile:
-      json.dump(json, outfile)
+      json.dump(data, outfile)
 
   def getCSVinFile(self,file_name):
     '''
@@ -93,8 +97,7 @@ class PhantStream(object):
     '''
     try:
       assert self.private_key!="", "private key required for logging"
-      url_send = self.url_send+"/clear?private_key="+self.private_key+"&"
-      url_send = url_send+urllib.urlencode(samples)
+      url_send = self.url_send+"/clear?private_key="+self.private_key
       f = urllib2.urlopen(url_send)
       return f.read()
     except urllib2.HTTPError as hpe:
