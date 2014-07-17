@@ -2,10 +2,14 @@
 http://github.com/alexanderhiam/PyBBIO   
 
 #### version 0.9
+  * Added SPI library with example for ADT7310 temp sensor
+  * Added library for phant.io with example
+  * Added eQEP library with example
   * Moved to C extensions for reading/writing Kernel driver files
   * Reorganized package structure and updated install process to support pip and apt-get distribution
   * Changed from Apache 2.0 license to MIT license
-  * Various bug fixes
+  * Fixed false interrupt firing on first attachInterrupt() call
+  * Various minor bug fixes
 
 #### version 0.8.5
  * Dropped mmap GPIO, use Kernel drivers
