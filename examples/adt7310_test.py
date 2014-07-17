@@ -15,14 +15,14 @@ adt = ADT7310(0,0)
 #interrput pin
 pin = GPIO1_28
 #critical pin
-pinc = GPIO1_10
+pinc = GPIO1_18
 
 def alarm():
   '''executed when temp crosses threshold temperatures - high and low '''
   print("Too Hot or Cold!")
 
 def criticalalarm():
- '''executed when temp crossed critical temperature '''
+  '''executed when temp crossed critical temperature '''
   print("Over Critical Temperature")
 
 def setup():

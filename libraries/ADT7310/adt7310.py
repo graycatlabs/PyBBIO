@@ -170,7 +170,7 @@ class ADT7310(object):
     attachInterrupt(self.alarm_pin, callback, FALLING)
 
 
-  def setCriticalAlarm(pin, callback):
+  def setCriticalAlarm(self,pin, callback):
     '''
     setCriticalAlarm(alarm_pin , callback)
     Sets the critical_pin to be an interrupt and calls callback() 
