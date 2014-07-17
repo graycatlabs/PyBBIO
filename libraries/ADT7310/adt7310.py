@@ -169,6 +169,7 @@ class ADT7310(object):
     pinMode(self.alarm_pin, INPUT, PULLUP)
     attachInterrupt(self.alarm_pin, callback, FALLING)
 
+
   def setCriticalAlarm(pin, callback):
     '''
     setCriticalAlarm(alarm_pin , callback, (optional)return_callback)

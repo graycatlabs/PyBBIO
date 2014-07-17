@@ -18,7 +18,7 @@ def setup():
   encoder.zero()
   
 def loop():
-  print encoder.getPosition()
+  print "encoder position : "+encoder.getPosition()
   delay(1000)
   
 run(setup, loop)
