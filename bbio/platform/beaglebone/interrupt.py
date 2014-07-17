@@ -10,16 +10,19 @@
 # Thanks!
 
 from config import GPIO_FILE_BASE, RISING, FALLING, BOTH
-import bbio, select, threading, os
+import bbio, select, threading, os, time
 
 
 INTERRUPT_VALUE_FILES = {}
 
 class EpollListener(threading.Thread):
+  CREATION_DEBOUNCE_MS = 15
   def __init__(self):
     self.epoll = select.epoll()
     self.epoll_callbacks = {}
     self.first_interrupt_registered = False
+    self.first_interrupt = True
+    self.creation_time = time.time()
     super(EpollListener, self).__init__()
 
   def run(self):
@@ -36,6 +39,15 @@ class EpollListener(threading.Thread):
       events = self.epoll.poll()
       for fileno, event in events:
         if fileno in self.epoll_callbacks:
+          if self.first_interrupt:
+            self.first_interrupt = False
+            elapsed = time.time()-self.creation_time
+            if elapsed <= self.CREATION_DEBOUNCE_MS:
+              # Ignore if interrupt fired within CREATION_DEBOUNCE_MS since
+              # the creation of this EpollListener - on 3.8 kernels there is
+              # always one false interrupt when first created, this avoids 
+              # that
+              continue
           self.epoll_callbacks[fileno]()
         
   def register(self, gpio_pin, callback):
