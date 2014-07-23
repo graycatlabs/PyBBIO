@@ -17,36 +17,36 @@ class MMA7660(object):
   RATE_ASLEEP_16 = 0x03
 
   def __init__(self,i2c_no):
-    assert 1 <= i2c_no < 2, "i2c_no must be between 1 or 2"
+    assert 1 <= i2c_no <= 2, "i2c_no must be between 1 or 2"
     self.i2c_no = i2c_no
     if i2c_no == 1:
       self.i2cdev = Wire1
     if i2c_no == 2:
       self.i2cdev = Wire2
-    i2cdev.begin()
-    i2cdev.write(REG_MODE,MODE_STAND_BY)
-    i2cdev.write(REG_SR,RATE_ASLEEP_16)
-    i2cdev.write(REG_MODE,MODE_ACTIVE)
+    self.i2cdev.begin()
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_SR,self.RATE_ASLEEP_16)
+    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
     
   def getX(self):
-    x = i2cdev.read(MMA7660_ADDR,REG_X)
-    while(i2cdev.read(MMA7660_ADDR,REG_X)>=64):
-      x = i2cdev.read(MMA7660_ADDR,REG_X)
-    x = x<<2
+    x = self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)
+    while(self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)>>6==1):
+      x = self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)
+    x = ((x<<2)-128)/4
     return x
     
   def getY(self):
-    y = i2cdev.read(MMA7660_ADDR,REG_Y)
-    while(i2cdev.read(MMA7660_ADDR,REG_Y)>=64):
-      y = i2cdev.read(MMA7660_ADDR,REG_Y)
-    y = y<<2
+    y = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Y)
+    while(self.i2cdev.read(self.MMA7660_ADDR,self.REG_Y)>>6==1):
+      y = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Y)
+    y = ((y<<2)-128)/4
     return y
 
   def getZ(self):
-    z = i2cdev.read(MMA7660_ADDR,REG_Z)
-    while(i2cdev.read(MMA7660_ADDR,REG_Z)>=64):
-      z = i2cdev.read(MMA7660_ADDR,REG_Z)
-    z = z<<2
+    z = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Z)
+    while(self.i2cdev.read(self.MMA7660_ADDR,self.REG_Z)>>6==1):
+      z = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Z)
+    z = ((z<<2)-128)/4
     return z
     
     
