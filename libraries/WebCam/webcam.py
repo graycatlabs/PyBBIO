@@ -5,6 +5,8 @@ class WebCam(object):
   def __init__(self,video_device=0):
     self.video_num = video_device
     self.video_device = "/dev/video%i"%(video_device)
+    self.rpipeline = None
+    self.spipeline = None
     addToCleanup(self.stopRecording) 
     addToCleanup(self.stopStreaming) 
   
@@ -14,7 +16,7 @@ class WebCam(object):
     delay(1000)
     self.spipeline.set_state(gst.STATE_NULL)
     source = gst.element_factory_make("v4l2src", "source")
-    caps = gst.Caps("image/jpeg,width=640,height=480,framerate=60/1")
+    caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
     capsfilter = gst.element_factory_make("capsfilter", "filter")
     jdecoder = gst.element_factory_make("jpegdec", "jdecoder")
     theoraenc = gst.element_factory_make("theoraenc", "theoraenc")
@@ -31,7 +33,7 @@ class WebCam(object):
     if not gst.element_link_many(source, capsfilter,  jdecoder, theoraenc, video_queue, muxogg, sink):
       raise Exception('Elements could not be linked')
      
-    source.set_property("device",self.video_num)
+    source.set_property("device",self.video_device)
     capsfilter.set_property("caps", caps)
     sink.set_property("host","127.0.0.1")
     sink.set_property("port",int(port))
