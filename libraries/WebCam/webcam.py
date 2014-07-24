@@ -2,7 +2,8 @@ import gst,sys,cv
  
 class WebCam(object):
 
-  def __init__(self):
+  def __init__(self,video_device=0):
+    self.video_device = "/dev/video"+str(video_device)
     self.spipeline = gst.Pipeline("test-pipeline")
     self.rpipeline = gst.Pipeline("test-pipeline")
 
@@ -29,7 +30,7 @@ class WebCam(object):
       print >> sys.stderr, "Elements could not be linked."
       exit(-1)
      
-    source.set_property("device","/dev/video0")
+    source.set_property("device",self.video_device)
     capsfilter.set_property("caps", caps)
     sink.set_property("host","127.0.0.1")
     sink.set_property("port",int(port))
@@ -78,7 +79,7 @@ class WebCam(object):
       print >> sys.stderr, "Elements could not be linked."
       exit(-1)
      
-    source.set_property("device","/dev/video0")
+    source.set_property("device",self.video_device)
     capsfilter.set_property("caps", caps)
     sink.set_property("location",filename+".ogg")
 
