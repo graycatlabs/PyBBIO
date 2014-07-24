@@ -1,17 +1,18 @@
 import gst,sys,cv
-from bbio import delay 
+from bbio import delay, addToCleanup 
 class WebCam(object):
 
   def __init__(self,video_device=0):
     self.video_num = video_device
     self.video_device = "/dev/video%i"%(video_device)
-    self.spipeline = None 
-    self.rpipeline = None 
+    addToCleanup(self.stopRecording) 
+    addToCleanup(self.stopStreaming) 
   
   def startStreaming(self,port = 5000):
     # Create the elements
     self.spipeline = gst.Pipeline("test-pipeline")
     delay(1000)
+    self.spipeline.set_state(gst.STATE_NULL)
     source = gst.element_factory_make("v4l2src", "source")
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=60/1")
     capsfilter = gst.element_factory_make("capsfilter", "filter")
@@ -20,9 +21,6 @@ class WebCam(object):
     video_queue = gst.element_factory_make("queue", "video_queue")
     muxogg= gst.element_factory_make("oggmux", "muxogg")
     sink = gst.element_factory_make("tcpserversink", "sink")
-    print "QQQQqQQQQQQQ"
-
- 
  
     if not (source and capsfilter and jdecoder and theoraenc and video_queue and \
         muxogg and sink and self.spipeline):
@@ -40,17 +38,18 @@ class WebCam(object):
 
     ret = self.spipeline.set_state(gst.STATE_PLAYING)
     if ret ==  gst.STATE_CHANGE_FAILURE:
-      print >> sys.stderr, "Unable to set the pipeline to the playing state."
-      exit(-1)
+      raise Exception('Unable to set the pipeline to the playing state.')
     else:
       return True
 
   
   def stopStreaming(self):
+    if not self.spipeline: return
     self.spipeline.set_state(gst.STATE_NULL)
     self.spipeline = None
     
   def stopRecording(self):
+    if not self.rpipeline: return
     self.rpipeline.set_state(gst.STATE_NULL)
     self.rpipeline = None
     
@@ -65,6 +64,8 @@ class WebCam(object):
   def startRecording(self,filename):
     filename = str(filename)
     self.rpipeline = gst.Pipeline("test-pipeline")
+    delay(1000)
+    self.rpipeline.set_state(gst.STATE_NULL)
      # Create the elements
     source = gst.element_factory_make("v4l2src", "source")
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
