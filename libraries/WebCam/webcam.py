@@ -4,11 +4,12 @@ class WebCam(object):
 
   def __init__(self,video_device=0):
     self.video_device = "/dev/video"+str(video_device)
-    self.spipeline = gst.Pipeline("test-pipeline")
-    self.rpipeline = gst.Pipeline("test-pipeline")
-
+    self.spipeline = None 
+    self.rpipeline = None 
+  
   def startStreaming(self,port = 5000):
     # Create the elements
+    self.spipeline = gst.Pipeline("test-pipeline")
     source = gst.element_factory_make("v4l2src", "source")
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=60/1")
     capsfilter = gst.element_factory_make("capsfilter", "filter")
@@ -45,9 +46,11 @@ class WebCam(object):
   
   def stopStreaming(self):
     self.spipeline.set_state(gst.STATE_NULL)
+    self.spipeline = None
     
   def stopRecording(self):
     self.rpipeline.set_state(gst.STATE_NULL)
+    self.rpipeline = None
     
   def captureSnapshot(self,filename):
     filename = str(filename)
@@ -59,6 +62,7 @@ class WebCam(object):
     
   def startRecording(self,filename):
     filename = str(filename)
+    self.rpipeline = gst.Pipeline("test-pipeline")
      # Create the elements
     source = gst.element_factory_make("v4l2src", "source")
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
