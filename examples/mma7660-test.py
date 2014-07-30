@@ -15,8 +15,8 @@ def setup():
   int_cfg = accel.INT_PD  | \
             accel.INT_SHX             
   accel.setInterrupt(int_cfg, INT_PIN, accelCallback)
-  accel.settapthreshold(4)
-  accel.setTapDebounce(31)
+  accel.settapthreshold(30)
+  accel.setTapDebounce(15)
 
   
 def loop():
