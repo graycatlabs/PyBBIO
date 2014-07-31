@@ -70,7 +70,7 @@ class _I2C_BUS(object):
                 print 'expected a byte and got something else'
                 return 1
             self.bus.write_byte(addr, data)
-        except IOError as e
+        except IOError as e:
             print 'Bus is active. do something about it'
 
     def readTransaction(self, addr, command, length):
