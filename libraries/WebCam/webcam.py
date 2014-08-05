@@ -110,8 +110,7 @@ class WebCam(object):
     sink_ghost_pad.set_active(True)
     bin.add_pad(sink_ghost_pad)
     return bin
-    
-      
+          
   def startStreaming(self,port = 5000):
     self.streamsink.set_property("host","127.0.0.1")
     self.streamsink.set_property("port",int(port))
@@ -123,15 +122,19 @@ class WebCam(object):
     self.fakestreamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.fake_stream_pad)
     self.src_stream_pad.link(self.stream_sink_pad)
-    self.queue_stream_pad.set_blocked(False)
+    self.queue_stream_pad.set_active(True)
    
   def stopStreaming(self):
     self.fakestreamsink.set_state(gst.STATE_PLAYING)
     self.queue_stream_pad.set_blocked(True)
+    while (not queue_stream_pad.is_blocking()):
+      continue
     self.streamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.stream_sink_pad)
     self.src_stream_pad.link(self.fake_stream_pad)
-    self.queue_stream_pad.set_blocked(False)
+    self.queue_stream_pad.set_active(True)
+    while queue_stream_pad.is_blocking():
+      continue
   
   def startRecording(self,filename):
     self.recordsink = gst.element_factory_make("filesink","record_sink")
@@ -143,7 +146,7 @@ class WebCam(object):
     self.fakerecordsink.set_state(gst.STATE_NULL)
     self.src_record_pad.unlink(self.fake_record_pad)
     self.src_record_pad.link(self.record_sink_pad)
-    self.queue_record_pad.set_blocked(False)
+    self.queue_record_pad.set_active(True)
     
   def stopRecording(self):
     self.fakerecordsink.set_state(gst.STATE_PLAYING)
@@ -152,16 +155,17 @@ class WebCam(object):
     self.src_record_pad.unlink(self.record_sink_pad)
     self.src_record_pad.link(self.fake_record_pad)
     self.pipeline.remove(self.recordsink)
-    self.queue_record_pad.set_blocked(False)
+    self.queue_record_pad.set_active(True)
   
   def takeSnapshot(self,filename):
     filename = str(filename)+".jpeg"
     caps=gst.Caps('image/jpeg')
     self.fakesink.set_state(gst.STATE_PAUSED)
     buffer = self.fakesink.get_property ('last-buffer')
-    buf = gst.video.video_convert_frame(buffer,"image/jpeg,width=640,height=480",5 * gst.SECOND)
+    buf = gst.video.video_convert_frame(buffer,"image/jpeg,width=640,height=480",\
+                                         5 * gst.SECOND)
 
-    with file(filename, 'w') as fh:
+    with file(filename,'w') as fh:
       fh.write(str(buf))
       print "done"
     self.fakesink.set_state(gst.STATE_PLAYING)
