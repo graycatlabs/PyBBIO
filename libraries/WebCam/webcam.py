@@ -73,7 +73,7 @@ class WebCam(object):
       raise Exception("Unable to set the pipeline to the playing state.")
     
     self.streamsink.set_state(gst.STATE_NULL)
-    delay(10000)
+    #delay(10000)
     addToCleanup(self.stopPipeline)
     
   def _sourcebin(self):
@@ -127,14 +127,10 @@ class WebCam(object):
   def stopStreaming(self):
     self.fakestreamsink.set_state(gst.STATE_PLAYING)
     self.queue_stream_pad.set_blocked(True)
-    while (not queue_stream_pad.is_blocking()):
-      continue
     self.streamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.stream_sink_pad)
     self.src_stream_pad.link(self.fake_stream_pad)
     self.queue_stream_pad.set_active(True)
-    while queue_stream_pad.is_blocking():
-      continue
   
   def startRecording(self,filename):
     self.recordsink = gst.element_factory_make("filesink","record_sink")
