@@ -122,7 +122,7 @@ class WebCam(object):
     self.fakestreamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.fake_stream_pad)
     self.src_stream_pad.link(self.stream_sink_pad)
-    self.queue_stream_pad.set_active(True)
+    self.queue_stream_pad.set_blocked(False)
    
   def stopStreaming(self):
     self.fakestreamsink.set_state(gst.STATE_PLAYING)
@@ -130,7 +130,7 @@ class WebCam(object):
     self.streamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.stream_sink_pad)
     self.src_stream_pad.link(self.fake_stream_pad)
-    self.queue_stream_pad.set_active(True)
+    self.queue_stream_pad.set_blocked(False)
   
   def startRecording(self,filename):
     self.recordsink = gst.element_factory_make("filesink","record_sink")
@@ -142,7 +142,7 @@ class WebCam(object):
     self.fakerecordsink.set_state(gst.STATE_NULL)
     self.src_record_pad.unlink(self.fake_record_pad)
     self.src_record_pad.link(self.record_sink_pad)
-    self.queue_record_pad.set_active(True)
+    self.queue_record_pad.set_blocked(False)
     
   def stopRecording(self):
     self.fakerecordsink.set_state(gst.STATE_PLAYING)
@@ -151,7 +151,7 @@ class WebCam(object):
     self.src_record_pad.unlink(self.record_sink_pad)
     self.src_record_pad.link(self.fake_record_pad)
     self.pipeline.remove(self.recordsink)
-    self.queue_record_pad.set_active(True)
+    self.queue_record_pad.set_blocked(False)
   
   def takeSnapshot(self,filename):
     filename = str(filename)+".jpeg"
