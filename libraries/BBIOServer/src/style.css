@@ -120,6 +120,10 @@ div .monitor-field {
   padding: 5px 0px 5px 2px;
 }
 
+div .video{
+  float: left;
+}
+
 #copyright {
   float: left; 
   width: 600px;
