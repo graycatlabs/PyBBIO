@@ -87,8 +87,7 @@ driver_package_dirs = {}
 driver_data = []
 
 install_requires = [
-  'pyserial',
-  'smbus'
+  'pyserial'
 ]
 
 if 'BeagleBone' in PLATFORM:
