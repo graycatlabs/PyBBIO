@@ -1,6 +1,11 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.1
+  * Added MMA7660 3-axis accelerometer library
+  * Removed smbus from pip requirements since there's no smbus package in PyPI
+  * Fixes a couple typos
+
 #### version 0.9
   * Added SPI library with example for ADT7310 temp sensor
   * Added library for phant.io with example
