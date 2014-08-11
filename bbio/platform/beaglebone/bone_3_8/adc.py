@@ -43,7 +43,7 @@ def analogRead(adc_pin):
   else:
     adc_file = glob.glob(adc_pin)
   if len(adc_file) == 0:
-    raise Exception('*Could load overlay for adc_pin: %s' % adc_pin)
+    raise Exception('*Could not load overlay for adc_pin: %s' % adc_pin)
   adc_file = adc_file[0]
   # Occasionally the kernel will be writing to the file when you try 
   # to read it, to avoid IOError try up to 5 times:
