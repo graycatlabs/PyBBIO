@@ -1,5 +1,5 @@
 '''
-MMA7660s - v0.1
+MMA7660 - v0.1
 Copyright 2014 Rekha Seethamraju
 
 Library for controlling temperature sensor, MMA7660 with the Beaglebone Black's
@@ -43,6 +43,11 @@ class MMA7660(object):
   INT_SHZ = 1<<7
   
   def __init__(self,i2c_no):
+    '''
+    MMA7660(i2c_no)
+    Creates an instance of the class MMA7660
+    i2c_no can be 1 or 2 based on the i2c bus used
+    '''
     assert 1 <= i2c_no <= 2, "i2c_no must be between 1 or 2"
     self.i2c_no = i2c_no
     if i2c_no == 1:
