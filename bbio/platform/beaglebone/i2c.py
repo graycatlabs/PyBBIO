@@ -11,10 +11,14 @@
 #       to activate i2c1 bus; echo BB-I2C1 > /sys/devices/bone_capemgr.8/slots; will be now present at /dev/i2c-2
 #       reference : http://datko.net/2013/11/03/bbb_i2c/
 
+
+#Another Note : i2c on the beaglebone (and in the linux kernel) is not really i2c! It's smbus (which is a derivative of i2c)
+#               So as a result communicating with true i2c peripherals is more or less a hack
+#               http://www.ti.com/lit/an/sloa132/sloa132.pdf
 import bbio
 from config import I2C
 
-from bbio.platform.platform import detect_platform 
+from bbio.platform.platform import detect_platform
 _platform = detect_platform()
 if "3.8" in _platform:
   from bone_3_8.i2c_setup import i2cInit
@@ -47,12 +51,40 @@ class _I2C_BUS(object):
         Initializes the I2C bus with BBB as master
         '''
         if not i2cInit(self.config):
-            print "Could not initialize i2c bus : %s" % self.config 
+            print "Could not initialize i2c bus : %s" % self.config
             return
         self.bus = smbus.SMBus(int(I2C[self.config][0][-1]))
         #smbus takes the dev_file number as parameter, not bus number
         #so if I pass 1 as the parameter, is uses /dev/i2c-1 file not i2c1 bus
         self.open = True
+
+    def quickwrite(self, addr, data):
+        '''
+        Write one byte to the address and don't read anything.
+        Useful for dumb devices that don't really have registers (plural)
+        '''
+        if not self.open:
+            print "I2C bus : %s - not initialized" % self.config
+        try:
+            if (type(data)!=int):
+                print 'expected a byte and got something else'
+                return 1
+            self.bus.write_byte(addr, data)
+        except IOError as e:
+            print 'Bus is active. do something about it'
+
+    def readTransaction(self, addr, command, length):
+        '''
+        write a command and then read a list of bytes from the I2C device. Sorry smbus is terrible :(
+        you can read why here: http://www.ti.com/lit/an/sloa132/sloa132.pdf
+        If you expect to read after you write, this is the one
+        '''
+        try:
+            results = self.bus.read_i2c_block_data(addr, command, length)
+            return results
+        except IOError as e:
+            print 'Bus is active. fix it!'
+
 
     def write(self, addr, reg, val):
         '''
