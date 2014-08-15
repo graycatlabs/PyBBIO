@@ -63,7 +63,6 @@ class WebCam(object):
       raise Exception("Unable to set the pipeline to the playing state.")
     
     self.streamsink.set_state(gst.STATE_NULL)
-    delay(10000)
     addToCleanup(self.stopPipeline)
 
   def _sourcebin(self):
@@ -119,10 +118,11 @@ class WebCam(object):
   def startStreaming(self,port = 5000):
     '''
     startStreaming((optional)port)
-    starts streaming video from the webcam to http://your_bbb's_ip_sddress:port
+    starts streaming video from the webcam to http://your_bbb's_ip_address:port
     port defaults to 5000
     NOTE : Once port no. is set trying to change it will show an error.
     '''
+    print "in startstreaming"
     self.streamsink.set_property("host","127.0.0.1")
     self.streamsink.set_property("port",int(port))
     self.streamsink.set_state(gst.STATE_PLAYING)
@@ -130,10 +130,13 @@ class WebCam(object):
       self.pipeline.add(self.streamsink)
       self.streaming = 1
     self.sink_stream_pad.set_blocked(True)
+    print "streaming1"
     self.fakestreamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.fake_stream_pad)
     self.src_stream_pad.link(self.stream_sink_pad)
     self.sink_stream_pad.set_blocked(False)
+    print "streaming2"
+    
    
   def stopStreaming(self):
     '''
