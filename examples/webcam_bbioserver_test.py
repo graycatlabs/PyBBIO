@@ -12,6 +12,7 @@ from WebCam import WebCam
 from BBIOServer import *
 
 cam = WebCam()
+delay(10000)
 server = BBIOServer()
 cam.startStreaming()
 
