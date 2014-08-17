@@ -109,12 +109,15 @@ class WebCam(object):
     caps=gst.Caps('image/jpeg')
     self.fakesink.set_state(gst.STATE_PAUSED)
     buffer = self.fakesink.get_property ('last-buffer')
+    while buffer == None:
+      # Make sure gstreamer has finished creating the pipeline
+      buffer = self.fakesink.get_property('last-buffer')
     buf = gst.video.video_convert_frame(buffer,"image/jpeg,width=640,height=480",5 * gst.SECOND)
 
     with file(filename, 'w') as fh:
       fh.write(str(buf))
-      print "took a picture"
     self.fakesink.set_state(gst.STATE_PLAYING)
+    
     
   def startStreaming(self,port = 5000):
     '''
