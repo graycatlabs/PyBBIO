@@ -12,13 +12,17 @@ from bbio import *
 from WebCam import WebCam
 
 cam = WebCam()
+s = 0
 
-
-cam.startStreaming(5001)
-cam.takeSnapshot("sam1")
-delay(30000)
-cam.stopStreaming()
-delay(30000)
-cam.startStreaming(5001)
-cam.takeSnapshot("../sam2")
-cam.stopStreaming()
+def setup():
+  cam.startStreaming()
+  
+def loop():
+  global s
+  location = "pic"+str(s)
+  cam.takeSnapshot(location)
+  print "saving image to %s" % location
+  s += 1
+  delay(10000)
+  
+run(setup, loop)
