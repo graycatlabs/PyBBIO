@@ -9,28 +9,23 @@
  This example program is in the public domain.
 """
 from bbio import *
+import smtplib
 from WebCam import WebCam
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
 from MMA7660 import MMA7660
 
-print "1"
 cam = WebCam()
-print "2"
 pir = GPIO1_28
-print "3"
 accel = MMA7660(2)
-print "4"
 INT_PIN = GPIO1_16
-print "5"
 sender = 'sender_email@gmail.com'
 reciever = 'reciver_emial@gmail.com'
 password = 'sender_email_password'
 #change the smtp address below if not using gmail
 sms = 'sms_gateway_address' 
 # can be obtained from http://www.ukrainecalling.com/email-to-text.aspx
-print "7"
 
 def setup():
   int_cfg = accel.INT_SHX | \
@@ -41,7 +36,6 @@ def setup():
   accel.setTapDebounce(15)
   pinMode(pir,INPUT,PULLUP)
   attachInterrupt(pir, motiondetect, RISING)
-  print "6"
 
 def loop():
   print "The loop continues..."
@@ -51,7 +45,7 @@ def accelCallback(back_front, portrait_landscape, tap, shake):
   '''
   detects shake interrupt
   '''
-  print "accelCallback"
+  print "shake detected"
   cam.takeSnapshot("sample")
   if shake == 1:
     sendmsg(1)
@@ -60,7 +54,7 @@ def motiondetect():
   '''
   motion detect interrupt function
   '''
-  print "motiondetect"
+  print "motion detected"
   cam.takeSnapshot("sample")
   sendmsg(2)
   
@@ -68,7 +62,6 @@ def sendmsg(num):
   '''
   sends an email and sms with the picture
   '''
-  print "Sending email notifcation"
   if num == 1:
     text = "Shake Detected"
   if num == 2:
