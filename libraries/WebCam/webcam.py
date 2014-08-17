@@ -11,7 +11,7 @@ class WebCam(object):
     This switches on your camera until stopPipeline() is called.
     '''
     self.video_num = video_device
-    self.video_device = "/dev/video%i"%(video_device)
+    self.video_dev = "/dev/video%i"%(video_device)
     self.pipeline = gst.Pipeline()
     self.srcbin = self._sourcebin()
     self.videocbin = self._videoconvertbin()
@@ -71,6 +71,7 @@ class WebCam(object):
     caps = gst.Caps("image/jpeg,width=640,height=480,framerate=30/1")
     capsfilter = gst.element_factory_make("capsfilter")
     jdecoder = gst.element_factory_make("jpegdec")
+    source.set_property("device",self.video_dev)
     bin.add(source,capsfilter,jdecoder)
     gst.element_link_many(source,capsfilter,jdecoder)
     # ghostpad 
@@ -122,7 +123,6 @@ class WebCam(object):
     port defaults to 5000
     NOTE : Once port no. is set trying to change it will show an error.
     '''
-    print "in startstreaming"
     self.streamsink.set_property("host","127.0.0.1")
     self.streamsink.set_property("port",int(port))
     self.streamsink.set_state(gst.STATE_PLAYING)
@@ -130,13 +130,10 @@ class WebCam(object):
       self.pipeline.add(self.streamsink)
       self.streaming = 1
     self.sink_stream_pad.set_blocked(True)
-    print "streaming1"
     self.fakestreamsink.set_state(gst.STATE_NULL)
     self.src_stream_pad.unlink(self.fake_stream_pad)
     self.src_stream_pad.link(self.stream_sink_pad)
-    self.sink_stream_pad.set_blocked(False)
-    print "streaming2"
-    
+    self.sink_stream_pad.set_blocked(False)    
    
   def stopStreaming(self):
     '''
