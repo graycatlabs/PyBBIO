@@ -15,7 +15,7 @@ cam = WebCam()
 s = 0
 
 def setup():
-  cam.startStreaming()
+  pass
   
 def loop():
   global s
