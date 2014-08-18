@@ -291,7 +291,7 @@ class Page(object):
     style = "clear: left;" if newline else ''
     self.html +=\
       '<div class="video" style="%s">\n' % (style) +\
-      '<video src="http://{0}:{1}" type="video/ogg" controls autoplay>' .format(str(ipaddress),str(port)) +\
+      '<video src="http://{0}:{1}" width="640" height="480" type="video/ogg" controls autoplay>' .format(str(ipaddress),str(port)) +\
       '</video>\n</div>\n'
 
   def __str__(self):
