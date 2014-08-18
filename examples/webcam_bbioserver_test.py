@@ -20,5 +20,4 @@ vid = Page("Webcam Video")
 vid.add_video("192.168.7.2","5000")
 server.start(vid)
 
-delay(50000)
 cam.stopStreaming()
