@@ -51,7 +51,7 @@ a:hover {
 
 #content {
   float: right;
-  width: 500px;
+  min-width: 500px;
   padding: 20px;
   line-height: 140%;
   margin: 7px 0px;
