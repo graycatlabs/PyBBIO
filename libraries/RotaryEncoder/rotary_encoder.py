@@ -25,6 +25,13 @@ class RotaryEncoder(object):
   EQEP2b = 3
     
   def __init__(self, eqep_num):
+    '''
+    RotaryEncoder(eqep_num)
+    Creates an instance of the class RotaryEncoder. 
+    eqep_num determines which eQEP pins are set up. 
+    eqep_num can be: EQEP0, EQEP1, EQEP2 or EQEP2b based on which pins \
+    the rotary encoder is connected to.
+    '''
     assert 0 <= eqep_num <= 3 , "eqep_num must be between 0 and 3"
     if eqep_num == 3:
         overlay = "PyBBIO-eqep2b"

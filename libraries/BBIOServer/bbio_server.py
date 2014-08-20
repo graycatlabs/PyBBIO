@@ -281,6 +281,18 @@ class Page(object):
       '<div class="monitor-field" id="%s"></div>\n' % (function_id) +\
       '<div class="value-field">%s</div>\n' % (units) +\
       '</div>\n'
+      
+  def add_video(self,ipaddress,port,newline=False):
+    '''
+    Add a video with controls to the current position in the page. It plays the 
+    video that is streamed from http://ipaddress:port. If newline=True the text 
+    will be put on a new line, otherwise it will be stacked on the current line.
+    '''
+    style = "clear: left;" if newline else ''
+    self.html +=\
+      '<div class="video" style="%s">\n' % (style) +\
+      '<video src="http://{0}:{1}" width="640" height="480" type="video/ogg" controls autoplay>' .format(str(ipaddress),str(port)) +\
+      '</video>\n</div>\n'
 
   def __str__(self):
     # Return the HTML with the content of the footer template
