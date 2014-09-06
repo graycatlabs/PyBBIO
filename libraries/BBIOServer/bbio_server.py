@@ -256,7 +256,33 @@ class Page(object):
       '<div class="button" onclick="call_function(%s, \'entry\')">%s\n' % \
       (function_id, submit_label) +\
      '</div>\n</div>\n'
+    
+  def add_range(self, function, submit_label,minvalue=0,maxvalue=100,defaultvalue=50,stepsize=1, newline=False):
+    """ Add a range slider box and a submit button with the given label to the 
+        current position in the page. When submitted, the given function will
+        be called, passing it the value (as a string) currently in the slider. The function 
+        must take take a value, e.g.: 'lambda s: print s'. If newline=True 
+        the text will be put on a new line, otherwise it will be stacked on
+        the current line. """
 
+    # Create the unique id and store the function:
+    function_id = str(int(time.time()*1e6) & 0xffff)
+    FUNCTIONS[function_id] = function
+
+    style = "clear: left;" if newline else ''
+
+    # Add the HTML. Pass the Javascript function the function id,
+    # as well as a string to indicate it's an entry. This way the
+    # Javascript function will know to extract the text from the 
+    # entry and pass it as part of its request. 
+    self.html +=\
+      '<div class="object-wrapper" style="%s">\n' % (style) +\
+      '<input class="entry" id="%s" type="range" min=%s max=%s step=%s value=%s name="entry" />\n' %\
+      (function_id,minvalue,maxvalue,stepsize,defaultvalue) +\
+      '<div class="button" onclick="call_function(%s, \'entry\')">%s\n' % \
+      (function_id, submit_label) +\
+     '</div>\n</div>\n'
+    
   def add_monitor(self, function, label, units='', newline=False):
     """ Add a monitor to the current position in the page. It will be
         displayed in the format: 'label' 'value' 'units', where value is 
@@ -281,6 +307,7 @@ class Page(object):
       '<div class="monitor-field" id="%s"></div>\n' % (function_id) +\
       '<div class="value-field">%s</div>\n' % (units) +\
       '</div>\n'
+
 
   def __str__(self):
     # Return the HTML with the content of the footer template
