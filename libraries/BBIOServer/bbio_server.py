@@ -1,6 +1,6 @@
 """
- BBIOServer - v1.2
- Copyright 2012 Alexander Hiam
+ BBIOServer - v1.3
+ Copyright 2012, 2014 Alexander Hiam
  A dynamic web interface library for PyBBIO.
 """
 
@@ -198,6 +198,11 @@ class Page(object):
     self.html = open(HEADER, 'r').read() % \
                 (title, stylesheet, title, open(SIDEBAR, 'r').read())
 
+  def add_html(self, html):
+    """ Add the given raw HTML to the current position in the page.
+        HTML may contain script tags. """
+    self.html += '%s\n' % (html)
+  
   def add_heading(self, text):
     """ Add a heading to the current position in the page. """
     self.html += '<div class="heading">%s</div>\n' % (text)

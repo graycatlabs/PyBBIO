@@ -43,7 +43,7 @@ def setup():
   home = Page("PyBBIO Test")
   # Add some text to the page:
   home.add_text("This is a test of the BBIOServer library for PyBBIO."+\
-                " Follow the links at the left to test the different pages.")                 
+                " Follow the links at the left to test the different pages.")
   # Create a new page to test the text input:
   text = Page("Text Input")
   text.add_text("Press submit to send the text in entry box:")

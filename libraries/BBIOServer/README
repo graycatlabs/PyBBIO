@@ -1,6 +1,6 @@
-BBIOServer - v1.2
+BBIOServer - v1.3
 
-Copyright 2012 Alexander Hiam
+Copyright 2012, 2014 Alexander Hiam
 hiamalexander@gmail.com
 
 BBIOServer is a dynamic web interface library for PyBBIO.
@@ -17,31 +17,22 @@ See PyBBIO/LICENSE.txt
 
 ---------------------------------------------------
 
-BBIOServer uses and includes a copy of the minified JQuery library v1.7.2,
+BBIOServer uses and includes a copy of the minified JQuery library v1.11.1,
 released under the MIT license. 
 
-JQuery license details:
+JQuery v1.11.1 license details:
 
-Copyright (c) 2011 John Resig, http://jquery.com/
+ jQuery JavaScript Library v1.11.1
+ http://jquery.com/
+ 
+ Includes Sizzle.js
+ http://sizzlejs.com/
 
-Permission is hereby granted, free of charge, to any person obtaining
-a copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sublicense, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
-the following conditions:
+ Copyright 2005, 2014 jQuery Foundation, Inc. and other contributors
+ Released under the MIT license
+ http://jquery.org/license
 
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
-MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
-WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+ Date: 2014-05-01T17:42Z
 
 ---------------------------------------------------
 
