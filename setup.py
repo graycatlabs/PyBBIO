@@ -123,14 +123,14 @@ elif (PLATFORM == 'BeagleBone 3.2'):
     warnings.append(w)
 
 setup(name='PyBBIO',
-      version='0.9.1',
+      version='0.9.2',
       description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
       long_description=open('README.md').read(),
       author='Alexander Hiam',
       author_email='hiamalexander@gmail.com',
       license='MIT License',
       url='https://github.com/alexanderhiam/PyBBIO/wiki',
-      download_url='https://github.com/alexanderhiam/PyBBIO/tarball/v0.9.1',
+      download_url='https://github.com/alexanderhiam/PyBBIO/tarball/v0.9.2',
       keywords=['BeagleBone', 'BeagleBone Black', 'IO', 'GPIO', 'ADC', 'PWM', 
                 'I2C', 'SPI', 'bbio'],
       packages=['bbio', 'bbio.platform', 'bbio.platform.util'] + driver_packages,

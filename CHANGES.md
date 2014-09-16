@@ -1,6 +1,13 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.2
+  * Added WebCam library from rseetham
+  * BBIOServer updates
+    * Slider from Ikario
+    * JQuery -> v1.11.1
+  * I2C library improvement from ycoroneos
+
 #### version 0.9.1
   * Added MMA7660 3-axis accelerometer library
   * Removed smbus from pip requirements since there's no smbus package in PyPI
