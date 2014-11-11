@@ -12,7 +12,7 @@
 # First we must import PyBBIO: 
 from bbio import *
 # Then we can import BBIOServer:
-from BBIOServer import *
+from bbio.libraries.BBIOServer import *
 
 # Now we create a server instance:
 server = BBIOServer()

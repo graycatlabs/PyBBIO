@@ -8,7 +8,7 @@
 """
 
 from bbio import *
-from ADS786x import *
+from bbio.libraries.ADS786x import *
 
 # Set variables for the pins connected to the ADC:
 data_pin = GPIO1_15  # P8.15

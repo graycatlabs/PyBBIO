@@ -9,9 +9,6 @@ import sys, atexit
 
 from .platform import platform_init, platform_cleanup
 from .util import ADDITIONAL_CLEANUP, util_init
-from .config import LIBRARIES_PATH
-
-sys.path.append(LIBRARIES_PATH)
 
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """

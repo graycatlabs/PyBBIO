@@ -9,7 +9,7 @@
 '''
 
 from bbio import *
-from WebCam import WebCam
+from bbio.libraries.WebCam import WebCam
 
 cam = WebCam()
 s = 0

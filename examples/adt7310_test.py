@@ -9,7 +9,7 @@
  This example program is in the public domain.
 '''
 from bbio import *
-from ADT7310 import *
+from bbio.libraries.ADT7310 import *
 
 adt = ADT7310(0,0)
 #interrput pin

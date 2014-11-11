@@ -1,5 +1,5 @@
 
-import sys, os, shutil
+import sys, os, shutil, glob
 
 
 # Some Angstrom images are missing the py_compile module; get it if not
@@ -25,25 +25,29 @@ if not os.path.exists(python_lib_path + 'py_compile.py'):
 
 print "Installing PyBBIO..." 
 
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 
 install_requires = [
   'pyserial'
 ]
 
-packages = ['bbio', 'bbio.platform', 'bbio.platform.util', 
-            'bbio.platform.beaglebone', 'bbio.platform.beaglebone.universal_io',
-            'bbio.platform.beaglebone.bone_3_2']
+extensions = [
+  Extension('bbio.platform.util._sysfs',
+            ['bbio/platform/util/_sysfs.c']),
+  Extension('bbio.platform.util._spi',
+            ['bbio/platform/util/spimodule.c']),
+  Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
+            ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
+             'bbio/platform/util/mmap_util.c'],
+            include_dirs=['bbio/platform/util'])
+]
 
-extensions = [Extension('bbio.platform.util._sysfs',
-              ['bbio/platform/util/_sysfs.c']),
-              Extension('bbio.platform.util._spi',
-              ['bbio/platform/util/spimodule.c']),
-              Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
-              ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
-               'bbio/platform/util/mmap_util.c'],
-               include_dirs=['bbio/platform/util'])]
-                                   
+# Install the BBIOServer src files to ~/.BBIOServer:
+data_files = [
+  ('%s/.BBIOServer/src' % os.getenv('HOME'), 
+   glob.glob('bbio/libraries/BBIOServer/src/*.*')),
+]
+
 setup(name='PyBBIO',
       version='0.9.2',
       description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
@@ -55,7 +59,8 @@ setup(name='PyBBIO',
       download_url='https://github.com/alexanderhiam/PyBBIO/tarball/v0.9.2',
       keywords=['BeagleBone', 'BeagleBone Black', 'IO', 'GPIO', 'ADC', 'PWM', 
                 'I2C', 'SPI', 'bbio'],
-      packages=packages,
+      packages=find_packages(),
+      data_files=data_files,
       ext_modules=extensions, 
       install_requires=install_requires,
       platforms=['BeagleBone', 'BeagleBone Black'],

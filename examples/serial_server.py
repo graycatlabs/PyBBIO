@@ -14,7 +14,7 @@
 # This example is in the public domain
 
 from bbio import *
-from BBIOServer import *
+from bbio.libraries.BBIOServer import *
 
 # Create a server instance:
 server = BBIOServer()

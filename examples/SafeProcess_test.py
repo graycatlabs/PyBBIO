@@ -10,7 +10,7 @@
 """
 
 from bbio import *
-from SafeProcess import *
+from bbio.libraries.SafeProcess import *
 
 def foo():
   while(True):

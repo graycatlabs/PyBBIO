@@ -7,7 +7,7 @@
 """
 
 from bbio import *
-from SafeProcess import *
+from ..SafeProcess import *
 import time
 from collections import deque
 from multiprocessing import Process

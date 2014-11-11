@@ -15,7 +15,7 @@
  This example program is in the public domain.  
 '''
 from bbio import *
-from ADT7310 import *
+from bbio.libraries.ADT7310 import *
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 

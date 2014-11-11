@@ -10,11 +10,11 @@
 """
 from bbio import *
 import smtplib
-from WebCam import WebCam
+from bbio.libraries.WebCam import WebCam
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.image import MIMEImage
-from MMA7660 import MMA7660
+from bbio.libraries.MMA7660 import MMA7660
 
 cam = WebCam()
 pir = GPIO1_28

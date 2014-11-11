@@ -10,7 +10,7 @@
 """
 
 from bbio import *
-from MAX31855 import *
+from bbio.libraries.MAX31855 import *
 
 # Set variables for the pins connected to the ADC:
 data_pin = GPIO1_15  # P8.15

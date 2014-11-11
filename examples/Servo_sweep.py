@@ -19,7 +19,7 @@
 # First we must import PyBBIO: 
 from bbio import *
 # Then we can import Servo:
-from Servo import *
+from bbio.libraries.Servo import *
 
 # Create an instance of the Servo object:
 servo1 = Servo(PWM1A)

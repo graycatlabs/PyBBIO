@@ -7,7 +7,7 @@
  This example program is in the public domain.
 '''
 from bbio import *
-from WebCam import WebCam
+from bbio.libraries.WebCam import WebCam
 
 from BBIOServer import *
 

@@ -25,7 +25,7 @@
 # First we import PyBBIO: 
 from bbio import *
 # Then we can import EventIO:
-from EventIO import *
+from bbio.libraries.EventIO import *
 
 sw1 = GPIO1_7
 sw2 = GPIO1_3

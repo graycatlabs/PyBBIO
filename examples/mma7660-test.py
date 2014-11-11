@@ -8,7 +8,7 @@
  This example program is in the public domain.
 """
 from bbio import *
-from MMA7660 import MMA7660
+from bbio.libraries.MMA7660 import MMA7660
 
 INT_PIN = GPIO1_16
 

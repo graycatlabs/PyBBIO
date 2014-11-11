@@ -9,7 +9,7 @@
 """
 
 from bbio import *
-from DACx311 import *
+from bbio.libraries.DACx311 import *
 
 # Set variables for the pins connected to the DAC:
 data_pin = GPIO1_6  # P8.3

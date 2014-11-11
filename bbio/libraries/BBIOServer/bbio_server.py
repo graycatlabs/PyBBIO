@@ -12,18 +12,18 @@ from bbio import *
 
 BBIOSERVER_VERSION = "1.2"
 
-THIS_DIR = os.path.dirname(__file__)
-PAGES_DIR = "%s/pages" % THIS_DIR
-HEADER = "%s/src/header.html" % THIS_DIR
-SIDEBAR = "%s/src/sidebar.html" % THIS_DIR
-FOOTER = "%s/src/footer.html" % THIS_DIR
-INDEX_TEMPLATE = "%s/src/index.html.template" % THIS_DIR
-INDEX = "%s/index.html" % THIS_DIR
+ROOT_DIR = '%s/.BBIOServer' % os.getenv('HOME')
+PAGES_DIR = "%s/pages" % ROOT_DIR
+HEADER = "%s/src/header.html" % ROOT_DIR
+SIDEBAR = "%s/src/sidebar.html" % ROOT_DIR
+FOOTER = "%s/src/footer.html" % ROOT_DIR
+INDEX_TEMPLATE = "%s/src/index.html.template" % ROOT_DIR
+INDEX = "%s/index.html" % ROOT_DIR
 
 # Change working directory to the BBIOServer library directory,
 # otherwise the request handler will try to deliver pages from the
 # directory where the program using the library is being run from:
-os.chdir(THIS_DIR)
+os.chdir(ROOT_DIR)
 
 # This is where we store the function strings indexed by their
 # unique ids:

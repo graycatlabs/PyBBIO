@@ -9,7 +9,7 @@
  This example program is in the public domain.
 """
 from bbio import *
-from RotaryEncoder import RotaryEncoder
+from bbio.libraries.RotaryEncoder import RotaryEncoder
 
 encoder = RotaryEncoder(RotaryEncoder.EQEP2b)
 
