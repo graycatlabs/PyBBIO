@@ -32,7 +32,7 @@ install_requires = [
 ]
 
 packages = ['bbio', 'bbio.platform', 'bbio.platform.util', 
-            'bbio.platform.beaglebone', 'bbio.platform.beaglebone.bone_3_8',
+            'bbio.platform.beaglebone', 'bbio.platform.beaglebone.universal_io',
             'bbio.platform.beaglebone.bone_3_2']
 
 extensions = [Extension('bbio.platform.util._sysfs',

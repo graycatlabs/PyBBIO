@@ -3,10 +3,10 @@
 from bbio.platform.platform import detect_platform 
 PLATFORM = detect_platform()
 
-if "3.8" in PLATFORM:
-  from bone_3_8 import config
-  from bone_3_8.adc import analogRead, inVolts
-  from bone_3_8.pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
+if ">=3.8" in PLATFORM:
+  from universal_io import config
+  from universal_io.adc import analogRead, inVolts
+  from universal_io.pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
   
 elif "3.2" in PLATFORM:
   from bone_3_2 import config
