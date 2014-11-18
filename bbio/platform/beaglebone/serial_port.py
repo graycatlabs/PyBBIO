@@ -5,14 +5,7 @@
 # 
 # Beaglebone serial driver
 
-from bbio.platform.platform import detect_platform 
-_platform = detect_platform()
-if "3.8" in _platform:
-  from bone_3_8.uart import uartInit
-elif "3.2" in _platform:
-  from bone_3_2.uart import uartInit
-del _platform
-
+import os, glob, cape_manager, bbio
 from config import UART, DEC, BIN, OCT, HEX
 
 try:
@@ -21,7 +14,22 @@ except:
   print "\n pyserial module not found; to install:\n\
    # opkg update && opkg install python-pyserial\n"
 
+def uartInit(uart):
+  """ Enables the given uart by loading its dto. """
+  port, overlay = UART[uart]
+  if os.path.exists(port): return True
+  # Unloading serial port overlays crashes the current cape manager, 
+  # disable until it gets fixed:
+  cape_manager.load(overlay, auto_unload=False)
+  if os.path.exists(port): return True
 
+  for i in range(5):
+    # Give it some time to load
+    bbio.delay(100)
+    if os.path.exists(port): return True
+    
+  # If we make it here it's pretty safe to say the overlay couldn't load
+  return False
 
 # _UART_PORT is a wrapper class for pySerial to enable Arduino-like access
 # to the UART1, UART2, UART4, and UART5 serial ports on the expansion headers:

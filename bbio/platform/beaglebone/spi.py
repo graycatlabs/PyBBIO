@@ -1,14 +1,14 @@
+import bbio, os, cape_manager
 from bbio.platform.util import _spi
 from config import LSBFIRST,MSBFIRST
 
-from bbio.platform.platform import detect_platform 
-_platform = detect_platform()
-if "3.8" in _platform:
-  from bone_3_8.spi_init import spi_init
-elif "3.2" in _platform:
-  from bone_3_2.spi_init import spi_init
-del _platform
 
+def spi_init(spi_num):
+  overlay = 'BB-SPIDEV%i' % spi_num
+  assert os.path.exists('/lib/firmware/%s-00A0.dtbo' % overlay), \
+    "SPI driver not present"
+  cape_manager.load(overlay, auto_unload=False)
+  bbio.delay(250) # Give driver time to load
 
 class SPI_Bus(object):
     

@@ -1,21 +1,11 @@
 # initialization for beaglebone
 
-from bbio.platform.platform import detect_platform 
-PLATFORM = detect_platform()
 
-if ">=3.8" in PLATFORM:
-  from universal_io import config
-  from universal_io.adc import analogRead, inVolts
-  from universal_io.pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
-  
-elif "3.2" in PLATFORM:
-  from bone_3_2 import config
-  from bone_3_2.adc import analogRead, inVolts
-  from bone_3_2.pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
-  
 from gpio import pinMode, digitalWrite, digitalRead, toggle, pinState, \
                  shiftIn, shiftOut
 from interrupt import attachInterrupt, detachInterrupt
+from adc import analogRead, inVolts
+from pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
 from serial_port import Serial1, Serial2, Serial4, Serial5
 from i2c import Wire1, Wire2
 from spi import SPI0, SPI1
@@ -41,8 +31,8 @@ from config import AIN0, AIN1, AIN2, AIN3, AIN4, AIN5, AIN6, AIN7,\
                    A0, A1, A2, A3, A4, A5, A6, A7, VSYS
 
 from config import PWM1A, PWM1B, PWM2A, PWM2B
-if "3.8" in PLATFORM:
-  from config import ECAP0, ECAP1
 from config import RES_16BIT, RES_8BIT, PERCENT
+
+from config import ECAP0, ECAP1
 
 from config import DEC, BIN, OCT, HEX

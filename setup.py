@@ -36,10 +36,10 @@ extensions = [
             ['bbio/platform/util/_sysfs.c']),
   Extension('bbio.platform.util._spi',
             ['bbio/platform/util/spimodule.c']),
-  Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
-            ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
-             'bbio/platform/util/mmap_util.c'],
-            include_dirs=['bbio/platform/util'])
+  #Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
+  #          ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
+  #           'bbio/platform/util/mmap_util.c'],
+  #          include_dirs=['bbio/platform/util'])
 ]
 
 # Install the BBIOServer src files to ~/.BBIOServer:

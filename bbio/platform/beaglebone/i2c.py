@@ -15,16 +15,8 @@
 #Another Note : i2c on the beaglebone (and in the linux kernel) is not really i2c! It's smbus (which is a derivative of i2c)
 #               So as a result communicating with true i2c peripherals is more or less a hack
 #               http://www.ti.com/lit/an/sloa132/sloa132.pdf
-import bbio
+import cape_manager, bbio, glob, os
 from config import I2C
-
-from bbio.platform.platform import detect_platform
-_platform = detect_platform()
-if "3.8" in _platform:
-  from bone_3_8.i2c_setup import i2cInit
-elif "3.2" in _platform:
-  from bone_3_2.i2c_setup import i2cInit
-del _platform
 
 try:
   import smbus
@@ -33,7 +25,28 @@ except:
   print "on Angstrom Linux : ~#opkg install python-smbus\n"
   print "on Ubuntu, Debian : ~#apt-get install python-smbus"
 
+def i2cInit(bus):
+	'''
+	Initializes reqd I2C bus
+	i2c0 (/dev/i2c-0) and i2c2 (/dev/i2c-1) are already initialized
+	overlay to be applied for i2c1 (/dev/i2c-2)
+	'''
+	dev_file, overlay = I2C[bus]
+	if os.path.exists(dev_file): 
+		return True
+	cape_manager.load(overlay, auto_unload=False)
+	
+	if os.path.exists(dev_file): 
+		return True
 
+	for i in range(5):
+		bbio.delay(5)
+		if os.path.exists(dev_file): 
+			return True
+
+	return False
+
+  
 class _I2C_BUS(object):
 
     def __init__(self, bus):

@@ -12,13 +12,7 @@ from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
                    MSBFIRST
 
-from bbio.platform.platform import detect_platform 
-_platform = detect_platform()
-if "3.8" in _platform:
-  from bone_3_8 import pinmux
-elif "3.2" in _platform:
-  from bone_3_2 import pinmux
-del _platform
+import pinmux
 
 def getGPIODirectory(gpio_pin):
   """ Returns the sysfs kernel driver base directory for the given pin. """
