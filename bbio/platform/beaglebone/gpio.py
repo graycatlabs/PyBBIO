@@ -19,7 +19,7 @@ def getGPIODirectory(gpio_pin):
   if 'USR' in gpio_pin:
     # USR LEDs use a different driver
     return GET_USR_LED_DIRECTORY(gpio_pin)
-  gpio_num = GPIO[gpio_pin][2]
+  gpio_num = GPIO[gpio_pin]['gpio_num']
   return '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
 
 

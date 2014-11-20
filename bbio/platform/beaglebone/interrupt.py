@@ -79,7 +79,7 @@ def attachInterrupt(gpio_pin, callback, mode=BOTH):
       or BOTH. 'callback' is the method called when an event is triggered. """
   # Start the listener thread
   _start_epoll_listener()
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin]['gpio_num']
   INTERRUPT_VALUE_FILES[gpio_pin] = open(
     os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value'), 'r')
   _edge(gpio_pin, mode)
@@ -87,13 +87,13 @@ def attachInterrupt(gpio_pin, callback, mode=BOTH):
 
 def detachInterrupt(gpio_pin):
   """ Detaches the interrupt from the given pin if set. """
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin]['gpio_num']
   EPOLL_LISTENER.unregister(gpio_pin)
   
 def _edge(gpio_pin, mode):
   """ Sets an edge-triggered interrupt with sysfs /sys/class/gpio
       interface. Returns True if successful, False if unsuccessful. """
-  gpio_num = int(gpio_pin[4])*32 + int(gpio_pin[6:])
+  gpio_num = GPIO[gpio_pin]['gpio_num']
   gpio_base = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num)
   if (not os.path.exists(gpio_base)): 
     # Pin not under userspace control
