@@ -28,7 +28,7 @@ def pinMux_dtOverlays(gpio_pin, mode, preserve_mode_on_exit=False):
 
   if len(mux_file_glob) == 0:
     print "*Could not load overlay for pin: %s" % gpio_pin
-    return 
+    return False
     
   mux_file = mux_file_glob[0]
   # Convert mode to ocp mux name:
@@ -48,7 +48,7 @@ def pinMux_dtOverlays(gpio_pin, mode, preserve_mode_on_exit=False):
     try:
       with open(mux_file, 'wb') as f:
         f.write(mode)
-      return
+      return True
     except IOError:
       # Wait a bit between attempts
       bbio.delay(10)
