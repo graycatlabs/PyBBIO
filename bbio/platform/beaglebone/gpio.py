@@ -5,8 +5,9 @@
 #
 # Beaglebone GPIO driver
 
-import os, math, sysfs
+import os, math
 from bbio.util import addToCleanup
+from bbio.platform.util import sysfs
 from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
                    CONF_GPIO_INPUT, CONF_GPIO_OUTPUT, FALLING, HIGH, LOW,\
@@ -89,16 +90,16 @@ def digitalWrite(gpio_pin, state):
           " Did you call pinMode()?" 
     return
   if (state):    
-    sysfs.kernelFilenameIO(gpio_file, '1')
+    sysfs.kernelFileIO(gpio_file, '1')
   else:
-    sysfs.kernelFilenameIO(gpio_file, '0')
+    sysfs.kernelFileIO(gpio_file, '0')
 
 
 def digitalRead(gpio_pin):
   """ Returns input pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
   gpio_file = getGPIOStateFile(gpio_pin)
-  return int(sysfs.kernelFilenameIO(gpio_file))
+  return int(sysfs.kernelFileIO(gpio_file))
 
 
 def toggle(gpio_pin):
