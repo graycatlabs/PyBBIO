@@ -41,7 +41,7 @@ char *getFirstGlobMatch(char *path) {
   else {
     // Found at least one match, grab first:
     length = strlen(glob_results.gl_pathv[0]);
-    expanded_path = (char *) calloc(length, sizeof(char));
+    expanded_path = (char *) calloc(length+1, sizeof(char));
     memcpy(expanded_path, glob_results.gl_pathv[0], length);
   }
   globfree(&glob_results);
@@ -57,9 +57,8 @@ int kernelFileWrite(char *path, char *value) {
     free(expanded_path);
     return ENOENT; // "No such file or directory" error code
   }
-  
-  fd = fopen(expanded_path, "w");
-  if(fd==NULL) {
+  fd = fopen(expanded_path, "r+");
+  if(!fd) {
     // Could not open file
     free(expanded_path);
     return errno; // fopen() updates errno when it failes
@@ -79,9 +78,8 @@ int kernelFileRead(char *path, char *result, int result_len) {
     free(expanded_path);
     return ENOENT; // "No such file or directory" error code
   }
-  
   fd = fopen(expanded_path, "r");
-  if(fd==NULL) {
+  if(!fd) {
     // Could not open file
     free(expanded_path);
     return errno;
