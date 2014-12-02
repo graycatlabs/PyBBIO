@@ -6,7 +6,7 @@
 # Beaglebone GPIO driver
 
 import os, math
-from bbio.util import addToCleanup
+from bbio.common import addToCleanup
 from bbio.platform.util import sysfs
 from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\

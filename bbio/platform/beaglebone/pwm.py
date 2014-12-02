@@ -7,7 +7,7 @@
 
 from bbio.platform.beaglebone import cape_manager
 from bbio.platform.beaglebone import sysfs
-from bbio.util import delay, addToCleanup
+from bbio.common import delay, addToCleanup
 from config import RES_8BIT, PWM_PINS, PWM_PERIOD, PWM_DUTY, PWM_POLARITY,\
                    PWM_RUN, PWM_DEFAULT_PERIOD
 

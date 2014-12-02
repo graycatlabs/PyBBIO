@@ -8,7 +8,7 @@
 import sys, atexit
 
 from .platform import platform_init, platform_cleanup
-from .util import ADDITIONAL_CLEANUP, util_init
+from .common import ADDITIONAL_CLEANUP, util_init
 
 def bbio_init():
   """ Pre-run initialization, i.e. starting module clocks, etc. """

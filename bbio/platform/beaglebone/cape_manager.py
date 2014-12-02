@@ -7,7 +7,7 @@
 # For Beaglebone's with 3.8 kernel or greater
 
 from bbio.platform.beaglebone.config import SLOTS_FILE
-from bbio.util import addToCleanup
+from bbio.common import addToCleanup
 
 def load(overlay, auto_unload=True):
   """ Attempt to load an overlay with the given name. If auto_unload=True it
