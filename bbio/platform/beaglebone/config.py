@@ -495,6 +495,36 @@ GPIO = {
   },
 }
 
+def getGPIODirectory(gpio_pin):
+  """ Returns the sysfs kernel driver base directory for the given pin. """
+  if 'USR' in gpio_pin:
+    # USR LEDs use a different driver
+    return GET_USR_LED_DIRECTORY(gpio_pin)
+  gpio_num = GPIO[gpio_pin]['gpio_num']
+  return '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
+
+
+def getGPIODirectionFile(gpio_pin):
+  """ Returns the absolute path to the state control file for the given pin. """
+  if 'USR' in gpio_pin:
+    # USR LED driver doesn't have a direction file
+    return ''
+  d = getGPIODirectory(gpio_pin)
+  return '%s/direction' % d
+
+
+def getGPIOStateFile(gpio_pin):
+  """ Returns the absolute path to the state control file for the given pin. """
+  d = getGPIODirectory(gpio_pin)
+  if 'USR' in gpio_pin:
+    # USR LEDs use a different driver
+    return '%s/brightness' % d
+  return '%s/value' % d
+  
+for pin in GPIO.keys():
+  GPIO[pin]['direction_file'] = getGPIODirectionFile(pin)
+  GPIO[pin]['state_file'] = getGPIOStateFile(pin)
+
 # Having available pins in a dictionary makes it easy to
 # check for invalid pins, but it's nice not to have to pass
 # around strings, so here's some friendly constants:

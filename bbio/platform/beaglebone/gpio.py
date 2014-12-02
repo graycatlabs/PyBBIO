@@ -15,33 +15,6 @@ from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
 
 import pinmux
 
-def getGPIODirectory(gpio_pin):
-  """ Returns the sysfs kernel driver base directory for the given pin. """
-  if 'USR' in gpio_pin:
-    # USR LEDs use a different driver
-    return GET_USR_LED_DIRECTORY(gpio_pin)
-  gpio_num = GPIO[gpio_pin]['gpio_num']
-  return '%s/gpio%i' % (GPIO_FILE_BASE, gpio_num)
-
-
-def getGPIODirectionFile(gpio_pin):
-  """ Returns the absolute path to the state control file for the given pin. """
-  if 'USR' in gpio_pin:
-    # USR LED driver doesn't have a direction file
-    return ''
-  d = getGPIODirectory(gpio_pin)
-  return '%s/direction' % d
-
-
-def getGPIOStateFile(gpio_pin):
-  """ Returns the absolute path to the state control file for the given pin. """
-  d = getGPIODirectory(gpio_pin)
-  if 'USR' in gpio_pin:
-    # USR LEDs use a different driver
-    return '%s/brightness' % d
-  return '%s/value' % d
-
-
 def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   """ Sets given digital pin to input if direction=1, output otherwise.
       'pull' will set the pull up/down resistor if setting as an input:
@@ -62,7 +35,7 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
   elif not preserve_mode_on_exit:
     addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
-  direction_file = getGPIODirectionFile(gpio_pin)
+  direction_file = GPIO[gpio_pin]['direction_file']
 
   if (direction == INPUT):
     # Pinmux:
@@ -84,7 +57,7 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
 def digitalWrite(gpio_pin, state):
   """ Writes given digital pin low if state=0, high otherwise. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  gpio_file = getGPIOStateFile(gpio_pin)
+  gpio_file = GPIO[gpio_pin]['state_file']
   if not os.path.exists(gpio_file):
     print "warning: digitalWrite() failed, pin '%s' not exported." % gpio_pin +\
           " Did you call pinMode()?" 
@@ -98,7 +71,7 @@ def digitalWrite(gpio_pin, state):
 def digitalRead(gpio_pin):
   """ Returns input pin state as 1 or 0. """
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  gpio_file = getGPIOStateFile(gpio_pin)
+  gpio_file = GPIO[gpio_pin]['state_file']
   return int(sysfs.kernelFileIO(gpio_file))
 
 
