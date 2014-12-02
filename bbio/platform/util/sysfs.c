@@ -97,8 +97,10 @@ static PyObject* kernelFileIO(PyObject *self, PyObject *args) {
   int rc;
 
   // Parse path and optional value:
-  if(!(PyArg_ParseTuple(args, "s|s", &path, &value))) return Py_None;
-
+  if(!(PyArg_ParseTuple(args, "s|s", &path, &value))) {
+    Py_INCREF(Py_None);
+    return Py_None;
+  }
   if (value) {
     // value is not a NULL pointer, meaning a value was passed in
     rc = kernelFileWrite(path, value);
