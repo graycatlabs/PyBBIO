@@ -1,2 +1,0 @@
-# Config file for PyBBIO
-
