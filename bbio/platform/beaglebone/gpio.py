@@ -6,7 +6,6 @@
 # Beaglebone GPIO driver
 
 import os, math
-from bbio.common import addToCleanup
 from bbio.platform.util import sysfs
 from config import GET_USR_LED_DIRECTORY, GPIO, GPIO_FILE_BASE, INPUT,\
                    CONF_PULLUP, CONF_PULLDOWN, CONF_PULL_DISABLE,\
@@ -28,12 +27,10 @@ def pinMode(gpio_pin, direction, pull=0, preserve_mode_on_exit=False):
       print 'warning: cannot set USR LEDs to INPUT'
     return
   assert (gpio_pin in GPIO), "*Invalid GPIO pin: '%s'" % gpio_pin
-  exported = pinmux.export(gpio_pin)
+  exported = pinmux.export(gpio_pin, not preserve_mode_on_exit)
   if not exported:
     print "warning: could not export pin '%s', skipping pinMode()" % gpio_pin
     return
-  elif not preserve_mode_on_exit:
-    addToCleanup(lambda: pinmux.unexport(gpio_pin))
 
   direction_file = GPIO[gpio_pin]['direction_file']
 

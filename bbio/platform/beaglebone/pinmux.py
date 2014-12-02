@@ -8,6 +8,7 @@
 
 from config import OCP_PATH, GPIO, GPIO_FILE_BASE, EXPORT_FILE, UNEXPORT_FILE,\
                    SLOTS_FILE
+from bbio.common import addToCleanup
 import glob, os, cape_manager, bbio
 
 
@@ -74,10 +75,11 @@ def pinMux(gpio_pin, mode, preserve_mode_on_exit=False):
     print "*could not configure pinmux for pin %s" % gpio_pin
 
 
-def export(gpio_pin):
+def export(gpio_pin, unexport_on_exit=False):
   """ Reserves a pin for userspace use with sysfs /sys/class/gpio interface. 
-      Returns True if pin was exported, False if it was already under 
-      userspace control. """
+      If unexport_on_exit=True unexport(gpio_pin) will be called automatically
+      when the program exits. Returns True if pin was exported, False if it was 
+      already under userspace control. """
   if ("USR" in gpio_pin):
     # The user LEDs are already under userspace control
     return True
@@ -88,6 +90,8 @@ def export(gpio_pin):
     return True
   with open(EXPORT_FILE, 'wb') as f:
     f.write(str(gpio_num))
+  if unexport_on_exit: 
+    addToCleanup(lambda: unexport(gpio_pin))
   return True
 
 def unexport(gpio_pin):
