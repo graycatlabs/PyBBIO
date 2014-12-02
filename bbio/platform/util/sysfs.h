@@ -47,11 +47,4 @@ int kernelFileWrite(char *filename, char *value);
 // contain '*' wildcards. Returns 0 if successful, errno error code otherwise.
 int kernelFileRead(char *filename, char *result, int result_len);
 
-// Python function which takes a file path (wildcards allowed) and an optional 
-// value string. If only a path is given, the contents of the file will be 
-// returned. If given a value as well, the value will be written to the file 
-// and the value will be returned. If unsuccsefull an integer error code will
-// be returned (as defined in errno.h). 
-static PyObject* kernelFileIO(PyObject *self, PyObject *args);
-
 #endif
