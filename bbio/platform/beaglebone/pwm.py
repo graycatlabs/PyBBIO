@@ -6,7 +6,7 @@
 # Beaglebone PWM driver for kernel >= 3.8
 
 from bbio.platform.beaglebone import cape_manager
-from bbio.platform.beaglebone import sysfs
+from bbio.platform.util import sysfs
 from bbio.common import delay, addToCleanup
 from config import RES_8BIT, PWM_PINS, PWM_PERIOD, PWM_DUTY, PWM_POLARITY,\
                    PWM_RUN, PWM_DEFAULT_PERIOD
@@ -32,17 +32,17 @@ def analogWrite(pwm_pin, value, resolution=RES_8BIT, polarity=0):
     assert resolution > 0, "*PWM resolution must be greater than 0"
     if (value < 0): value = 0
     if (value >= resolution): value = resolution-1
-    period_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD)))
+    period_ns = int(sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_PERIOD)))
     # Todo: round values properly!: 
     duty_ns = int(value * (period_ns/resolution))
-    sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY), str(duty_ns))
+    sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_DUTY), str(duty_ns))
     if polarity == 0:
-      sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_POLARITY), '0')
+      sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_POLARITY), '0')
     else:
-      sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_POLARITY), '1')
+      sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_POLARITY), '1')
     # Enable output:
-    if (sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_RUN)) == '0\n'):
-      sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_RUN), '1') 
+    if (sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_RUN)) == '0\n'):
+      sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_RUN), '1') 
   except IOError:
     print "*PWM pin '%s' reserved by another process!" % pwm_pin
 
@@ -59,8 +59,8 @@ def pwmFrequency(pwm_pin, freq_hz):
   pin_config = PWM_PINS[pwm_pin]
   helper_path = pin_config[1]
 
-  old_duty_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY)))
-  old_period_ns = int(sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD)))
+  old_duty_ns = int(sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_DUTY)))
+  old_period_ns = int(sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_PERIOD)))
 
   duty_percent = old_duty_ns / old_period_ns
   new_period_ns = int(1e9/freq_hz)
@@ -69,11 +69,11 @@ def pwmFrequency(pwm_pin, freq_hz):
 
   try: 
     # Duty cyle must be set to 0 before changing frequency:
-    sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY), '0')
+    sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_DUTY), '0')
     # Set new frequency:
-    sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD), str(new_period_ns))
+    sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_PERIOD), str(new_period_ns))
     # Set the duty cycle:
-    sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY), str(new_duty_ns))
+    sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_DUTY), str(new_duty_ns))
   except IOError:
     print "*PWM pin '%s' reserved by another process!" % pwm_pin
     # that's probably not the best way to handle this error...
@@ -95,14 +95,14 @@ def pwmEnable(pwm_pin):
   helper_path = pin_config[1]
   # Make sure output is disabled, so it won't start outputing a 
   # signal until analogWrite() is called: 
-  if (sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_RUN)) == '1\n'):
-    sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_RUN), '0')
+  if (sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_RUN)) == '1\n'):
+    sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_RUN), '0')
 
   # Duty cyle must be set to 0 before changing frequency:
-  sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_DUTY), '0')
+  sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_DUTY), '0')
   # Is this still true??
 
-  sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_PERIOD), 
+  sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_PERIOD), 
                       str(PWM_DEFAULT_PERIOD))
   addToCleanup(lambda : pwmDisable(pwm_pin))
   PWM_PINS_ENABLED[pwm_pin] = True
@@ -113,5 +113,5 @@ def pwmDisable(pwm_pin):
   pin_config = PWM_PINS[pwm_pin]
   assert (pin_config), "*Invalid PWM pin: '%s'" % pwm_pin
   helper_path = pin_config[1]
-  sysfs.kernelFilenameIO('%s/%s' % (helper_path, PWM_RUN), '0')
+  sysfs.kernelFileIO('%s/%s' % (helper_path, PWM_RUN), '0')
   PWM_PINS_ENABLED[pwm_pin] = False
