@@ -8,8 +8,8 @@ eQEP is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt
 '''
 import os
-from bbio.platform import sysfs
-from bbio.platform.beaglebone.bone_3_8 import cape_manager
+from bbio.platform.util import sysfs
+from bbio.platform.beaglebone import cape_manager
 from bbio import addToCleanup, delay
 from bbio.platform.beaglebone.config import OCP_PATH
 
@@ -54,7 +54,7 @@ class RotaryEncoder(object):
     Turns the eQEP hardware ON
     '''
     enable_file = "%s/enabled" % self.base_dir
-    return sysfs.kernelFilenameIO(enable_file, 1) 
+    return sysfs.kernelFileIO(enable_file, 1) 
     
   def disable(self):
     '''
@@ -62,7 +62,7 @@ class RotaryEncoder(object):
     Turns the eQEP hardware OFF
     '''
     enable_file = "%s/enabled" % self.base_dir
-    return sysfs.kernelFilenameIO(enable_file, 0)
+    return sysfs.kernelFileIO(enable_file, 0)
 
   def setAbsolute(self):
     '''
@@ -72,7 +72,7 @@ class RotaryEncoder(object):
     decremented by the encoder's movement
     '''
     mode_file = "%s/mode" % self.base_dir
-    return sysfs.kernelFilenameIO(mode_file, 0)
+    return sysfs.kernelFileIO(mode_file, 0)
     
   def setRelative(self):
     '''
@@ -81,7 +81,7 @@ class RotaryEncoder(object):
     The position is reset when the unit timer overflows.
     '''
     mode_file = "%s/mode" % self.base_dir
-    return sysfs.kernelFilenameIO(mode_file, 1)
+    return sysfs.kernelFileIO(mode_file, 1)
     
   def getMode(self):
     '''
@@ -89,7 +89,7 @@ class RotaryEncoder(object):
     Returns the mode the eQEP hardware is in.
     '''
     mode_file = "%s/mode" % self.base_dir
-    return sysfs.kernelFilenameIO(mode_file)
+    return sysfs.kernelFileIO(mode_file)
 
   def getPosition(self):
     '''
@@ -101,7 +101,7 @@ class RotaryEncoder(object):
     encoder at the last unit timer overflow.
     '''
     position_file = "%s/position" % self.base_dir
-    return sysfs.kernelFilenameIO(position_file)
+    return sysfs.kernelFileIO(position_file)
     
   def setFrequency(self,freq):
     '''
@@ -109,7 +109,7 @@ class RotaryEncoder(object):
     Set the frequency in Hz at which the driver reports new positions.
     '''
     period_file = "%s/period" % self.base_dir
-    return sysfs.kernelFilenameIO(period_file,1000000000/freq)
+    return sysfs.kernelFileIO(period_file,1000000000/freq)
     
   def setPosition(self,val):
     ''' 
@@ -117,7 +117,7 @@ class RotaryEncoder(object):
     Give a new value to the current position
     '''
     position_file = "%s/position" % self.base_dir
-    return sysfs.kernelFilenameIO(position_file,val)
+    return sysfs.kernelFileIO(position_file,val)
     
   def zero(self):
     '''
