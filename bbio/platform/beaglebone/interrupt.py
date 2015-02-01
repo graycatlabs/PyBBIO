@@ -9,7 +9,7 @@
 # Alan Christopher Thomas - https://github.com/alanctkc
 # Thanks!
 
-from config import GPIO_FILE_BASE, RISING, FALLING, BOTH
+from config import GPIO_FILE_BASE, RISING, FALLING, BOTH, GPIO
 import bbio, select, threading, os, time
 
 
