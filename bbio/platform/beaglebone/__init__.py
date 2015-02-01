@@ -1,6 +1,5 @@
 # initialization for beaglebone
 
-
 from gpio import pinMode, digitalWrite, digitalRead, toggle, pinState, \
                  shiftIn, shiftOut
 from interrupt import attachInterrupt, detachInterrupt
@@ -9,8 +8,6 @@ from pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
 from serial_port import Serial1, Serial2, Serial4, Serial5
 from i2c import Wire1, Wire2
 from spi import SPI0, SPI1
-
-from api import platform_init, platform_cleanup
 
 from config import USR0, USR1, USR2, USR3, GPIO0_2, GPIO0_3, GPIO0_4, GPIO0_5,\
                    GPIO0_7, GPIO0_8, GPIO0_9, GPIO0_10, GPIO0_11, GPIO0_12,\
@@ -36,6 +33,8 @@ from config import RES_16BIT, RES_8BIT, PERCENT
 from config import ECAP0, ECAP1
 
 from config import DEC, BIN, OCT, HEX
+
+from api import platform_init, platform_cleanup
 
 __all__ = [
   'pinMode', 'digitalWrite', 'digitalRead', 'toggle', 'pinState', 'shiftIn', 
