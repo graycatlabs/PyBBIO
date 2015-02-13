@@ -40,11 +40,6 @@ extensions = [
             ['bbio/platform/beaglebone/gpio.c',
              'bbio/platform/util/sysfs.c'],
             include_dirs=['bbio/platform/util']),
-            
-  #Extension('bbio.platform.beaglebone.bone_3_2.bone_mmap',
-  #          ['bbio/platform/beaglebone/bone_3_2/bone_mmap.c',
-  #           'bbio/platform/util/mmap_util.c'],
-  #          include_dirs=['bbio/platform/util'])
 ]
 
 data_files = [
@@ -58,16 +53,16 @@ data_files = [
 ]
 
 setup(name='PyBBIO',
-      version='0.9.2',
+      version='0.9.3',
       description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
       long_description=open('README.md').read(),
       author='Alexander Hiam',
-      author_email='hiamalexander@gmail.com',
+      author_email='alex@graycat.io',
       license='MIT License',
-      url='https://github.com/alexanderhiam/PyBBIO/wiki',
-      download_url='https://github.com/alexanderhiam/PyBBIO/tarball/v0.9.2',
+      url='https://github.com/graycatlabs/PyBBIO/wiki',
+      download_url='https://github.com/graycatlabs/PyBBIO/tarball/v0.9.3',
       keywords=['BeagleBone', 'BeagleBone Black', 'IO', 'GPIO', 'ADC', 'PWM', 
-                'I2C', 'SPI', 'bbio'],
+                'I2C', 'SPI', 'bbio', 'eQEP'],
       packages=find_packages(),
       data_files=data_files,
       ext_modules=extensions, 

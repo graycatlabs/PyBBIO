@@ -1,6 +1,18 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.3
+  * Moved all GPIO code to C extension
+  * Added LiquidCrystal character LCD library
+  * Improved sysfs interface for faster kernel driver file access 
+  * Removed 3.2 support, use 0.9.2 if you're still running 3.2 for some reason...
+  * Libraries are now contained within the bbio package. This changes importing a bit, user code will need updating
+  * Simplifies setup.py
+    * Examples are no longer copied
+    * DT overlays are distributed compiled and copied with setuptool as data_files
+  * BBIOServer now serves from ~/.BBIOServer instead of from inside the package
+  * Started adding stubs for universion-io support, not yet implemented
+
 #### version 0.9.2
   * Added WebCam library from rseetham
   * BBIOServer updates
