@@ -4,4 +4,4 @@ recursive-include bbio *.py
 recursive-include bbio/libraries *.md
 recursive-include bbio/libraries/BBIOServer/src *.*
 recursive-include examples *.*
-recursive-include tools *.py *.txt *.dts
+recursive-include tools *.py *.txt *.dts *.dtbo

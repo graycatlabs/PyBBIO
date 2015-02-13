@@ -47,10 +47,14 @@ extensions = [
   #          include_dirs=['bbio/platform/util'])
 ]
 
-# Install the BBIOServer src files to ~/.BBIOServer:
 data_files = [
+  # Install the BBIOServer src files to ~/.BBIOServer:
   ('%s/.BBIOServer/src' % os.getenv('HOME'), 
    glob.glob('bbio/libraries/BBIOServer/src/*.*')),
+
+  # Install the DT overlays:
+  ('/lib/firmware', 
+   glob.glob('tools/overlays/compiled/*.dtbo')),
 ]
 
 setup(name='PyBBIO',

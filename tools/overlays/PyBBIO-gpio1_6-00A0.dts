@@ -1,0 +1,76 @@
+/dts-v1/;
+/plugin/;
+
+/{
+  compatible = "ti,beaglebone", "ti,beaglebone-black";
+
+  part-number = "PyBBIO-gpio1_6";
+  version = "00A0";
+
+  /* state the resources this cape uses */
+  exclusive-use =
+    /* the pin header uses */
+
+    /* the hardware IP uses */
+    "gpio1_6";
+
+  fragment@0 {
+    target = <&am33xx_pinmux>;
+    __overlay__ {
+
+      pybbio_gpio1_6_rxactive_nopull: pinmux_pybbio_gpio1_6_rxactive_nopull {
+        pinctrl-single,pins = <
+          24 0x2f  /* gpmc_ad6 - rx active | no pull | MODE7 (gpio1_6) */
+        >;
+      };
+      pybbio_gpio1_6_rxactive_pullup: pinmux_pybbio_gpio1_6_rxactive_pullup {
+        pinctrl-single,pins = <
+          24 0x37  /* gpmc_ad6 - rx active | pull up | MODE7 (gpio1_6) */
+        >;
+      };
+      pybbio_gpio1_6_rxactive_pulldown: pinmux_pybbio_gpio1_6_rxactive_pulldown {
+        pinctrl-single,pins = <
+          24 0x27  /* gpmc_ad6 - rx active | pull down | MODE7 (gpio1_6) */
+        >;
+      };
+      
+      pybbio_gpio1_6_nopull: pinmux_pybbio_gpio1_6_nopull {
+        pinctrl-single,pins = <
+          24 0x0f  /* gpmc_ad6 - rx active | no pull | MODE7 (gpio1_6) */
+        >;
+      };
+      pybbio_gpio1_6_pullup: pinmux_pybbio_gpio1_6_pullup {
+        pinctrl-single,pins = <
+          24 0x17  /* gpmc_ad6 - rx active | pull up | MODE7 (gpio1_6) */
+        >;
+      };
+      pybbio_gpio1_6_pulldown: pinmux_pybbio_gpio1_6_pulldown {
+        pinctrl-single,pins = <
+          24 0x07  /* gpmc_ad6 - rx active | pull down | MODE7 (gpio1_6) */
+        >;
+      };
+      
+    };
+  };
+
+  fragment@1 {
+    target = <&ocp>; /* On-Chip Peripherals */
+    __overlay__ {
+      PyBBIO-gpio1_6 {
+        compatible = "bone-pinmux-helper"; /* Use the pinmux helper */
+        status="okay";
+        /* Define custom names for indexes in pinctrl array: */ 
+        pinctrl-names = "mode_0b00101111", "mode_0b00110111", "mode_0b00100111",
+                        "mode_0b00001111", "mode_0b00010111", "mode_0b00000111";
+        /* Set the elements of the pinctrl array to the pinmux overlays
+           defined above: */
+        pinctrl-0 = <&pybbio_gpio1_6_rxactive_nopull>; 
+        pinctrl-1 = <&pybbio_gpio1_6_rxactive_pullup>; 
+        pinctrl-2 = <&pybbio_gpio1_6_rxactive_pulldown>;
+        pinctrl-3 = <&pybbio_gpio1_6_nopull>; 
+        pinctrl-4 = <&pybbio_gpio1_6_pullup>; 
+        pinctrl-5 = <&pybbio_gpio1_6_pulldown>;
+      };
+    };
+  };
+};

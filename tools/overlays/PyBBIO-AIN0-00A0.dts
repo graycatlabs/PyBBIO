@@ -1,0 +1,29 @@
+/dts-v1/;
+/plugin/;
+
+/{
+  compatible = "ti,beaglebone", "ti,beaglebone-black";
+  /* identification */
+  part-number = "PyBBIO-AIN0";
+  version = "00A0";
+
+  /* state the resources this cape uses */
+  exclusive-use =
+  /* the pin header uses */
+  "P9.39";
+
+  fragment@0 {
+    target = <&ocp>;
+      __overlay__ {
+      /* avoid stupid warning */
+      #address-cells = <1>;
+      #size-cells = <1>;
+      adc_helper: PyBBIO-AIN0 {
+        compatible = "bone-iio-helper";
+        vsense-name = "AIN0";
+        vsense-scale = <100>;
+        status = "okay";
+      };
+    };
+  };
+};
