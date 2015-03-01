@@ -115,7 +115,7 @@ static PyObject *SPIDev_close(SPIDev *self, PyObject *args, PyObject *kwds) {
 
 PyDoc_STRVAR(SPIDev_read__doc__,
   "SPIDev.read(n_words, cs=0) -> list\n\n"
-  "Reads n_words words from the SPI interface and returns then as a list.\n"
+  "Reads n_words words from the SPI interface and returns them as a list.\n"
   "Uses the given chip select, or chip select 0 if none given.\n"
   "Will only read up to a maximum of 4096 byts.\n");
 static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
