@@ -9,15 +9,20 @@
 from bbio.platform.beaglebone.config import SLOTS_FILE
 from bbio.common import addToCleanup
 
-def load(overlay, auto_unload=True):
-  """ Attempt to load an overlay with the given name. If auto_unload=True it
-      will be auto-unloaded at program exit (the current cape manager crashes
-      when trying to unload certain overlay fragments). """
+def isLoaded(overlay):
+  """ Returns True if the given overlay is loaded, False if not. """
   with open(SLOTS_FILE, 'rb') as f:
     capes = f.read()
   if (',%s\n' % overlay) in capes:
     # already loaded
-    return
+    return True
+  return False
+
+def load(overlay, auto_unload=True):
+  """ Attempt to load an overlay with the given name. If auto_unload=True it
+      will be auto-unloaded at program exit (the current cape manager crashes
+      when trying to unload certain overlay fragments). """
+  if isLoaded(overlay): return
   with open(SLOTS_FILE, 'wb') as f:
     f.write(overlay)
   if auto_unload:
@@ -30,6 +35,6 @@ def unload(overlay):
     slots = f.readlines()
   for slot in slots:
     if overlay in slot:
-      load('-%i' % int(slot.split(':')[0]))
+      load('-%i' % int(slot.split(':')[0]), auto_unload=False)
       return True
   return False 
