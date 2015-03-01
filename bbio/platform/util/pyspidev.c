@@ -371,7 +371,7 @@ static PyObject *SPIDev_setLSBFirst(SPIDev *self, PyObject *args,
 
 PyDoc_STRVAR(SPIDev_setBitsPerWord__doc__,
   "SPIDev.setBitsPerWord(cs, bits_per_word) -> None\n\n"
-  "Sets the SPI bits per wordfor the given chip select to the given value.\n"
+  "Sets the SPI bits per word for the given chip select to the given value.\n"
   " (0<bits_per_word<256).\n"
   "Raises an exception if unable to set the bit order.\n");
 static PyObject *SPIDev_setBitsPerWord(SPIDev *self, PyObject *args, 
@@ -508,7 +508,7 @@ static PyObject *SPIDev_setClockMode(SPIDev *self, PyObject *args,
 
 PyDoc_STRVAR(SPIDev_setCSActiveLow__doc__,
   "SPIDev.setCSActiveLow(cs) -> None\n\n"
-  "Sets the SPI interface to use a low level when activiating the given chip\n"
+  "Sets the SPI interface to use a low level when activating the given chip\n"
   "select (default).\n"
   "Raises an exception if unable to set the CS mode.\n");
 static PyObject *SPIDev_setCSActiveLow(SPIDev *self, PyObject *args, 
@@ -534,7 +534,7 @@ static PyObject *SPIDev_setCSActiveLow(SPIDev *self, PyObject *args,
 
 PyDoc_STRVAR(SPIDev_setCSActiveHigh__doc__,
   "SPIDev.setCSActiveHigh(cs) -> None\n\n"
-  "Sets the SPI interface to use a high level when activiating the given chip\n"
+  "Sets the SPI interface to use a high level when activating the given chip\n"
   "select (inverted).\n"
   "Raises an exception if unable to set the CS mode.\n");
 static PyObject *SPIDev_setCSActiveHigh(SPIDev *self, PyObject *args, 
