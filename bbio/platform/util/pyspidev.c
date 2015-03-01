@@ -124,7 +124,7 @@ static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
   PyObject *data;
   void *rxbuf; static char *kwlist[] = {"n_words", "cs", NULL};
   cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "I|bb", kwlist, &n_words, &cs)) {
+  if(!PyArg_ParseTupleAndKeywords(args, kwds, "I|b", kwlist, &n_words, &cs)) {
     return NULL;
   }
 
@@ -187,7 +187,7 @@ static PyObject *SPIDev_write(SPIDev *self, PyObject *args, PyObject *kwds) {
   static char *kwlist[] = {"data", "cs", NULL};
 
   cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|bb", kwlist, &PyList_Type, 
+  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|b", kwlist, &PyList_Type, 
                                   &data, &cs)) {
     return NULL;
   }
@@ -264,7 +264,7 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
     return NULL;
   }
   cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|bb", kwlist, &PyList_Type,  
+  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|b", kwlist, &PyList_Type,  
                                   &txdata, &cs)) {
     return NULL;
   }
@@ -582,9 +582,27 @@ static int SPIDev_setBus(SPIDev *self, PyObject *value, void *closure) {
   return 0;
 }
 
+static PyObject *SPIDev_getSpidev(SPIDev *self, void *closure) {
+    int i;
+    PyObject *spidev_fd;
+    spidev_fd = PyList_New(SPIDev_MAX_CS_PER_BUS);
+    for (i=0; i<SPIDev_MAX_CS_PER_BUS; i++) {
+      PyList_SetItem(spidev_fd, i, Py_BuildValue("i", self->spidev_fd[i]));
+    }
+    Py_INCREF(spidev_fd);
+    return spidev_fd;
+}
+
+static int SPIDev_setSpidev(SPIDev *self, PyObject *value, void *closure) {
+  return 0;
+}
+
+
 static PyGetSetDef SPIDev_getseters[] = {
   {"bus", (getter)SPIDev_getBus, (setter)SPIDev_setBus, 
    "SPI bus number", NULL},
+  {"spidev_fd", (getter)SPIDev_getSpidev, (setter)SPIDev_setSpidev, 
+   "spidev file descriptor", NULL},
   {NULL}
 };
 
