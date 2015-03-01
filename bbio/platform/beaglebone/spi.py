@@ -8,6 +8,10 @@ class SPI_Bus(spidev.SPIDev):
     bbio.delay(250) # Give driver time to load
     assert cape_manager.isLoaded(overlay), "Could not load SPI overlay"
     super(SPI_Bus, self).open()
+    # Initialize to default parameters:
+    self.setBitsPerWord(8)
+    self.setMaxFrequency(8000000)
+    self.setClockMode(0)
 
   def begin(self):
     self.open()
