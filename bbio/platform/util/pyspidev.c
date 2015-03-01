@@ -106,44 +106,52 @@ PyDoc_STRVAR(SPIDev_close__doc__,
   "Close the SPI interface.\n");
 
 static PyObject *SPIDev_close(SPIDev *self, PyObject *args, PyObject *kwds) {
-  if (self->spidev_fd > 0) {
-    SPI_close(self->spidev_fd[0]);
+  int i;
+  for (i=0; i<SPIDev_MAX_CS_PER_BUS; i++) {
+    if (self->spidev_fd[i] > 0) {
+      SPI_close(self->spidev_fd[i]);
+      self->spidev_fd[i] = -1;
+    }
   }
   Py_INCREF(Py_None);
   return Py_None;
 }
 
+int SPIDev_activateCS(SPIDev *self, uint8_t cs) {
+  if (cs > SPIDev_MAX_CS_PER_BUS) {
+    PyErr_SetString(PyExc_IOError, "invalid chip select");
+    return -1;
+  }
+  if (self->spidev_fd[cs] < 0) {
+    if (cs == 0) {
+      PyErr_SetString(PyExc_IOError, 
+        "must call SPIDev.open() first to initialize the SPI interface");
+      return -1;
+    }
+    self->spidev_fd[cs] = SPI_open(self->bus, cs);
+    if (self->spidev_fd[cs] < 0) {
+      PyErr_SetString(PyExc_IOError, "could not access given SPI chip select");
+      return -1;
+    }
+  }
+  return 0;
+}
+
 PyDoc_STRVAR(SPIDev_read__doc__,
-  "SPIDev.read(n_words, cs=0) -> list\n\n"
+  "SPIDev.read(cs, n_words) -> list\n\n"
   "Reads n_words words from the SPI interface and returns them as a list.\n"
-  "Uses the given chip select, or chip select 0 if none given.\n"
+  "Uses the given chip select.\n"
   "Will only read up to a maximum of 4096 byts.\n");
 static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
   uint8_t cs;
   uint32_t n_bytes, n_words, i, word;
   PyObject *data;
   void *rxbuf; 
-  static char *kwlist[] = {"n_words", "cs", NULL};
-  cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "I|b", kwlist, &n_words, &cs)) {
+  if(!PyArg_ParseTuple(args, "bI", &cs, &n_words)) {
     return NULL;
   }
-  if (cs > SPIDev_MAX_CS_PER_BUS) {
-    PyErr_SetString(PyExc_IOError, "invalid chip select");
-    return NULL;
-  }
-  if (self->spidev_fd[cs] < 0) {
-    if (cs == 0) {
-      PyErr_SetString(PyExc_IOError, 
-        "must call SPIDev.open() first to initialize the SPI interface");
-      return NULL;
-    }
-    self->spidev_fd[cs] = SPI_open(self->bus, cs);
-    if (self->spidev_fd[cs] < 0) {
-      PyErr_SetString(PyExc_IOError, "could not access given SPI chip select");
-      return NULL;
-    }
-  }
+
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
 
   n_bytes = (uint32_t) (((float) (self->bits_per_word * n_words)) / 8.0 + 0.5);
   rxbuf = malloc(n_bytes);
@@ -174,9 +182,9 @@ static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
 }
 
 PyDoc_STRVAR(SPIDev_write__doc__,
-  "SPIDev.write([words], cs=0) -> int\n\n"
+  "SPIDev.write(cs, [words]) -> int\n\n"
   "Writes the given list of words to the SPI interface.\n"
-  "Uses the given chip select, or chip select 0 if none given.\n"
+  "Uses the given chip select.\n"
   "Will only write up to a maximum of 4096 byts.\n"
   "Returns the number of words written.\n");
 static PyObject *SPIDev_write(SPIDev *self, PyObject *args, PyObject *kwds) {
@@ -184,29 +192,12 @@ static PyObject *SPIDev_write(SPIDev *self, PyObject *args, PyObject *kwds) {
   uint32_t n_bytes, n_words, i, word;
   PyObject *data, *word_obj;
   void *txbuf;
-  static char *kwlist[] = {"data", "cs", NULL};
 
-  cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|b", kwlist, &PyList_Type, 
-                                  &data, &cs)) {
+  if(!PyArg_ParseTuple(args, "bO!", &cs, &PyList_Type, &data)) {
     return NULL;
   }
-  if (cs > SPIDev_MAX_CS_PER_BUS) {
-    PyErr_SetString(PyExc_IOError, "invalid chip select");
-    return NULL;
-  }
-  if (self->spidev_fd[cs] < 0) {
-    if (cs == 0) {
-      PyErr_SetString(PyExc_IOError, 
-        "must call SPIDev.open() first to initialize the SPI interface");
-      return NULL;
-    }
-    self->spidev_fd[cs] = SPI_open(self->bus, cs);
-    if (self->spidev_fd[cs] < 0) {
-      PyErr_SetString(PyExc_IOError, "could not access given SPI chip select");
-      return NULL;
-    }
-  }
+  
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
 
   n_words = PyList_Size(data);
   n_bytes = (uint32_t) (((float) (self->bits_per_word * n_words)) / 8.0 + 0.5);
@@ -245,10 +236,10 @@ static PyObject *SPIDev_write(SPIDev *self, PyObject *args, PyObject *kwds) {
 }
 
 PyDoc_STRVAR(SPIDev_transfer__doc__,
-  "SPIDev.transfer([words], cs=0) -> list\n\n"
+  "SPIDev.transfer(cs, [words]) -> list\n\n"
   "Writes the given list of words to the SPI interface while simultaneously\n"
   "reading bytes.\n"
-  "Uses the given chip select, or chip select 0 if none given.\n"
+  "Uses the given chip select.\n"
   "Will only write/read up to a maximum of 4096 byts.\n"
   "Returns the number of words written.\n");
 static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
@@ -256,7 +247,6 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
   uint32_t n_bytes, n_words, i, word;
   PyObject *txdata, *rxdata, *word_obj;
   void *txbuf, *rxbuf;
-  static char *kwlist[] = {"txdata", "cs", NULL};
 
   if (self->mode_3wire) {
     PyErr_SetString(PyExc_IOError, 
@@ -264,27 +254,11 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
     return NULL;
   }
   cs = 0;
-  if(!PyArg_ParseTupleAndKeywords(args, kwds, "O!|b", kwlist, &PyList_Type,  
-                                  &txdata, &cs)) {
+  if(!PyArg_ParseTuple(args, "bO!", &cs, &PyList_Type, &txdata)) {
     return NULL;
   }
   
-  if (cs > SPIDev_MAX_CS_PER_BUS) {
-    PyErr_SetString(PyExc_IOError, "invalid chip select");
-    return NULL;
-  }
-  if (self->spidev_fd[cs] < 0) {
-    if (cs == 0) {
-      PyErr_SetString(PyExc_IOError, 
-        "must call SPIDev.open() first to initialize the SPI interface");
-      return NULL;
-    }
-    self->spidev_fd[cs] = SPI_open(self->bus, cs);
-    if (self->spidev_fd[cs] < 0) {
-      PyErr_SetString(PyExc_IOError, "could not access given SPI chip select");
-      return NULL;
-    }
-  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
 
   n_words = PyList_Size(txdata);
   n_bytes = (uint32_t) (((float) (self->bits_per_word * n_words)) / 8.0 + 0.5);
@@ -344,17 +318,24 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
 }
 
 PyDoc_STRVAR(SPIDev_setMSBFirst__doc__,
-  "SPIDev.setMSBFirst() -> None\n\n"
-  "Sets the SPI bit order to most significant bit first.\n"
+  "SPIDev.setMSBFirst(cs) -> None\n\n"
+  "Sets the SPI bit order for the given chip select to be most significant\n"
+  "bit first.\n"
   "Raises an exception if unable to set the bit order.\n");
 static PyObject *SPIDev_setMSBFirst(SPIDev *self, PyObject *args, 
                                     PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_setBitOrder(self->spidev_fd[0], SPI_MSBFIRST) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setBitOrder(self->spidev_fd[cs], SPI_MSBFIRST) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI bit order");
     return NULL;
   }
@@ -363,17 +344,24 @@ static PyObject *SPIDev_setMSBFirst(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setLSBFirst__doc__,
-  "SPIDev.setLSBFirst() -> None\n\n"
-  "Sets the SPI bit order to least significant bit first.\n"
+  "SPIDev.setLSBFirst(cs) -> None\n\n"
+  "Sets the SPI bit order for the given chip select to be least significant\n"
+  "bit first.\n"
   "Raises an exception if unable to set the bit order.\n");
 static PyObject *SPIDev_setLSBFirst(SPIDev *self, PyObject *args, 
                                     PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_setBitOrder(self->spidev_fd[0], SPI_LSBFIRST) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setBitOrder(self->spidev_fd[cs], SPI_LSBFIRST) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI bit order");
     return NULL;
   }
@@ -382,25 +370,28 @@ static PyObject *SPIDev_setLSBFirst(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setBitsPerWord__doc__,
-  "SPIDev.setBitsPerWord(bits_per_word) -> None\n\n"
-  "Sets the SPI bits per word to the given value (0<bits_per_word<256).\n"
+  "SPIDev.setBitsPerWord(cs, bits_per_word) -> None\n\n"
+  "Sets the SPI bits per wordfor the given chip select to the given value.\n"
+  " (0<bits_per_word<256).\n"
   "Raises an exception if unable to set the bit order.\n");
 static PyObject *SPIDev_setBitsPerWord(SPIDev *self, PyObject *args, 
                                        PyObject *kwds) {
-  uint8_t bpw;
+  uint8_t bpw, cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if(!PyArg_ParseTuple(args, "b", &bpw)) {
+  if(!PyArg_ParseTuple(args, "bb", &cs, &bpw)) {
     return NULL;
   }
   if (bpw > 32) {
     PyErr_SetString(PyExc_IOError, "bits per word must be <= 32");
     return NULL;
   }
-  if (SPI_setBitsPerWord(self->spidev_fd[0], bpw) < 0) {
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+  
+  if (SPI_setBitsPerWord(self->spidev_fd[cs], bpw) < 0) {
     PyErr_SetString(PyExc_ValueError, "could not set SPI bits per word");
     return NULL;
   }
@@ -409,22 +400,25 @@ static PyObject *SPIDev_setBitsPerWord(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setMaxFrequency__doc__,
-  "SPIDev.setMaxFrequency(frequency) -> None\n\n"
-  "Sets the maximum SPI clock frequency to the given value.\n"
-  "The actual clock rate should be the set value or the next lowest supported value.\n"
+  "SPIDev.setMaxFrequency(cs, frequency) -> None\n\n"
+  "Sets the maximum SPI clock frequency for the given chip select to the\n"
+  "given value.\n"
   "Raises an exception if unable to set the frequency.\n");
 static PyObject *SPIDev_setMaxFrequency(SPIDev *self, PyObject *args, 
                                         PyObject *kwds) {
+  uint8_t cs;
   uint32_t frequency;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if(!PyArg_ParseTuple(args, "i", &frequency)) {
+  if(!PyArg_ParseTuple(args, "bi", &cs, &frequency)) {
     return NULL;
   }
-  if (SPI_setMaxFrequency(self->spidev_fd[0], frequency) < 0) {
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setMaxFrequency(self->spidev_fd[cs], frequency) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI frequency");
     return NULL;
   }
@@ -433,17 +427,23 @@ static PyObject *SPIDev_setMaxFrequency(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_enableLoopback__doc__,
-  "SPIDev.enableLoopback() -> None\n\n"
-  "Sets the SPI interface to loopback mode.\n"
+  "SPIDev.enableLoopback(cs) -> None\n\n"
+  "Sets the SPI interface to loopback mode for the given chip sleect.\n"
   "Raises an exception if unable to enable loopback mode.\n");
 static PyObject *SPIDev_enableLoopback(SPIDev *self, PyObject *args, 
                                         PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_enableLoopback(self->spidev_fd[0]) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_enableLoopback(self->spidev_fd[cs]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not enable SPI loopback");
     return NULL;
   }
@@ -452,17 +452,23 @@ static PyObject *SPIDev_enableLoopback(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_disableLoopback__doc__,
-  "SPIDev.disableLoopback() -> None\n\n"
-  "Sets the SPI interface to normal mode if in loopback mode.\n"
+  "SPIDev.disableLoopback(cs) -> None\n\n"
+  "Disables loopback mode for the given chip select of the SPI interface.\n"
   "Raises an exception if unable to disable loopback mode.\n");
 static PyObject *SPIDev_disableLoopback(SPIDev *self, PyObject *args, 
                                         PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_disableLoopback(self->spidev_fd[0]) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_disableLoopback(self->spidev_fd[cs]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not disable SPI loopback");
     return NULL;
   }
@@ -471,26 +477,28 @@ static PyObject *SPIDev_disableLoopback(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setClockMode__doc__,
-  "SPIDev.setClockMode(clock_mode) -> None\n\n"
-  "Sets the SPI interface clock mode.\n"
+  "SPIDev.setClockMode(cs, clock_mode) -> None\n\n"
+  "Sets the clock mode for the given chip select of the SPI interface.\n"
   "See http://en.wikipedia.org/wiki/Serial_Peripheral_Interface_Bus#Mode_numbers\n"
   "Raises an exception if unable to set the clock mode.\n");
 static PyObject *SPIDev_setClockMode(SPIDev *self, PyObject *args, 
                                      PyObject *kwds) {
-  uint8_t mode;
+  uint8_t mode, cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if(!PyArg_ParseTuple(args, "b", &mode)) {
+  if(!PyArg_ParseTuple(args, "bb", &cs, &mode)) {
     return NULL;
   }
   if (mode > 3) {
     PyErr_SetString(PyExc_IOError, "SPI clock mode must be in range 0-3");
     return NULL;
   }
-  if (SPI_setClockMode(self->spidev_fd[0], mode) < 0) {
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setClockMode(self->spidev_fd[cs], mode) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI clock mode");
     return NULL;
   }
@@ -499,17 +507,24 @@ static PyObject *SPIDev_setClockMode(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setCSActiveLow__doc__,
-  "SPIDev.setCSActiveLow() -> None\n\n"
-  "Sets the SPI interface to use a low level for chip select (default).\n"
+  "SPIDev.setCSActiveLow(cs) -> None\n\n"
+  "Sets the SPI interface to use a low level when activiating the given chip\n"
+  "select (default).\n"
   "Raises an exception if unable to set the CS mode.\n");
 static PyObject *SPIDev_setCSActiveLow(SPIDev *self, PyObject *args, 
                                        PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_setCSActiveLow(self->spidev_fd[0]) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setCSActiveLow(self->spidev_fd[cs]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI CS to active low");
     return NULL;
   }
@@ -518,17 +533,24 @@ static PyObject *SPIDev_setCSActiveLow(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_setCSActiveHigh__doc__,
-  "SPIDev.setCSActiveHigh() -> None\n\n"
-  "Sets the SPI interface to use a high level for chip select (inverted).\n"
+  "SPIDev.setCSActiveHigh(cs) -> None\n\n"
+  "Sets the SPI interface to use a high level when activiating the given chip\n"
+  "select (inverted).\n"
   "Raises an exception if unable to set the CS mode.\n");
 static PyObject *SPIDev_setCSActiveHigh(SPIDev *self, PyObject *args, 
                                         PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_setCSActiveHigh(self->spidev_fd[0]) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_setCSActiveHigh(self->spidev_fd[cs]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not set SPI CS to active high");
     return NULL;
   }
@@ -537,17 +559,23 @@ static PyObject *SPIDev_setCSActiveHigh(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_disableCS__doc__,
-  "SPIDev.disableCS() -> None\n\n"
-  "Disables CS signaling for the SPI interface.\n"
+  "SPIDev.disableCS(cs) -> None\n\n"
+  "Disables the given chip select for the SPI interface.\n"
   "Raises an exception if unable to set disable CS.\n");
 static PyObject *SPIDev_disableCS(SPIDev *self, PyObject *args, 
                                   PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
-  if (SPI_disableCS(self->spidev_fd[0]) < 0) {
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
+  if (SPI_disableCS(self->spidev_fd[cs]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not disable SPI CS");
     return NULL;
   }
@@ -556,16 +584,22 @@ static PyObject *SPIDev_disableCS(SPIDev *self, PyObject *args,
 }
 
 PyDoc_STRVAR(SPIDev_enableCS__doc__,
-  "SPIDev.enableCS() -> None\n\n"
-  "Enables CS signaling for the SPI interface (default state).\n"
+  "SPIDev.enableCS(cs) -> None\n\n"
+  "Enables the given chip select for the SPI interface (default state).\n"
   "Raises an exception if unable to set disable CS.\n");
 static PyObject *SPIDev_enableCS(SPIDev *self, PyObject *args, 
                                   PyObject *kwds) {
+  uint8_t cs;
   if (self->spidev_fd[0] < 0) {
     PyErr_SetString(PyExc_IOError, 
       "must call SPIDev.open() first to initialize the SPI interface");
     return NULL;
   }
+  if(!PyArg_ParseTuple(args, "b", &cs)) {
+    return NULL;
+  }
+  if (SPIDev_activateCS(self, cs) < 0) return NULL;
+
   if (SPI_enableCS(self->spidev_fd[0]) < 0) {
     PyErr_SetString(PyExc_IOError, "could not enable SPI CS");
     return NULL;
@@ -612,16 +646,16 @@ static PyMethodDef SPIDev_methods[] = {
   {"close", (PyCFunction)SPIDev_close, METH_NOARGS,
     SPIDev_close__doc__},
 
-  {"read", (PyCFunction)SPIDev_read, METH_VARARGS | METH_KEYWORDS,
+  {"read", (PyCFunction)SPIDev_read, METH_VARARGS,
     SPIDev_read__doc__},
-  {"write", (PyCFunction)SPIDev_write, METH_VARARGS | METH_KEYWORDS,
+  {"write", (PyCFunction)SPIDev_write, METH_VARARGS,
     SPIDev_write__doc__},
-  {"transfer", (PyCFunction)SPIDev_transfer, METH_VARARGS | METH_KEYWORDS,
+  {"transfer", (PyCFunction)SPIDev_transfer, METH_VARARGS,
     SPIDev_transfer__doc__},
 
-  {"setMSBFirst", (PyCFunction)SPIDev_setMSBFirst, METH_NOARGS,
+  {"setMSBFirst", (PyCFunction)SPIDev_setMSBFirst, METH_VARARGS,
     SPIDev_setMSBFirst__doc__},
-  {"setLSBFirst", (PyCFunction)SPIDev_setLSBFirst, METH_NOARGS,
+  {"setLSBFirst", (PyCFunction)SPIDev_setLSBFirst, METH_VARARGS,
     SPIDev_setLSBFirst__doc__},
 
   {"setBitsPerWord", (PyCFunction)SPIDev_setBitsPerWord, METH_VARARGS,
@@ -630,22 +664,22 @@ static PyMethodDef SPIDev_methods[] = {
   {"setMaxFrequency", (PyCFunction)SPIDev_setMaxFrequency, METH_VARARGS,
     SPIDev_setMaxFrequency__doc__},
 
-  {"enableLoopback", (PyCFunction)SPIDev_enableLoopback, METH_NOARGS,
+  {"enableLoopback", (PyCFunction)SPIDev_enableLoopback, METH_VARARGS,
     SPIDev_enableLoopback__doc__},
-  {"disableLoopback", (PyCFunction)SPIDev_disableLoopback, METH_NOARGS,
+  {"disableLoopback", (PyCFunction)SPIDev_disableLoopback, METH_VARARGS,
     SPIDev_disableLoopback__doc__},
 
   {"setClockMode", (PyCFunction)SPIDev_setClockMode, METH_VARARGS,
 
     SPIDev_setClockMode__doc__},
-  {"setCSActiveLow", (PyCFunction)SPIDev_setCSActiveLow, METH_NOARGS,
+  {"setCSActiveLow", (PyCFunction)SPIDev_setCSActiveLow, METH_VARARGS,
     SPIDev_setCSActiveLow__doc__},
-  {"setCSActiveHigh", (PyCFunction)SPIDev_setCSActiveHigh, METH_NOARGS,
+  {"setCSActiveHigh", (PyCFunction)SPIDev_setCSActiveHigh, METH_VARARGS,
     SPIDev_setCSActiveHigh__doc__},
 
-  {"disableCS", (PyCFunction)SPIDev_disableCS, METH_NOARGS,
+  {"disableCS", (PyCFunction)SPIDev_disableCS, METH_VARARGS,
     SPIDev_disableCS__doc__},
-  {"enableCS", (PyCFunction)SPIDev_enableCS, METH_NOARGS,
+  {"enableCS", (PyCFunction)SPIDev_enableCS, METH_VARARGS,
     SPIDev_enableCS__doc__},
 
   {NULL},

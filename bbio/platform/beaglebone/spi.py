@@ -9,10 +9,10 @@ class SPI_Bus(spidev.SPIDev):
     assert cape_manager.isLoaded(overlay), "Could not load SPI overlay"
     super(SPI_Bus, self).open()
     # Initialize to default parameters:
-    self.setCSActiveLow()
-    self.setBitsPerWord(8)
-    self.setMaxFrequency(8000000)
-    self.setClockMode(0)
+    self.setCSActiveLow(0)
+    self.setBitsPerWord(0, 8)
+    self.setMaxFrequency(0, 8000000)
+    self.setClockMode(0, 0)
 
   def begin(self):
     self.open()
