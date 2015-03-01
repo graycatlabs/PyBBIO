@@ -122,12 +122,12 @@ static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
   uint8_t cs;
   uint32_t n_bytes, n_words, i, word;
   PyObject *data;
-  void *rxbuf; static char *kwlist[] = {"n_words", "cs", NULL};
+  void *rxbuf; 
+  static char *kwlist[] = {"n_words", "cs", NULL};
   cs = 0;
   if(!PyArg_ParseTupleAndKeywords(args, kwds, "I|b", kwlist, &n_words, &cs)) {
     return NULL;
   }
-
   if (cs > SPIDev_MAX_CS_PER_BUS) {
     PyErr_SetString(PyExc_IOError, "invalid chip select");
     return NULL;
