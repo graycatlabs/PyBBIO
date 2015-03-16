@@ -145,7 +145,7 @@ PyDoc_STRVAR(SPIDev_read__doc__,
 static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
   uint8_t cs;
   uint32_t n_bytes, n_words, i, word;
-  PyObject *data;
+  PyObject *data, *word_obj;
   void *rxbuf; 
   if(!PyArg_ParseTuple(args, "bI", &cs, &n_words)) {
     return NULL;
@@ -174,7 +174,9 @@ static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
       word = 0;
       break;
     }
-    PyList_Append(data, PyInt_FromLong(word));
+    word_obj = PyInt_FromLong(word);
+    PyList_Append(data, word_obj);
+    Py_DECREF(word_obj);
   }
   free(rxbuf);
   Py_INCREF(data);
