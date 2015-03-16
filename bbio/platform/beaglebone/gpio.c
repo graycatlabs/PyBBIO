@@ -98,6 +98,7 @@ static PyObject *pinMode(PyObject *self, PyObject *args) {
   const char *gpio_pin;
   char error_msg[EXCEPTION_STRING_LEN];
   int direction, pull, preserve_mode_on_exit;
+  PyObject *gpio_pin_obj;
   pull = 0;
   preserve_mode_on_exit = 0;
   if(!PyArg_ParseTuple(args, "si|ii", &gpio_pin, &direction, &pull, 
@@ -105,12 +106,15 @@ static PyObject *pinMode(PyObject *self, PyObject *args) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(gpio_pin))) {
+  gpio_pin_obj = PyString_FromString(gpio_pin);
+  if (!PyDict_Contains(_gpio_dict, gpio_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", gpio_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(gpio_pin_obj);
     return NULL;
   }
   PyGPIO_pinMode(gpio_pin, direction, pull, preserve_mode_on_exit);
+  Py_DECREF(gpio_pin_obj);
   Py_INCREF(Py_None);
   return Py_None;
 }
@@ -140,17 +144,20 @@ static int PyGPIO_digitalRead(const char *gpio_pin) {
 static PyObject *digitalRead(PyObject *self, PyObject *args) {\
   const char *gpio_pin;
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *gpio_pin_obj;
   
   if(!PyArg_ParseTuple(args, "s", &gpio_pin)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(gpio_pin))) {
+  gpio_pin_obj = PyString_FromString(gpio_pin);
+  if (!PyDict_Contains(_gpio_dict, gpio_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", gpio_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(gpio_pin_obj);
     return NULL;
   }
-  
+  Py_DECREF(gpio_pin_obj);
   return Py_BuildValue("i", PyGPIO_digitalRead(gpio_pin));
 }
 
@@ -178,16 +185,20 @@ static PyObject *digitalWrite(PyObject *self, PyObject *args) {
   const char *gpio_pin;
   int state;
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *gpio_pin_obj;
   if(!PyArg_ParseTuple(args, "si", &gpio_pin, &state)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(gpio_pin))) {
+  gpio_pin_obj = PyString_FromString(gpio_pin);
+  if (!PyDict_Contains(_gpio_dict, gpio_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", gpio_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(gpio_pin_obj);
     return NULL;
   }
   PyGPIO_digitalWrite(gpio_pin, state);
+  Py_DECREF(gpio_pin_obj);
   Py_INCREF(Py_None);
   return Py_None;
 }
@@ -220,16 +231,20 @@ static void PyGPIO_toggle(const char *gpio_pin) {
 static PyObject *toggle(PyObject *self, PyObject *args) {
   const char *gpio_pin;
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *gpio_pin_obj;
   if(!PyArg_ParseTuple(args, "s", &gpio_pin)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(gpio_pin))) {
+  gpio_pin_obj = PyString_FromString(gpio_pin);
+  if (!PyDict_Contains(_gpio_dict, gpio_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", gpio_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(gpio_pin_obj);
     return NULL;
   }
   PyGPIO_toggle(gpio_pin);
+  Py_DECREF(gpio_pin_obj);
   Py_INCREF(Py_None);
   return Py_None;
 }
@@ -249,15 +264,19 @@ static int PyGPIO_pinState(const char *gpio_pin) {
 static PyObject *pinState(PyObject *self, PyObject *args) {
   const char *gpio_pin;
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *gpio_pin_obj;
   if(!PyArg_ParseTuple(args, "s", &gpio_pin)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(gpio_pin))) {
+  gpio_pin_obj = PyString_FromString(gpio_pin);
+  if (!PyDict_Contains(_gpio_dict, gpio_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", gpio_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(gpio_pin_obj);
     return NULL;
   }
+  Py_DECREF(gpio_pin_obj);
   return Py_BuildValue("i", PyGPIO_pinState(gpio_pin));
 }
 
@@ -299,6 +318,7 @@ static PyObject *shiftIn(PyObject *self, PyObject *args) {
   int bit_order, edge, n_bytes;
   char data[n_bytes];
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *data_pin_obj, *clk_pin_obj;
   n_bytes = 1;
   edge = FALLING;
   if(!PyArg_ParseTuple(args, "ssi|ii", &data_pin, &clk_pin, &bit_order, 
@@ -306,16 +326,22 @@ static PyObject *shiftIn(PyObject *self, PyObject *args) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(data_pin))) {
+  data_pin_obj = PyString_FromString(data_pin);
+  if (!PyDict_Contains(_gpio_dict, data_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", data_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(data_pin_obj);
     return NULL;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(clk_pin))) {
+  Py_DECREF(data_pin_obj);
+  clk_pin_obj = PyString_FromString(clk_pin);
+  if (!PyDict_Contains(_gpio_dict, clk_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", clk_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(clk_pin_obj);
     return NULL;
   }
+  Py_DECREF(clk_pin_obj);
   PyGPIO_shiftIn(data_pin, clk_pin, bit_order, data, n_bytes, edge);
 
   return Py_BuildValue("s#", data, n_bytes);
@@ -360,22 +386,29 @@ static PyObject *shiftOut(PyObject *self, PyObject *args) {
   int bit_order, edge;
   Py_ssize_t n_bytes;
   char error_msg[EXCEPTION_STRING_LEN];
+  PyObject *data_pin_obj, *clk_pin_obj;
   edge = FALLING;
   if(!PyArg_ParseTuple(args, "ssis#|i", &data_pin, &clk_pin, &bit_order, &data, 
                        &n_bytes, &edge)) {
     Py_INCREF(Py_None);
     return Py_None;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(data_pin))) {
+  data_pin_obj = PyString_FromString(data_pin);
+  if (!PyDict_Contains(_gpio_dict, data_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", data_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(data_pin_obj);
     return NULL;
   }
-  if (!PyDict_Contains(_gpio_dict, PyString_FromString(clk_pin))) {
+  Py_DECREF(data_pin_obj);
+  clk_pin_obj = PyString_FromString(clk_pin);
+  if (!PyDict_Contains(_gpio_dict, clk_pin_obj)) {
     snprintf(error_msg, EXCEPTION_STRING_LEN, "Invalid GPIO pin: %s", clk_pin);
     PyErr_SetString(PyExc_ValueError, error_msg);
+    Py_DECREF(clk_pin_obj);
     return NULL;
   }
+  Py_DECREF(clk_pin_obj);
   PyGPIO_shiftOut(data_pin, clk_pin, bit_order, data, (int) n_bytes, edge);  
   Py_INCREF(Py_None);
   return Py_None;
