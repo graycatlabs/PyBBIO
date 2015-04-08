@@ -11,7 +11,7 @@ print "Importing bbio"
 from bbio import *
 
 print "now we can import example"
-import example
+from bbio.libraries import example
 
 print "testing example library:"
 example.foo()
