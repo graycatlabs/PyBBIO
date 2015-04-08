@@ -1,6 +1,14 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.4
+  * Created a new C SPI driver and C extension for it to replace the old 
+    spimodule code. Should be a good performance improvement
+  * Fixed a couple memory leaks in C extensions 
+  * Fixed a missing type check in sysfs C extension. Was causing RotaryEncoder 
+    library to fail
+  * Fixed the tests/library_test.py example file
+
 #### version 0.9.3
   * Moved all GPIO code to C extension
   * Added LiquidCrystal character LCD library
