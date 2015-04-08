@@ -29,6 +29,10 @@
 #include <glob.h>
 #include <errno.h>
 
+ PyDoc_STRVAR(sysfs_module__doc__,
+  "This module provides the kernelFileIO routine for reading and writing\n"
+  "special kernel files.");
+
 char *getFirstGlobMatch(char *path) {
   char *expanded_path;
   size_t length;
@@ -98,8 +102,9 @@ static PyObject* kernelFileIO(PyObject *self, PyObject *args) {
 
   // Parse path and optional value:
   if(!(PyArg_ParseTuple(args, "s|s", &path, &value))) {
-    Py_INCREF(Py_None);
-    return Py_None;
+    PyErr_SetString(PyExc_TypeError, 
+      "sysfs.kernelFileIO can only take string values");
+    return NULL;
   }
   if (value) {
     // value is not a NULL pointer, meaning a value was passed in
@@ -123,8 +128,11 @@ unsuccsefull an integer error code will be returned (as defined in errno.h)."
 	{ NULL, NULL },
 };
 
+#ifndef PyMODINIT_FUNC  /* declarations for DLL import/export */
+#define PyMODINIT_FUNC void
+#endif
 PyMODINIT_FUNC initsysfs(void)
 {
-	Py_InitModule( "sysfs" , sysfsMethods );
+	Py_InitModule3( "sysfs", sysfsMethods, sysfs_module__doc__);
 }
 
