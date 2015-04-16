@@ -1,6 +1,6 @@
 # pwm.py 
 # Part of PyBBIO
-# github.com/alexanderhiam/PyBBIO
+# github.com/graycatlabs/PyBBIO
 # MIT License
 # 
 # Beaglebone PWM driver for kernel >= 3.8

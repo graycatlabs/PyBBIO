@@ -1,6 +1,6 @@
 # cape_manager.py 
 # Part of PyBBIO
-# github.com/alexanderhiam/PyBBIO
+# github.com/graycatlabs/PyBBIO
 # MIT License
 # 
 # Beaglebone Cape Manager driver

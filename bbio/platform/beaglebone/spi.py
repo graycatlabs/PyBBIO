@@ -1,3 +1,8 @@
+# spi.py 
+# Part of PyBBIO
+# github.com/graycatlabs/PyBBIO
+# MIT License
+
 import bbio, os, cape_manager
 from bbio.platform.util import spidev
 

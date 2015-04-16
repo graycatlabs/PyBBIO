@@ -1,4 +1,4 @@
-# util.py
+# common.py
 # Part of PyBBIO
 # github.com/alexanderhiam/PyBBIO
 # MIT License

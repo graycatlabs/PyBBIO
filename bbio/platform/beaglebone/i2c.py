@@ -98,7 +98,6 @@ class _I2C_BUS(object):
         except IOError as e:
             print 'Bus is active. fix it!'
 
-
     def write(self, addr, reg, val):
         '''
         Writes value 'val' to address 'addr'

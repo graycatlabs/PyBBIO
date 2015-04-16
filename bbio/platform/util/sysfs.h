@@ -3,8 +3,8 @@
  * Provides C and Python functions to read and write kernel driver sysfs 
  * interface files. 
  *
- * Part of PyBBIO - https://github.com/alexanderhiam/PyBBIO
- * Copyright (c) 2014 - Alexander Hiam <hiamalexander@gmail.com>
+ * Part of PyBBIO - https://github.com/graycatlabs/PyBBIO
+ * Copyright (c) 2014 - Alexander Hiam <alex@graycat.io>
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal

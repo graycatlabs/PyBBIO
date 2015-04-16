@@ -1,6 +1,6 @@
 # serial_port.py 
 # Part of PyBBIO
-# github.com/alexanderhiam/PyBBIO
+# github.com/graycatlabs/PyBBIO
 # MIT License
 # 
 # Beaglebone serial driver

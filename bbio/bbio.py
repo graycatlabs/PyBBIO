@@ -1,8 +1,8 @@
 """
  PyBBIO - bbio.py
- Copyright (c) 2012-2014 - Alexander Hiam <hiamalexander@gmail.com>
+ Copyright (c) 2012-2015 - Alexander Hiam <alex@graycat.io>
  Released under the MIT license
- https://github.com/alexanderhiam/PyBBIO
+ https://github.com/graycatlabs/PyBBIO
 """
 
 import sys, atexit
