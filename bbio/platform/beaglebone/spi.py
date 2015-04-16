@@ -6,7 +6,7 @@
 import cape_manager
 from bbio.platform.util import spidev
 
-class SPI_Bus(spidev.SPIDev):
+class SPIBus(spidev.SPIDev):
   def open(self):
     overlay = 'BB-SPIDEV%i' % (self.bus-1)
     cape_manager.load(overlay, auto_unload=False)
@@ -26,5 +26,5 @@ class SPI_Bus(spidev.SPIDev):
     self.close()
     
 # Initialize the global SPI  instances:
-SPI0 = SPI_Bus(1)
-SPI1 = SPI_Bus(2)
+SPI0 = SPIBus(1)
+SPI1 = SPIBus(2)
