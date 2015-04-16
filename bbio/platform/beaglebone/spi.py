@@ -3,7 +3,7 @@
 # github.com/graycatlabs/PyBBIO
 # MIT License
 
-import bbio, os, cape_manager
+import cape_manager
 from bbio.platform.util import spidev
 
 class SPI_Bus(spidev.SPIDev):
