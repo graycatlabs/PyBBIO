@@ -29,7 +29,7 @@
 
 PyDoc_STRVAR(SPIDev_module__doc__,
   "This module provides the SPIDev class for controlling SPI interfaces on\n"
-  "Linux platforms. The appropriated Linux kernel drivers for your platorm\n"
+  "Linux platforms. The appropriated Linux kernel drivers for your platform\n"
   "must already be loaded to provide a spidev interface to control, i.e.\n"
   "/dev/spidevB.C (where B is the bus and C is the chip select).\n"
   "To control /dev/spidev0.0 you would instantiate with SPIDev(0,0).");
