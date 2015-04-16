@@ -12,7 +12,7 @@ from bbio.libraries.MMA7660 import MMA7660
 
 INT_PIN = GPIO1_16
 
-accel = MMA7660(2)
+accel = MMA7660(Wire2)
 
 def accelCallback(back_front, portrait_landscape, tap, shake):
   '''

@@ -42,26 +42,22 @@ class MMA7660(object):
   INT_SHY = 1<<6
   INT_SHZ = 1<<7
   
-  def __init__(self,i2c_no):
+  def __init__(self, i2c_bus):
     '''
     MMA7660(i2c_no)
     Creates an instance of the class MMA7660
     i2c_no can be 1 or 2 based on the i2c bus used
     '''
-    assert 1 <= i2c_no <= 2, "i2c_no must be between 1 or 2"
-    self.i2c_no = i2c_no
-    if i2c_no == 1:
-      self.i2cdev = Wire1
-    if i2c_no == 2:
-      self.i2cdev = Wire2
+    self.i2cdev = i2c_bus
     self.int_pin = None 
     self.i2cdev.begin()
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_SR,self.SRATE_120 | self.SR_FLIT)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PD,self.PD_TAP_THRESH)
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
+    self.i2cdev.write(self.MMA7660_ADDR, 
+                      [self.REG_SR, self.SRATE_120 | self.SR_FLIT])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_PD, self.PD_TAP_THRESH])
     pdet = self.PDET_TH | self.PDET_TAP_X | self.PDET_TAP_Y | self.PDET_TAP_Z
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PDET,pdet)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)  
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_PDET, pdet])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_ACTIVE])  
     addToCleanup(self.close)
     
   def getX(self):
@@ -70,9 +66,9 @@ class MMA7660(object):
     Returns the value of X dimension. 
     Value of X can be from -31 to 32 
     '''
-    x = self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)
+    x = self.i2cdev.readTransaction(self.MMA7660_ADDR, self.REG_X, 1)[0]
     while(x>>6==1):
-      x = self.i2cdev.read(self.MMA7660_ADDR,self.REG_X)
+      x = self.i2cdev.readTransaction(self.MMA7660_ADDR,self.REG_X, 1)[0]
     x = ((x<<2)-128)/4
     return x
     
@@ -82,9 +78,9 @@ class MMA7660(object):
     Returns the value of Y dimension. 
     Value of Y can be from -31 to 32 
     '''
-    y = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Y)
+    y = self.i2cdev.readTransaction(self.MMA7660_ADDR, self.REG_Y, 1)[0]
     while(y>>6==1):
-      y = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Y)
+      y = self.i2cdev.readTransaction(self.MMA7660_ADDR, self.REG_Y, 1)[0]
     y = ((y<<2)-128)/4
     return y
 
@@ -94,9 +90,9 @@ class MMA7660(object):
     Returns the value of Z dimension. 
     Value of Z can be from -31 to 32 
     '''
-    z = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Z)
+    z = self.i2cdev.readTransaction(self.MMA7660_ADDR, self.REG_Z, 1)[0]
     while(z>>6==1):
-      z = self.i2cdev.read(self.MMA7660_ADDR,self.REG_Z)
+      z = self.i2cdev.readTransaction(self.MMA7660_ADDR, self.REG_Z, 1)[0]
     z = ((z<<2)-128)/4
     return z
     
@@ -139,9 +135,9 @@ class MMA7660(object):
                        shake = 0 - Shake Not Detected
                        shake = 1 - Shake Detected
     '''
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_INTSU,cfg)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE) 
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_INTSU, cfg])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_ACTIVE]) 
     self.usr_callback = callback
     self.int_pin = pin
     pinMode(self.int_pin, INPUT, PULLUP)
@@ -154,9 +150,9 @@ class MMA7660(object):
     Tap detection threshold = +/-value counts
     '''
     assert 0 <= value <= 31, "tap detection threshold must be between 0 and 31"
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PDET,value)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_PDET, value])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_ACTIVE])
   
   def settiltfilter(self, value):
     '''
@@ -167,9 +163,9 @@ class MMA7660(object):
     the device updates portrait/ landscape data.
     '''
     assert 0 <= value <= 8, "Tilt debounce filtering must be between 0 and 8"
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_SR,value)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)		
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_SR,value])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_ACTIVE])		
   
   def setTapDebounce(self, value):
     '''
@@ -180,9 +176,9 @@ class MMA7660(object):
     '''
     assert 0 <= value <= 256, "tap detection debounce filter must be between \
                               0 and 256"
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_PD,value)
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_ACTIVE)
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_PD, value])
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_ACTIVE])
   
   def getOrientation(self):
     '''
@@ -198,9 +194,9 @@ class MMA7660(object):
                                    inverted orientation
     portrait_landscape = 6 - Up: Equipment standing vertically in normal orientation
     '''
-    status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    status = self.i2cdev.readTransaction(self.MMA7660_ADDR, [self.REG_TILT], 1)[0]
     while((status&0x40)>>6==1):
-      status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+      status = self.i2cdev.readTransaction(self.MMA7660_ADDR, [self.REG_TILT], 1)[0]
     back_front = (status&0x03)
     portrait_landscape = (status&0x1C)>>2
     return [back_front, portrait_landscape]
@@ -210,9 +206,9 @@ class MMA7660(object):
     _int_callback()
     Internal function to read status of interrupt
     '''
-    status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+    status = self.i2cdev.readTransaction(self.MMA7660_ADDR, [self.REG_TILT], 1)[0]
     while((status&0x40)>>6==1):
-      status = self.i2cdev.read(self.MMA7660_ADDR,self.REG_TILT)
+      status = self.i2cdev.readTransaction(self.MMA7660_ADDR, [self.REG_TILT], 1)[0]
     back_front = (status&0x03)
     portrait_landscape = (status&0x1C)>>2
     tap = (status&0x20)>>5
@@ -233,5 +229,5 @@ class MMA7660(object):
     sets the device in standby mode and closes the connection to the device.
     '''
     self.removeInterrupt()
-    self.i2cdev.write(self.MMA7660_ADDR,self.REG_MODE,self.MODE_STAND_BY)
+    self.i2cdev.write(self.MMA7660_ADDR, [self.REG_MODE, self.MODE_STAND_BY])
     self.i2cdev.end()
