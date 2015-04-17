@@ -145,20 +145,20 @@ class LiquidCrystal(object):
     assert glyph_num >= 0 and glyph_num < 8, "only 0-7 are valid glyphs"
     self.writeData(glyph_num)
   
-  def scrollDisplay(self, ammount):
-    """ Scrolls the whole display the given ammount. Positive numbers scroll 
+  def scrollDisplay(self, amount):
+    """ Scrolls the whole display the given amount. Positive numbers scroll 
         the display to the right, negative to the left. """
-    if ammount > 0: dir = self.SHIFT_RIGHT
+    if amount > 0: dir = self.SHIFT_RIGHT
     else: dir = 0
-    for i in range(abs(ammount)):
+    for i in range(abs(amount)):
       self.writeCommand(self.COMMAND_SHIFT | self.SHIFT_DISPLAY | dir)
       
-  def  scrollCursor(self, ammount):
-    """ Moves the cursor the given ammount. Positive numbers move it right,
+  def  scrollCursor(self, amount):
+    """ Moves the cursor the given amount. Positive numbers move it right,
         negative left. """
-    if ammount > 0: dir = self.SHIFT_RIGHT
+    if amount > 0: dir = self.SHIFT_RIGHT
     else: dir = 0
-    for i in range(abs(ammount)):
+    for i in range(abs(amount)):
       self.writeCommand(self.COMMAND_SHIFT | dir)
 
   def setDisplay(self, state):
