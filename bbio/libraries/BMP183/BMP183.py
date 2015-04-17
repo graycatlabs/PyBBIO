@@ -121,7 +121,7 @@ class BMP183(object):
     
   def getPressurePSI(self):
     """ Returns the current pressure in PSI. """
-    return self.readPressure() * 0.000145037738
+    return self.getPressure() * 0.000145037738
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
