@@ -14,6 +14,8 @@ for added functionality.
 
 Documentation can be found at http://github.com/graycatlabs/PyBBIO/wiki
 
+Follow me on Twitter [@alexanderhiam](https://twitter.com/alexanderhiam) for PyBBIO development updates
+
 License
 =======
 
