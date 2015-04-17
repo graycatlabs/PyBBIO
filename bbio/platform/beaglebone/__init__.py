@@ -6,7 +6,7 @@ from interrupt import attachInterrupt, detachInterrupt
 from adc import analogRead, inVolts
 from pwm import analogWrite, pwmFrequency, pwmEnable, pwmDisable
 from serial_port import Serial1, Serial2, Serial4, Serial5
-from i2c import Wire1, Wire2
+from i2c import I2C1, I2C2, Wire1, Wire2
 from spi import SPI0, SPI1
 
 from config import USR0, USR1, USR2, USR3, GPIO0_2, GPIO0_3, GPIO0_4, GPIO0_5,\
@@ -42,7 +42,7 @@ __all__ = [
   'analogRead', 'inVolts', 'analogWrite', 
   'pwmFrequency', 'pwmEnable', 'pwmDisable', 
   'Serial1', 'Serial2', 'Serial4', 'Serial5', 
-  'Wire1', 'Wire2', 
+  'I2C1', 'I2C2', 'Wire1', 'Wire2', 
   'SPI0', 'SPI1', 
   'platform_init', 'platform_cleanup',
   'USR0', 'USR1', 'USR2', 'USR3', 'GPIO0_2', 'GPIO0_3', 'GPIO0_4', 'GPIO0_5', 

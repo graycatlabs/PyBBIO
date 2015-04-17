@@ -51,5 +51,5 @@ def i2c_cleanup():
   Wire1.close()
   Wire2.close()
 
-Wire1 = I2CBus(1)
-Wire2 = I2CBus(2) 
+Wire1 = I2C1 = I2CBus(1)
+Wire2 = I2C2 = I2CBus(2) 
