@@ -190,7 +190,7 @@ class LiquidCrystal(object):
     self._entry_mode |= self.ENTRYMODE_SHIFTRIGHT
     self.writeCommand(self.COMMAND_ENTRYMODE | self._entry_mode)
    
-  def leftToRight(self):
+  def rightToLeft(self):
     """ Set string writing from right to left. """
     self._entry_mode &= ~self.ENTRYMODE_SHIFTRIGHT
     self.writeCommand(self.COMMAND_ENTRYMODE | self._entry_mode)
