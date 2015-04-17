@@ -119,9 +119,9 @@ class BMP183(object):
     p += (x1 + x2 + 3791) / 16
     return p
     
-  def getPressurePSI(self):
+  def getPressurePSI(self, oversampling=OVERSAMPLE_0):
     """ Returns the current pressure in PSI. """
-    return self.getPressure() * 0.000145037738
+    return self.getPressure(oversampling) * 0.000145037738
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
