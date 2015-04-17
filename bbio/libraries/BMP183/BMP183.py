@@ -80,7 +80,7 @@ class BMP183(object):
     return temp
         
   def getTempF(self):
-    """ Returns current temperature in Ferinheight. """
+    """ Returns current temperature in Fahrenheit. """
     tempC = self.readTemp()
     return tempC * 9./5 + 32
         
