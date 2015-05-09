@@ -179,7 +179,6 @@ static PyObject *SPIDev_read(SPIDev *self, PyObject *args, PyObject *kwds) {
     Py_DECREF(word_obj);
   }
   free(rxbuf);
-  Py_INCREF(data);
   return data;
 }
 
@@ -315,7 +314,6 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
   }
   free(txbuf);
   free(rxbuf);
-  Py_INCREF(rxdata);
   return rxdata;
 }
 
@@ -625,7 +623,6 @@ static PyObject *SPIDev_getSpidev(SPIDev *self, void *closure) {
     for (i=0; i<SPIDev_MAX_CS_PER_BUS; i++) {
       PyList_SetItem(spidev_fd, i, Py_BuildValue("i", self->spidev_fd[i]));
     }
-    Py_INCREF(spidev_fd);
     return spidev_fd;
 }
 

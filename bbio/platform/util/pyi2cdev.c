@@ -148,7 +148,6 @@ static PyObject *I2CDev_read(I2CDev *self, PyObject *args, PyObject *kwds) {
     Py_DECREF(byte_obj);
   }
   free(rxbuf);
-  Py_INCREF(data);
   return data;
 }
 
@@ -194,7 +193,6 @@ static PyObject *I2CDev_readTransaction(I2CDev *self, PyObject *args,
     Py_DECREF(byte_obj);
   }
   free(rxbuf);
-  Py_INCREF(data);
   return data;
 }
 
