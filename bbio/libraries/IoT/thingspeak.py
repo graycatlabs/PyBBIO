@@ -1,5 +1,14 @@
 """
+thingspeak.py
+Copyright (c) 2015 - Gray Cat Labs 
+Alexander Hiam <alex@graycat.io>
 
+This module provides the ThingSpeakChannel class for sending data
+to a ThingSpeak.com channel. It also provides the ThingTweet class
+for using ThingSpeak's ThingTweet service.
+
+This module is released as part of PyBBIO under its MIT license.
+See PyBBIO/LICENSE.txt
 """
 
 import requests, datetime
