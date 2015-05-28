@@ -23,7 +23,7 @@ For additional information read the wiki page.
 https://github.com/alexanderhiam/PyBBIO/wiki/PhantStream
 '''
 from bbio import *
-from bbio.libraries.PhantStream import *
+from bbio.libraries.IoT.phant import PhantStream
 
 
 pot = AIN0
