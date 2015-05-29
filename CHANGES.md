@@ -1,6 +1,16 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.5
+ * New libraries
+   * BMP183 SPI pressure sensor
+   * HTU21D I2C RH sensor
+   * IoT
+     * Phant
+     * ThingSpeak
+ * Added I2C1/I2C2 alternative names for Wire1/Wire2
+ * Fixed a memory leak in the SPI and I2C C extensions
+
 #### version 0.9.4
   * Created a new C SPI driver and C extension for it to replace the old 
     spimodule code. Should be a good performance improvement
