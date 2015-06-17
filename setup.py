@@ -13,18 +13,21 @@ if not os.path.exists(python_lib_path + 'py_compile.py'):
       import urllib.request as urllib2
   except ImportError:
       import urllib2
-  url = "http://hg.python.org/cpython/raw-file/4ebe1ede981e/Lib/py_compile.py"
-  py_compile = urllib2.urlopen(url)
-  with open(python_lib_path+'py_compile.py', 'wb') as f:
-    f.write(py_compile.read())
-  print("testing py_compile...")
   try:
     import py_compile
-    print("py_compile installed successfully")
-  except Exception as e:
-    print("*py_compile install failed, could not import")
-    print("*Exception raised:")
-    raise e
+  except ImportError:
+    url = "http://hg.python.org/cpython/raw-file/4ebe1ede981e/Lib/py_compile.py"
+    py_compile = urllib2.urlopen(url)
+    with open(python_lib_path+'py_compile.py', 'wb') as f:
+      f.write(py_compile.read())
+    print("testing py_compile...")
+    try:
+      import py_compile
+      print("py_compile installed successfully")
+    except Exception as e:
+      print("*py_compile install failed, could not import")
+      print("*Exception raised:")
+      raise e
 
 print("Installing PyBBIO...")
 
