@@ -3,15 +3,23 @@
 # github.com/graycatlabs/PyBBIO
 # MIT License
 
-import cape_manager, bbio
+import cape_manager, bbio, os, glob
 from bbio.platform.util import spidev
+from config import SPI_BASE_ADDRESSES
 
 class SPIBus(spidev.SPIDev):
   def open(self):
-    overlay = 'BB-SPIDEV%i' % (self.bus-1)
+    overlay = "BB-SPIDEV%i" % (self.bus)
     cape_manager.load(overlay, auto_unload=False)
     bbio.common.delay(250) # Give driver time to load
     assert cape_manager.isLoaded(overlay), "Could not load SPI overlay"
+
+    for i in glob.glob("/sys/bus/spi/devices/*.0"):
+      path = os.path.realpath(i)
+      module_addr = int(path.split("/")[4].split(".")[0], 16)
+      if module_addr == SPI_BASE_ADDRESSES[self.bus]:
+        self.bus = int(path.split("/")[6][-1])
+        break
     super(SPIBus, self).open()
     # Initialize to default parameters:
     self.setCSActiveLow(0)
@@ -26,5 +34,5 @@ class SPIBus(spidev.SPIDev):
     self.close()
     
 # Initialize the global SPI  instances:
-SPI0 = SPIBus(1)
-SPI1 = SPIBus(2)
+SPI0 = SPIBus(0)
+SPI1 = SPIBus(1)

@@ -711,3 +711,15 @@ PWM_DEFAULT_PERIOD = int(1e9/PWM_DEFAULT_FREQ)
 ##--- End PWM config: ------##
 ##############################
 
+
+##############################
+##--- Start SPI config: ----##
+
+SPI_BASE_ADDRESSES = [
+  0x48030000,
+  0x481a0000
+  ]
+
+##--- End SPI config: ------##
+##############################
+
