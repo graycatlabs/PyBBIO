@@ -609,21 +609,38 @@ static PyObject *SPIDev_enableCS(SPIDev *self, PyObject *args,
 }
 
 static PyObject *SPIDev_getBus(SPIDev *self, void *closure) {
-    return Py_BuildValue("i", self->bus);
+  return Py_BuildValue("i", self->bus);
 }
 
 static int SPIDev_setBus(SPIDev *self, PyObject *value, void *closure) {
+  long int bus;
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete bus attribute");
+    return -1;
+  }
+  if (!PyInt_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, "bus attribute must be integer");
+    return -1;
+  }
+
+  bus = PyInt_AsLong(value);
+  if (bus < 0 || bus > 255) {
+    PyErr_SetString(PyExc_TypeError, "bus number must be in range [0,255]");
+    return -1;
+  }
+
+  self->bus = (uint8_t) bus;
   return 0;
 }
 
 static PyObject *SPIDev_getSpidev(SPIDev *self, void *closure) {
-    int i;
-    PyObject *spidev_fd;
-    spidev_fd = PyList_New(SPIDev_MAX_CS_PER_BUS);
-    for (i=0; i<SPIDev_MAX_CS_PER_BUS; i++) {
-      PyList_SetItem(spidev_fd, i, Py_BuildValue("i", self->spidev_fd[i]));
-    }
-    return spidev_fd;
+  int i;
+  PyObject *spidev_fd;
+  spidev_fd = PyList_New(SPIDev_MAX_CS_PER_BUS);
+  for (i=0; i<SPIDev_MAX_CS_PER_BUS; i++) {
+    PyList_SetItem(spidev_fd, i, Py_BuildValue("i", self->spidev_fd[i]));
+  }
+  return spidev_fd;
 }
 
 static int SPIDev_setSpidev(SPIDev *self, PyObject *value, void *closure) {
