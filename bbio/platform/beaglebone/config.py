@@ -716,10 +716,22 @@ PWM_DEFAULT_PERIOD = int(1e9/PWM_DEFAULT_FREQ)
 ##--- Start SPI config: ----##
 
 SPI_BASE_ADDRESSES = [
-  0x48030000,
-  0x481a0000
+  0x48030000, # SPI0
+  0x481a0000  # SPI1
   ]
 
 ##--- End SPI config: ------##
 ##############################
 
+
+##############################
+##--- Start I2C config: ----##
+
+I2C_BASE_ADDRESSES = [
+  0x44e0b000, # I2C0 (shouldn't ever be used)
+  0x4802a000, # I2C1
+  0x4819c000  # I2C2
+  ]
+
+##--- End I2C config: ------##
+##############################

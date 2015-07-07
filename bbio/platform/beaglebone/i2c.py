@@ -5,19 +5,13 @@
 # 
 # Beaglebone i2c driver
 
-import bbio, cape_manager, os
+import bbio, cape_manager, os, glob
 from bbio.platform.util import i2cdev
+from config import I2C_BASE_ADDRESSES
 
 class I2CBus(i2cdev.I2CDev):
   def __init__(self, bus):
     assert 1<= bus <= 2, 'Only I2C buses 1 and 2 are available'
-
-    # Corresponds to I2C1 or I2C2 hardware peripheral:
-    self.hw_bus = bus
-
-    # The kernel driver uses /dev/i2c-2 for the I2C1 peripheral and 
-    # /dev/i2c-1 for the I2C2, so turn 1 to 2 and 2 to 1 (the fun way):
-    bus = ((bus-1)^1)+1
 
     # Run i2cdev.I2CDev initializtion:
     super(I2CBus, self).__init__(bus)
@@ -35,6 +29,14 @@ class I2CBus(i2cdev.I2CDev):
       # Make sure it initialized correctly:
       assert os.path.exists('/dev/i2c-%i' % self.bus_num), \
         'could not enable I2C bus %i' % self.hw_bus
+
+    # Detect bus number:
+    for i in glob.glob("/sys/bus/i2c/devices/i2c-*"):
+      path = os.path.realpath(i)
+      module_addr = int(path.split("/")[4].split(".")[0], 16)
+      if module_addr == I2C_BASE_ADDRESSES[self.bus_num]:
+        self.bus_num = int(path.split("/")[5][-1])
+        break
 
     super(I2CBus, self).open(use_10bit_address=use_10bit_address)
 
