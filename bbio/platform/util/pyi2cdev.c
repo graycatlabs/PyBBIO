@@ -269,6 +269,23 @@ static PyObject *I2CDev_get_bus_num(I2CDev *self, void *closure) {
 }
 
 static int I2CDev_set_bus_num(I2CDev *self, PyObject *value, void *closure) {
+  long int bus_num;
+  if (value == NULL) {
+    PyErr_SetString(PyExc_TypeError, "Cannot delete bus_num attribute");
+    return -1;
+  }
+  if (!PyInt_Check(value)) {
+    PyErr_SetString(PyExc_TypeError, "bus_num must be an integer");
+    return -1;
+  }
+
+  bus_num = PyInt_AsLong(value);
+  if (bus_num < 0 || bus_num > 255) {
+    PyErr_SetString(PyExc_TypeError, "bus_num must be in range [0,255]");
+    return -1;
+  }
+
+  self->bus_num = (uint8_t) bus_num;
   return 0;
 }
 
