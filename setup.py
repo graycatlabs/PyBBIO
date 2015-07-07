@@ -56,6 +56,10 @@ data_files = [
   # Install the DT overlays:
   ('/lib/firmware', 
    glob.glob('tools/overlays/compiled/*.dtbo')),
+
+  # Install the examples:
+  ('/usr/local/lib/PyBBIO/examples', 
+   glob.glob('examples/*')),  
 ]
 
 setup(name='PyBBIO',
