@@ -1,6 +1,10 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.5.1
+ * Install examples to /usr/local/lib/PyBBIO/examples/
+ * Implemented proper bus number detection for SPI and I2C
+
 #### version 0.9.5
  * New libraries
    * BMP183 SPI pressure sensor

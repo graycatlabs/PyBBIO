@@ -63,14 +63,14 @@ data_files = [
 ]
 
 setup(name='PyBBIO',
-      version='0.9.5',
+      version='0.9.5.1',
       description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
       long_description=open('README.md').read(),
       author='Alexander Hiam',
       author_email='alex@graycat.io',
       license='MIT License',
       url='https://github.com/graycatlabs/PyBBIO/wiki',
-      download_url='https://github.com/graycatlabs/PyBBIO/tarball/v0.9.5',
+      download_url='https://github.com/graycatlabs/PyBBIO/tarball/v0.9.5.1',
       keywords=['BeagleBone', 'BeagleBone Black', 'IO', 'GPIO', 'ADC', 'PWM', 
                 'I2C', 'SPI', 'bbio', 'eQEP'],
       packages=find_packages(),
