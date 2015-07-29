@@ -41,9 +41,9 @@ def loop():
 	# Test print for conveinence 
 	
 	print "\n===============================================================================\n"
-	print "\n AccelX: %02f Gs \t | AccelY: %02f Gs\t | AccelZ: %02f Gs" % (accelX, accelY, accelZ )
-	print "\n GyroX: %02f dps \t | GyroY: %02f dps\t | GyroZ: %02f dps" % (gyroX, gyroY, gyroZ )
-	print "\n MagX: %02f uT \t | MagY: %02f uT\t | MagZ: %02f uT" % (magX, magY, magZ )
+	print "\n AccelX: %.3f Gs \t | AccelY: %.3f Gs\t | AccelZ: %.3f Gs" % (accelX, accelY, accelZ )
+	print "\n GyroX: %.3f dps \t | GyroY: %.3f dps\t | GyroZ: %.3f dps" % (gyroX, gyroY, gyroZ )
+	print "\n MagX: %.3f uT \t | MagY: %.3f uT\t | MagZ: %.3f uT" % (magX, magY, magZ )
 
 	delay(200)
 
