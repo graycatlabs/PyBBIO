@@ -45,6 +45,10 @@ def loop():
 	print "\n GyroX: %.3f dps \t | GyroY: %.3f dps\t | GyroZ: %.3f dps" % (gyroX, gyroY, gyroZ )
 	print "\n MagX: %.3f uT \t | MagY: %.3f uT\t | MagZ: %.3f uT" % (magX, magY, magZ )
 
+	degC = mpu.getTemp()
+	
+	print "\n On-die temperature is: %d C" % degC 
+	
 	delay(200)
 
 run(setup, loop)

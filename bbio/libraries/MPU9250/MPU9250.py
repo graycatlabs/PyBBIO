@@ -24,6 +24,8 @@ class MPU9250(object):
   AK8963_CNTL1 = 0x0A  
   AK8963_CNTL2 = 0x0B  
 
+  REG_TEMP_OUT_H    = 0x41
+  REG_TEMP_OUT_L    = 0x42
 
   CMD_TEMPERATURE      = 0x2e
   CMD_PRESSURE         = 0x34
@@ -81,18 +83,18 @@ class MPU9250(object):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(59, 6)
 
-    valX = fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_ACCEL
-    valY = fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_ACCEL
-    valZ = fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_ACCEL
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_ACCEL
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_ACCEL
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_ACCEL
     return [valX, valY, valZ]
   
   def getGyro( self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(67, 6)
 
-    valX = fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_GYRO
-    valY = fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_GYRO
-    valZ = fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_GYRO
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_GYRO
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_GYRO
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_GYRO
     return [valX, valY, valZ]
  
   def getMag( self):
@@ -103,27 +105,22 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x87) # read 7
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2 = self.readRegister(73,7)
          
-    valX = fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_MAG
-    valY = fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_MAG
-    valZ = fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_MAG
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_MAG
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_MAG
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_MAG
     return [valX, valY, valZ]
   
 
-  def getTemp(self, return_b5_coefficient=False):
-    """ Returns current temperature in Celsius. """
-    self.writeRegister(self.REG_CTRL_MEAS, self.CMD_TEMPERATURE) 
-    bbio.delay(self.TEMP_CONVERSION_TIME)
-    msb, lsb = self.readRegister(self.REG_OUT_MSB, 2)
-    val = (msb << 8) | lsb
+  def getTemp(self):
+    """ Returns current temperature of sensor die in Celsius. """
+    msb, lsb = self.readRegister(self.REG_TEMP_OUT_H, 2)
+    val = self.fromSigned16([msb, lsb])
 
-    # Conversions are straight out of the datasheet
-    x1 = (val - self.cal_AC6) * self.cal_AC5 / 32768
-    x2 = self.cal_MC * 2048 / (x1 + self.cal_MD)
-    b5 = x1 + x2
-    temp_counts = (b5 + 8) / 16
-    temp = temp_counts * 0.1 # 0.1 degree C resolution
-    if return_b5_coefficient:
-      return (temp, b5)
+    # Conversions are straight out of the datahsheet
+    # TEMP_degC   = ((TEMP_OUT - RoomTemp_Offset) / Temp_Sensitivity) + 21 
+    # They fail to mention what RT_Offset or Temp_Sensitivity should equal to
+    temp = (( val - 21) / 333.87) + 21;
+    
     return temp
         
   def getTempF(self):
@@ -147,13 +144,13 @@ class MPU9250(object):
     self.spi.write(self.cs, [addr & 0x7f, value & 0xff])
 
 
-def fromUnsigned16(bytes):
-  """ Convert register values as unsigned short int """
-  return bytes[0]<<8 | bytes[1]
+  def fromUnsigned16(self, bytes):
+    """ Convert register values as unsigned short int """
+    return bytes[0]<<8 | bytes[1]
 
-def fromSigned16(bytes):
-  """ Convert register values as signed short int """
-  x = fromUnsigned16(bytes)
-  if x > 32767: return -(65536-x)
-  return x
+  def fromSigned16(self, bytes):
+    """ Convert register values as signed short int """
+    x = self.fromUnsigned16(bytes)
+    if x > 32767: return -(65536-x)
+    return x
 
