@@ -24,7 +24,7 @@ def setup():
 	# mpu.writeRegister( 28, 24) # AccelConfig1 = 0b00011000
 
 	# Change gyro range for fun
-	mpu.setRangeGyro(mpu.RANGE_GYRO.DPS500)
+	mpu.setRangeGyro(mpu.RANGE_GYRO_500DPS)
 	
 	delay(1000)
 	confData = mpu.readRegister( 27, 2)
@@ -32,7 +32,14 @@ def setup():
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
 
 	# Change it back to maximum
-	mpu.setRangeGyro(mpu.RANGE_GYRO.DPS2000)
+	mpu.setRangeGyro(mpu.RANGE_GYRO_2000DPS)
+	
+	delay(1000)
+	confData = mpu.readRegister( 27, 2)
+	print '\n GyroConfig: {:#010b}'.format(confData[0])
+	print '\n AccelConfig: {:#010b}'.format(confData[1])
+	
+	delay(1000)
 	
 	delay(100) # Let the I2C reset settle
 	# Sanity check
@@ -41,7 +48,7 @@ def setup():
 
 
 def loop():
-
+	
 	# Get data
 	accelX, accelY, accelZ = mpu.getAcceleration()
 	gyroX, gyroY, gyroZ = mpu.getGyro()

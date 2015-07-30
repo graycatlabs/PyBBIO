@@ -31,19 +31,27 @@ class MPU9250(object):
   REG_ACCEL_CONFIG1 = 0x1C
   REG_ACCEL_CONFIG2 = 0x1D
 
-  CMD_TEMPERATURE      = 0x2e
-  CMD_PRESSURE         = 0x34
-  CMD_PRESSURE_OSS_INC = 0x40
 
-  TEMP_CONVERSION_TIME      = 4.5 
-  PRESSURE_CONVERSION_TIMES = [4.5, 7.5, 13.5, 25.5]
-  
+  # Define possible gyro & accel ranges
+  RANGE_GYRO_2000DPS  = 3
+  RANGE_GYRO_1000DPS  = 2
+  RANGE_GYRO_500DPS   = 1
+  RANGE_GYRO_250DPS   = 0
+  RANGE_ACCEL_16G     = 3
+  RANGE_ACCEL_8G      = 2
+  RANGE_ACCEL_4G      = 1
+  RANGE_ACCEL_2G      = 0
+
+  # Same as above, used for scaling
+  SCALE_GYRO  = 250, 500, 1000, 2000
+  SCALE_ACCEL = 2, 4, 8, 16
+
   def __init__(self, spi, cs=0):
     self.spi = spi
     self.cs = cs
     spi.begin()
     spi.setClockMode(0, 0)
-    spi.setMaxFrequency(0, 3000000)
+    spi.setMaxFrequency(0, 1000000)
     
     # Am I talking to an MPU9250?
     id_val = self.readRegister(self.REG_ID)[0]
@@ -64,29 +72,21 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
     
-    # Define possible gyro & accel ranges
-    self.RANGE_GYRO  = self.enum( DPS2000=3, DPS1000=2, DPS500=1, DPS250=0)
-    self.RANGE_ACCEL = self.enum( G16=3, G8=2, G4=1, G2=0)
     
-    # RANGE_ACCEL = 16   # Gs
-    # RANGE_GYRO  = 2000 # dps
+    # Set current ranges to max values
+  
+    self.currentRangeMag    = 4912 # uT; fixed!
+    self.setRangeGyro(self.RANGE_GYRO_2000DPS)
+    self.setRangeAccel(self.RANGE_ACCEL_16G)
 
-    # Set default range to max
-    #RANGE_CURR_GYRO   = 0
-    #RANGE_CURR_ACCEL  = 0
-    # fix this?
-    self.RANGE_CURR_GYRO   = self.RANGE_GYRO.DPS2000
-    self.RANGE_CURR_ACCEL  = self.RANGE_ACCEL.G16
-    self.RANGE_CURR_MAG   = 4912 # uT
+    # Above code does these 
+    #self.CurrentRangeGyro   = self.RANGE_GYRO_2000DPS
+    #self.CurrentRangeAccel  = self.RANGE_ACCEL_16G
     
-    
-    self.setRangeGyro(self.RANGE_CURR_GYRO)
-    self.setRangeAccel(self.RANGE_CURR_ACCEL)
-    
+    # Done with init() 
 
   def ak8963Whoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
-    
     self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
     # READ Flag + 0x0C is AK slave addr
     self.writeRegister(self.REG_I2C_SLV0_REG, 0x00)
@@ -97,36 +97,63 @@ class MPU9250(object):
 
   def setRangeGyro(self, rangeVal):
     """ Sets the readout range for the gyroscope
-    Possible values, rangeVal == RANGE_GYRO\.2000DPS\.1000DPS\.500DPS\.250DPS 
+    Possible values
+    rangeVal == self.RANGE_GYRO_\2000DPS\1000DPS\500DPS\250DPS 
     """
-    self.writeRegister(self.REG_GYRO_CONFIG, rangeVal)
+    regVal = rangeVal<<3 # Shift to bits [3:4] GYRO_FS_SEL 
+    self.writeRegister(self.REG_GYRO_CONFIG, regVal)
 
-    gyroConf = self.readRegister(self.REG_GYRO_CONFIG, 1)  
-    # test printout
-    print "\n I've set the gyro range to %d, wanted to set to %d" %(gyroConf[0], rangeVal)
+    gyroConf = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
+    # test if we did it right??
+    if (regVal == gyroConf):
+      # Update Current range variable
+      self.currentRangeGyro = rangeVal
+    else:
+      print "\n WARNING! FAILED TO SET gyroscope range!"
+      print "\n\tI've set REG_GYRO_CONFIG to %d, wanted to set to %d" % (
+        gyroConf, regVal)
+      
+      # @TODO Add proper error log
 
   def setRangeAccel(self, rangeVal):
-    """ Sets the readout range for the accelerometer 
-    Possible values, rangeVal == RANGE_ACCEL\.16Gs\.8Gs\.4Gs\.2Gs 
+    """ Sets the readout range for the accelerometer
+    Possible values
+    rangeVal == self.RANGE_GYRO_\16G\8G\4G\2G 
     """
-    self.writeRegister( self.REG_ACCEL_CONFIG1, rangeVal)
+    regVal = rangeVal<<3 # Shift to bits [3:4] ACCEL_FS_SEL 
+    self.writeRegister(self.REG_ACCEL_CONFIG1, regVal)
 
+    accelConf = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0] 
+    # test if we did it right??
+    if (regVal == accelConf):
+      # Update Current range variable
+      self.currentRangeAccel = rangeVal
+    else:
+      print "\n WARNING! FAILED TO SET acceletometer range!"
+      print "\n\tI've set REG_ACCEL_CONFIG to %d, wanted to set to %d" % (
+        accelConf, regVal)
+      
+      # @TODO Add proper error log
+
+  
   def getAcceleration(self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(59, 6)
 
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_ACCEL
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_ACCEL
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_ACCEL
+    scaling = self.SCALE_ACCEL[self.currentRangeAccel] # Get scale value
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
     return [valX, valY, valZ]
   
   def getGyro(self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(67, 6)
 
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_GYRO
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_GYRO
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_GYRO
+    scaling = self.SCALE_GYRO[self.currentRangeGyro] # Get scale value
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
     return [valX, valY, valZ]
  
   def getMag( self):
@@ -136,10 +163,11 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_REG, 0x03)
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x87) # read 7
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2 = self.readRegister(73,7)
-         
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_MAG
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_MAG
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_MAG
+    
+    scaling = self.currentRangeMag     
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
     return [valX, valY, valZ]
   
   def getTemp(self):
@@ -162,7 +190,6 @@ class MPU9250(object):
   def runSelfTestGyro(self):
     """ Initiates self test for Gyroscope and returns self-test values """
     
-  
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
@@ -188,6 +215,3 @@ class MPU9250(object):
     if x > 32767: return -(65536-x)
     return x
 
-  def enum(self, **enums):
-    """ Using enums for an API-like library is (usually) a good idea, hence """
-    return type('Enum', (), enums)
