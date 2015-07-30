@@ -20,16 +20,25 @@ mpu = MPU9250(SPI0)
 def setup():
 	
 	# Setup accel and gyro for full range
-	mpu.writeRegister( 27, 24) # GryoConfig   = 0b00011000
-	mpu.writeRegister( 28, 24) # AccelConfig1 = 0b00011000
+	# mpu.writeRegister( 27, 24) # GryoConfig   = 0b00011000
+	# mpu.writeRegister( 28, 24) # AccelConfig1 = 0b00011000
 
+	# Change gyro range for fun
+	mpu.setRangeGyro(mpu.RANGE_GYRO.DPS500)
+	
+	delay(1000)
 	confData = mpu.readRegister( 27, 2)
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
 
+	# Change it back to maximum
+	mpu.setRangeGyro(mpu.RANGE_GYRO.DPS2000)
+	
 	delay(100) # Let the I2C reset settle
 	# Sanity check
 	mpu.ak8963Whoami()
+
+
 
 def loop():
 

@@ -27,6 +27,10 @@ class MPU9250(object):
   REG_TEMP_OUT_H    = 0x41
   REG_TEMP_OUT_L    = 0x42
 
+  REG_GYRO_CONFIG   = 0x1B
+  REG_ACCEL_CONFIG1 = 0x1C
+  REG_ACCEL_CONFIG2 = 0x1D
+
   CMD_TEMPERATURE      = 0x2e
   CMD_PRESSURE         = 0x34
   CMD_PRESSURE_OSS_INC = 0x40
@@ -34,21 +38,14 @@ class MPU9250(object):
   TEMP_CONVERSION_TIME      = 4.5 
   PRESSURE_CONVERSION_TIMES = [4.5, 7.5, 13.5, 25.5]
   
-  OVERSAMPLE_0 = 0
-  OVERSAMPLE_1 = 1
-  OVERSAMPLE_2 = 2
-  OVERSAMPLE_3 = 3
-
-  RANGE_ACCEL = 16   # Gs
-  RANGE_GYRO  = 2000 # dps
-  RANGE_MAG   = 4912 # uT
-
   def __init__(self, spi, cs=0):
     self.spi = spi
     self.cs = cs
     spi.begin()
     spi.setClockMode(0, 0)
     spi.setMaxFrequency(0, 3000000)
+    
+    # Am I talking to an MPU9250?
     id_val = self.readRegister(self.REG_ID)[0]
     # print "\nGot WHOAMI = 0x%02x" %id_val
     assert id_val == self.ID_VALUE, "MPU9250 not detected on SPI bus"
@@ -66,9 +63,28 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
     self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+    
+    # Define possible gyro & accel ranges
+    self.RANGE_GYRO  = self.enum( DPS2000=3, DPS1000=2, DPS500=1, DPS250=0)
+    self.RANGE_ACCEL = self.enum( G16=3, G8=2, G4=1, G2=0)
+    
+    # RANGE_ACCEL = 16   # Gs
+    # RANGE_GYRO  = 2000 # dps
 
+    # Set default range to max
+    #RANGE_CURR_GYRO   = 0
+    #RANGE_CURR_ACCEL  = 0
+    # fix this?
+    self.RANGE_CURR_GYRO   = self.RANGE_GYRO.DPS2000
+    self.RANGE_CURR_ACCEL  = self.RANGE_ACCEL.G16
+    self.RANGE_CURR_MAG   = 4912 # uT
+    
+    
+    self.setRangeGyro(self.RANGE_CURR_GYRO)
+    self.setRangeAccel(self.RANGE_CURR_ACCEL)
+    
 
-  def ak8963Whoami( self):
+  def ak8963Whoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
     
     self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
@@ -79,22 +95,38 @@ class MPU9250(object):
     print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
     assert whoami_ak[0] == 0x48, "AK8963 not detected on internal I2C bus"
 
-  def getAcceleration( self):
+  def setRangeGyro(self, rangeVal):
+    """ Sets the readout range for the gyroscope
+    Possible values, rangeVal == RANGE_GYRO\.2000DPS\.1000DPS\.500DPS\.250DPS 
+    """
+    self.writeRegister(self.REG_GYRO_CONFIG, rangeVal)
+
+    gyroConf = self.readRegister(self.REG_GYRO_CONFIG, 1)  
+    # test printout
+    print "\n I've set the gyro range to %d, wanted to set to %d" %(gyroConf[0], rangeVal)
+
+  def setRangeAccel(self, rangeVal):
+    """ Sets the readout range for the accelerometer 
+    Possible values, rangeVal == RANGE_ACCEL\.16Gs\.8Gs\.4Gs\.2Gs 
+    """
+    self.writeRegister( self.REG_ACCEL_CONFIG1, rangeVal)
+
+  def getAcceleration(self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(59, 6)
 
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_ACCEL
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_ACCEL
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_ACCEL
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_ACCEL
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_ACCEL
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_ACCEL
     return [valX, valY, valZ]
   
-  def getGyro( self):
+  def getGyro(self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(67, 6)
 
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_GYRO
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_GYRO
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_GYRO
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_GYRO
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_GYRO
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_GYRO
     return [valX, valY, valZ]
  
   def getMag( self):
@@ -105,12 +137,11 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x87) # read 7
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2 = self.readRegister(73,7)
          
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_MAG
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_MAG
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_MAG
+    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * self.RANGE_CURR_MAG
+    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * self.RANGE_CURR_MAG
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * self.RANGE_CURR_MAG
     return [valX, valY, valZ]
   
-
   def getTemp(self):
     """ Returns current temperature of sensor die in Celsius. """
     msb, lsb = self.readRegister(self.REG_TEMP_OUT_H, 2)
@@ -128,7 +159,10 @@ class MPU9250(object):
     tempC = self.readTemp()
     return tempC * 9./5 + 32
         
+  def runSelfTestGyro(self):
+    """ Initiates self test for Gyroscope and returns self-test values """
     
+  
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
@@ -154,3 +188,6 @@ class MPU9250(object):
     if x > 32767: return -(65536-x)
     return x
 
+  def enum(self, **enums):
+    """ Using enums for an API-like library is (usually) a good idea, hence """
+    return type('Enum', (), enums)
