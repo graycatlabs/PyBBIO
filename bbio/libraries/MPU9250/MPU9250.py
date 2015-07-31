@@ -14,6 +14,13 @@ class MPU9250(object):
     
   REG_ID         = 0x75 # WHOAMI
   
+  REG_SMPLRT_DIV    = 0x19
+  REG_CONFIG        = 0x18
+  REG_GYRO_CONFIG   = 0x1B
+  REG_ACCEL_CONFIG1 = 0x1C
+  REG_ACCEL_CONFIG2 = 0x1D
+  
+  REG_FIFO_EN       = 0x23
   REG_I2C_MST_CTRL  = 0x24
   REG_I2C_SLV0_ADDR = 0x25
   REG_I2C_SLV0_REG  = 0x26
@@ -27,9 +34,6 @@ class MPU9250(object):
   REG_TEMP_OUT_H    = 0x41
   REG_TEMP_OUT_L    = 0x42
 
-  REG_GYRO_CONFIG   = 0x1B
-  REG_ACCEL_CONFIG1 = 0x1C
-  REG_ACCEL_CONFIG2 = 0x1D
 
 
   # Define possible gyro & accel ranges
@@ -136,7 +140,7 @@ class MPU9250(object):
       # @TODO Add proper error log
 
   
-  def getAcceleration(self):
+  def getAccel(self):
     """ Returns current acceleration triplet. """
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(59, 6)
 
@@ -187,9 +191,115 @@ class MPU9250(object):
     tempC = self.readTemp()
     return tempC * 9./5 + 32
         
-  def runSelfTestGyro(self):
-    """ Initiates self test for Gyroscope and returns self-test values """
-    
+  def runSelfTest(self):
+    """ Initiates self test for gyroscope and accelerometer
+        Returns deviation with respect to factory trim values 
+    """
+   
+    # Init sums
+    sumAccel = [0] * 200
+    sumGyro = [0] * 200
+    STSumAccel = [0] * 200
+    STSumGyro = [0] * 200
+ 
+    # Set range and sampling rate
+          # Set gyro sample rate to 1 kHz
+    self.writeRegister(self.REG_SMPLRT_DIV, 0x00) 
+          # Set gyro sample rate to 1 kHz and DLPF to 92 Hz
+    self.writeRegister(self.REG_CONFIG, 0x02)
+          # Set full scale range for the gyro to 250 dps
+    self.setRangeGyro(self.RANGE_GYRO_250DPS)
+          # Set accelerometer rate to 1 kHz and bandwidth to 92 Hz
+    self.writeRegister(self.REG_ACCEL_CONFIG2, 0x02)
+          # Set full scale range for the accelerometer to 2 Gs
+    self.setRangeAccel(self.RANGE_ACCEL_2G)
+
+
+    # Get 200 measurements for averaging
+    for i in range(200):
+
+      accelX, accelY, accelZ = self.getAccel()
+      gyroX, gyroY, gyroZ = self.getGyro()
+
+      sumAccel[0] += accelX
+      sumAccel[1] += accelY
+      sumAccel[2] += accelZ 
+      sumGyro[0]  += gyroX
+      sumGyro[1]  += gyroY
+      sumGyro[2]  += gyroZ
+  
+    for i in range(3):
+      sumAccel[i] /= 200.0
+      sumGyro[i]  /= 200.0
+
+
+    # print " AVG Accel = %f %f %f | AVG Gyro = %f %f %f" % ( sumAccel[0],sumAccel[1],sumAccel[2],  sumGyro[0], sumGyro[1],sumGyro[2])
+ 
+
+    # Configure accel & gyro for self-test
+      # Enable self test on all three axes and set accel range to +/- 2 g
+    self.writeRegister(self.REG_ACCEL_CONFIG1, 0xE0) 
+      # Enable self test on all three axes and set gyro range to +/- 250 DPS
+    self.writeRegister(self.REG_GYRO_CONFIG,  0xE0)
+
+    # Get 200 self-test measurements for averaging
+    for i in range(200):
+
+      accelX, accelY, accelZ = self.getAccel()
+      gyroX, gyroY, gyroZ = self.getGyro()
+
+      STSumAccel[0] += accelX
+      STSumAccel[1] += accelY
+      STSumAccel[2] += accelZ 
+      STSumGyro[0]  += gyroX
+      STSumGyro[1]  += gyroY
+      STSumGyro[2]  += gyroZ
+  
+    for i in range(3):
+      STSumAccel[i] /= 200.0
+      STSumGyro[i]  /= 200.0
+
+
+    # Set things back to normal again
+    self.setRangeGyro(self.RANGE_GYRO_250DPS) # Write 0x00 to gyro config
+    self.setRangeAccel(self.RANGE_ACCEL_2G)   # Write 0x00 to accel config
+
+    # Retrieve factory self-test data
+    STGyroX, STGyroY, STGyroZ = self.readRegister(0x00, 3)
+    STAccelX, STAccelY, STAccelZ = self.readRegister(0x0D, 3)
+
+    FTrimGyro   = [0] * 3
+    FTrimAccel  = [0] * 3
+    # Compute factory trim values
+    FTrimGyro[0] = 2620 * pow( 1.01, STGyroX - 1.0 )
+    FTrimGyro[1] = 2620 * pow( 1.01, STGyroY - 1.0 )
+    FTrimGyro[2] = 2620 * pow( 1.01, STGyroZ - 1.0 )
+    FTrimAccel[0] = 2620 * pow( 1.01, STAccelX - 1.0 )
+    FTrimAccel[1] = 2620 * pow( 1.01, STAccelY - 1.0 )
+    FTrimAccel[2] = 2620 * pow( 1.01, STAccelZ - 1.0 )
+
+    devGyro   = [0] * 3
+    devAccel  = [0] * 3
+    # Compute deviations
+    for i in range(3):
+      devAccel[i] = 100.0 * ( STSumAccel[i] - sumAccel[i]) / FTrimAccel[i]
+      devGyro[i] = 100.0 * ( STSumGyro[i] - sumGyro[i]) / FTrimGyro[i]
+   
+    return devAccel, devGyro   
+
+    """  
+ // Configure the gyro and accelerometer for normal operation
+   writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 0x00);  
+   writeByte(MPU9250_ADDRESS, GYRO_CONFIG,  0x00);  
+   delay(25);  // Delay a while to let the device stabilize
+    """
+    """    
+    writeByte(MPU9250_ADDRESS, SMPLRT_DIV, 0x00);    // Set gyro sample rate to 1 kHz
+    writeByte(MPU9250_ADDRESS, CONFIG, 0x02);        // Set gyro sample rate to 1 kHz and DLPF to 92 Hz
+    writeByte(MPU9250_ADDRESS, GYRO_CONFIG, 1<<FS);  // Set full scale range for the gyro to 250 dps
+    writeByte(MPU9250_ADDRESS, ACCEL_CONFIG2, 0x02); // Set accelerometer rate to 1 kHz and bandwidth to 92 Hz
+    writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 1<<FS); // Set full scale range for the accelerometer to 2 g 
+    """
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 

@@ -19,10 +19,10 @@ mpu = MPU9250(SPI0)
 
 def setup():
 	
-	# Setup accel and gyro for full range
-	# mpu.writeRegister( 27, 24) # GryoConfig   = 0b00011000
-	# mpu.writeRegister( 28, 24) # AccelConfig1 = 0b00011000
-
+	delay(100) # Let the I2C reset settle
+	# Sanity check
+	mpu.ak8963Whoami()
+	
 	# Change gyro range for fun
 	mpu.setRangeGyro(mpu.RANGE_GYRO_500DPS)
 	
@@ -39,18 +39,24 @@ def setup():
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
 	
-	delay(1000)
+
+	# Do a selftest before we start
+	devAccel, devGyro = mpu.runSelfTest()
 	
-	delay(100) # Let the I2C reset settle
-	# Sanity check
-	mpu.ak8963Whoami()
-
-
+	print "\n Sensor deviations from factory self-test values:"
+	print "\n\t ACCEL: %f %f %f" % (devAccel[0], devAccel[1], devAccel[2])
+	print "\n\t GYRO: %f %f %f" % (devGyro[0], devGyro[1], devGyro[2])
+	
+	delay(1000)
+	confData = mpu.readRegister( 27, 2)
+	print '\n GyroConfig: {:#010b}'.format(confData[0])
+	print '\n AccelConfig: {:#010b}'.format(confData[1])
+	delay(1000)
+		
 
 def loop():
-	
 	# Get data
-	accelX, accelY, accelZ = mpu.getAcceleration()
+	accelX, accelY, accelZ = mpu.getAccel()
 	gyroX, gyroY, gyroZ = mpu.getGyro()
 	magX, magY, magZ = mpu.getMag()
 	
