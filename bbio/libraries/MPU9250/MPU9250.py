@@ -141,9 +141,9 @@ class MPU9250(object):
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(59, 6)
 
     scaling = self.SCALE_ACCEL[self.currentRangeAccel] # Get scale value
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
+    valX = self.fromSigned16([msbX, lsbX]) / 32768.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32768.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32768.0 * scaling
     return [valX, valY, valZ]
   
   def getGyro(self):
@@ -151,9 +151,9 @@ class MPU9250(object):
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ = self.readRegister(67, 6)
 
     scaling = self.SCALE_GYRO[self.currentRangeGyro] # Get scale value
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
+    valX = self.fromSigned16([msbX, lsbX]) / 32768.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32768.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32768.0 * scaling
     return [valX, valY, valZ]
  
   def getMag( self):
@@ -165,9 +165,9 @@ class MPU9250(object):
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2 = self.readRegister(73,7)
     
     scaling = self.currentRangeMag     
-    valX = self.fromSigned16([msbX, lsbX]) / 32760.0 * scaling
-    valY = self.fromSigned16([msbY, lsbY]) / 32760.0 * scaling
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32760.0 * scaling
+    valX = self.fromSigned16([msbX, lsbX]) / 32768.0 * scaling
+    valY = self.fromSigned16([msbY, lsbY]) / 32768.0 * scaling
+    valZ = self.fromSigned16([msbZ, lsbZ]) / 32768.0 * scaling
     return [valX, valY, valZ]
   
   def getTemp(self):
