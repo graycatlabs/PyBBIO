@@ -76,7 +76,13 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
     
-    
+
+    # Reset gyro and accel configs
+    self.writeRegister(self.REG_GYRO_CONFIG, 0x00)
+    self.writeRegister(self.REG_ACCEL_CONFIG1, 0x00)
+    self.writeRegister(self.REG_ACCEL_CONFIG2, 0x00)
+  
+
     # Set current ranges to max values
   
     self.currentRangeMag    = 4912 # uT; fixed!
@@ -104,40 +110,64 @@ class MPU9250(object):
     Possible values
     rangeVal == self.RANGE_GYRO_\2000DPS\1000DPS\500DPS\250DPS 
     """
-    regVal = rangeVal<<3 # Shift to bits [3:4] GYRO_FS_SEL 
-    self.writeRegister(self.REG_GYRO_CONFIG, regVal)
-
-    gyroConf = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
-    # test if we did it right??
-    if (regVal == gyroConf):
-      # Update Current range variable
-      self.currentRangeGyro = rangeVal
+    # We only accept rangeVal = 0 to 3
+    if (rangeVal < 0 or rangeVal > 3):
+      print "\n Invalid RANGE value! Range not changed"
+      # @TODO Error handling
+      return -1
     else:
-      print "\n WARNING! FAILED TO SET gyroscope range!"
-      print "\n\tI've set REG_GYRO_CONFIG to %d, wanted to set to %d" % (
-        gyroConf, regVal)
-      
-      # @TODO Add proper error log
+
+      # Preserve previous REG bits
+      regOld = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
+      regOld &= ~(0x3<<3) # Clear [3:4] FS bits 
+        # Combine regOld and rangeVal shifted to bits [3:4] GYRO_FS_SEL 
+      regVal = regOld | (rangeVal<<3)
+      self.writeRegister(self.REG_GYRO_CONFIG, regVal)
+
+      gyroConf = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
+      # test if we did it right??
+      if (regVal == gyroConf):
+        # Update Current range variable
+        self.currentRangeGyro = rangeVal
+        return 0
+      else:
+        print "\n WARNING! FAILED TO SET gyroscope range!"
+        print "\n\tI've set REG_GYRO_CONFIG to %d, wanted to set to %d" % (
+          gyroConf, regVal)
+        return -2
+        # @TODO Add proper error log
 
   def setRangeAccel(self, rangeVal):
     """ Sets the readout range for the accelerometer
     Possible values
     rangeVal == self.RANGE_GYRO_\16G\8G\4G\2G 
     """
-    regVal = rangeVal<<3 # Shift to bits [3:4] ACCEL_FS_SEL 
-    self.writeRegister(self.REG_ACCEL_CONFIG1, regVal)
+    # We only accept rangeVal = 0 to 3
+    if (rangeVal < 0 or rangeVal > 3):
+      print "\n Invalid RANGE value! Range not changed"
+      # @TODO Error handling
+      return -1
+    else: 
 
-    accelConf = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0] 
-    # test if we did it right??
-    if (regVal == accelConf):
-      # Update Current range variable
-      self.currentRangeAccel = rangeVal
-    else:
-      print "\n WARNING! FAILED TO SET acceletometer range!"
-      print "\n\tI've set REG_ACCEL_CONFIG to %d, wanted to set to %d" % (
-        accelConf, regVal)
-      
-      # @TODO Add proper error log
+      # Preserve previous REG bits
+      regOld = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0]
+      regOld &= ~(0x3<<3) # Clear [3:4] FS bits 
+        # Combine regOld and rangeVal shifted to bits [3:4] ACCEL_FS_SEL 
+      regVal = regOld | (rangeVal<<3) 
+      self.writeRegister(self.REG_ACCEL_CONFIG1, regVal)
+
+      accelConf = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0] 
+      # test if we did it right??
+      if (regVal == accelConf):
+        # Update Current range variable
+        self.currentRangeAccel = rangeVal
+        return 0
+      else:
+        print "\n WARNING! FAILED TO SET acceletometer range!"
+        print "\n\tI've set REG_ACCEL_CONFIG to %d, wanted to set to %d" % (
+          accelConf, regVal)
+        return -2
+        # @TODO Add proper error log
 
   
   def getAccel(self):
@@ -201,6 +231,14 @@ class MPU9250(object):
     sumGyro = [0] * 200
     STSumAccel = [0] * 200
     STSumGyro = [0] * 200
+
+
+    # Read configs for restoration
+    oldRegConf      = self.readRegister(self.REG_CONFIG, 1)[0]
+    oldGyroConf     = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
+    oldAccelConf1   = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0]
+    oldAccelConf2   = self.readRegister(self.REG_ACCEL_CONFIG2, 1)[0]
+
  
     # Set range and sampling rate
           # Set gyro sample rate to 1 kHz
@@ -260,9 +298,9 @@ class MPU9250(object):
       STSumGyro[i]  /= 200.0
 
 
-    # Set things back to normal again
-    self.setRangeGyro(self.RANGE_GYRO_250DPS) # Write 0x00 to gyro config
-    self.setRangeAccel(self.RANGE_ACCEL_2G)   # Write 0x00 to accel config
+    # Set things back to normal again (0x00 to gyro & accel config)
+    self.writeRegister(self.REG_ACCEL_CONFIG1, 0x00)
+    self.writeRegister(self.REG_GYRO_CONFIG, 0x00)
 
     # Retrieve factory self-test data
     STGyroX, STGyroY, STGyroZ = self.readRegister(0x00, 3)
@@ -284,22 +322,16 @@ class MPU9250(object):
     for i in range(3):
       devAccel[i] = 100.0 * ( STSumAccel[i] - sumAccel[i]) / FTrimAccel[i]
       devGyro[i] = 100.0 * ( STSumGyro[i] - sumGyro[i]) / FTrimGyro[i]
-   
-    return devAccel, devGyro   
 
-    """  
- // Configure the gyro and accelerometer for normal operation
-   writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 0x00);  
-   writeByte(MPU9250_ADDRESS, GYRO_CONFIG,  0x00);  
-   delay(25);  // Delay a while to let the device stabilize
-    """
-    """    
-    writeByte(MPU9250_ADDRESS, SMPLRT_DIV, 0x00);    // Set gyro sample rate to 1 kHz
-    writeByte(MPU9250_ADDRESS, CONFIG, 0x02);        // Set gyro sample rate to 1 kHz and DLPF to 92 Hz
-    writeByte(MPU9250_ADDRESS, GYRO_CONFIG, 1<<FS);  // Set full scale range for the gyro to 250 dps
-    writeByte(MPU9250_ADDRESS, ACCEL_CONFIG2, 0x02); // Set accelerometer rate to 1 kHz and bandwidth to 92 Hz
-    writeByte(MPU9250_ADDRESS, ACCEL_CONFIG, 1<<FS); // Set full scale range for the accelerometer to 2 g 
-    """
+    
+    # Restore old configuration registers
+    self.writeRegister(self.REG_CONFIG, oldRegConf)
+    self.writeRegister(self.REG_GYRO_CONFIG, oldGyroConf)
+    self.writeRegister(self.REG_ACCEL_CONFIG1, oldAccelConf1)
+    self.writeRegister(self.REG_ACCEL_CONFIG2, oldAccelConf2)
+
+     
+    return devAccel, devGyro   
 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
