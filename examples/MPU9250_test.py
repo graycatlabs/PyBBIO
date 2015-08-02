@@ -19,7 +19,7 @@ mpu = MPU9250(SPI0)
 
 def setup():
 	
-	delay(100) # Let the I2C reset settle
+	delay(200) # Let the I2C reset settle
 	# Sanity check
 	mpu.ak8963Whoami()
 	
@@ -33,6 +33,7 @@ def setup():
 
 	# Change it back to maximum
 	mpu.setRangeGyro(mpu.RANGE_GYRO_2000DPS)
+	mpu.setRangeGyro(27)
 	
 	delay(1000)
 	confData = mpu.readRegister( 27, 2)
@@ -47,6 +48,9 @@ def setup():
 	print "\n\t ACCEL: %f %f %f" % (devAccel[0], devAccel[1], devAccel[2])
 	print "\n\t GYRO: %f %f %f" % (devGyro[0], devGyro[1], devGyro[2])
 	
+
+	# mpu.calibrateGyroAccel()
+
 	delay(1000)
 	confData = mpu.readRegister( 27, 2)
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
@@ -55,6 +59,10 @@ def setup():
 		
 
 def loop():
+
+	# mpu.calibrateGyroAccel()
+
+
 	# Get data
 	accelX, accelY, accelZ = mpu.getAccel()
 	gyroX, gyroY, gyroZ = mpu.getGyro()
@@ -69,7 +77,7 @@ def loop():
 
 	degC = mpu.getTemp()
 	
-	print "\n On-die temperature is: %d C" % degC 
+	print "\n On-die temperature: %d C" % degC 
 	
 	delay(200)
 

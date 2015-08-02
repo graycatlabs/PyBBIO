@@ -8,14 +8,22 @@ MPU9250 is released as part of PyBBIO under its MIT license.
 See PyBBIO/LICENSE.txt
 """
 import bbio
+import time
 
 class MPU9250(object):
-  ID_VALUE = 0x71  	# precoded identification string in WHOAMI Reg
-    
-  REG_ID         = 0x75 # WHOAMI
   
-  REG_SMPLRT_DIV    = 0x19
-  REG_CONFIG        = 0x18
+  
+  # Set Register addresses  
+  
+  REG_XG_OFFSET_H   = 0x13  # User-defined trim values for gyroscope
+  REG_XG_OFFSET_L   = 0x14
+  REG_YG_OFFSET_H   = 0x15
+  REG_YG_OFFSET_L   = 0x16
+  REG_ZG_OFFSET_H   = 0x17
+  REG_ZG_OFFSET_L   = 0x18  
+  
+  REG_SMPLRT_DIV    = 0x19  # Sample rate divider
+  REG_CONFIG        = 0x18  # General & Gyro Config
   REG_GYRO_CONFIG   = 0x1B
   REG_ACCEL_CONFIG1 = 0x1C
   REG_ACCEL_CONFIG2 = 0x1D
@@ -26,7 +34,10 @@ class MPU9250(object):
   REG_I2C_SLV0_REG  = 0x26
   REG_I2C_SLV0_CTRL = 0x27
   REG_I2C_SLV0_DO   = 0x63
+  
   REG_USER_CTRL     = 0x6A
+  REG_PWR_MGMT_1    = 0x6B # Device defaults to the SLEEP mode
+  REG_PWR_MGMT_2    = 0x6C 
   
   AK8963_CNTL1 = 0x0A  
   AK8963_CNTL2 = 0x0B  
@@ -34,7 +45,12 @@ class MPU9250(object):
   REG_TEMP_OUT_H    = 0x41
   REG_TEMP_OUT_L    = 0x42
 
-
+  REG_XA_OFFSET_H   = 0x77  # User-defined trim values for accelerometer
+  REG_XA_OFFSET_L   = 0x78
+  REG_YA_OFFSET_H   = 0x7A
+  REG_YA_OFFSET_L   = 0x7B
+  REG_ZA_OFFSET_H   = 0x7D
+  REG_ZA_OFFSET_L   = 0x7E
 
   # Define possible gyro & accel ranges
   RANGE_GYRO_2000DPS  = 3
@@ -50,6 +66,9 @@ class MPU9250(object):
   SCALE_GYRO  = 250, 500, 1000, 2000
   SCALE_ACCEL = 2, 4, 8, 16
 
+  REG_ID         = 0x75 # WHOAMI REG
+  MPU9250_ID_VALUE = 0x71  	# precoded identification string in WHOAMI REG
+  
   def __init__(self, spi, cs=0):
     self.spi = spi
     self.cs = cs
@@ -60,22 +79,23 @@ class MPU9250(object):
     # Am I talking to an MPU9250?
     id_val = self.readRegister(self.REG_ID)[0]
     # print "\nGot WHOAMI = 0x%02x" %id_val
-    assert id_val == self.ID_VALUE, "MPU9250 not detected on SPI bus"
+    assert id_val == self.MPU9250_ID_VALUE, "MPU9250 not detected on SPI bus"
 
+    # @TODO Fix mysterious periodic hang of magnetometer ? 
+    self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
+    time.sleep(0.2)
+    self.writeRegister(self.REG_PWR_MGMT_1, 0x01) # Auto select best clock source 
+    self.writeRegister(self.REG_PWR_MGMT_2, 0x00) # Gyro & Accel ON
+    time.sleep(0.2)  
+
+   
     #This part is to set up the magnetometer, due to it being a separate device
     self.writeRegister(self.REG_I2C_MST_CTRL, 0x0D) # I2C speed 400 Khz 
-    self.writeRegister(self.REG_USER_CTRL, 0x22) #
+    self.writeRegister(self.REG_USER_CTRL, 0x32) #
+    time.sleep(0.2) 
 
-    # Reset magnetometer 
-    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C)
-    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL2)
-    self.writeRegister(self.REG_I2C_SLV0_DO, 0x01)
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81) 
-    # Set 16-bit continues MODE1 readouts
-    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-    self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-    
+	  # Init magnetometer 
+    self.initMag()
 
     # Reset gyro and accel configs
     self.writeRegister(self.REG_GYRO_CONFIG, 0x00)
@@ -94,6 +114,22 @@ class MPU9250(object):
     #self.CurrentRangeAccel  = self.RANGE_ACCEL_16G
     
     # Done with init() 
+
+  def initMag(self):
+    """ Initalize on-die AK8963 magnetometer & get offset""" 
+    # Soft Reset
+    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C)
+    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL2)
+    self.writeRegister(self.REG_I2C_SLV0_DO, 0x01)
+    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81) 
+    time.sleep(0.1) # Stabilize
+
+    # Set 16-bit output & continuous MODE1 
+    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+    self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
+    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+    
+
 
   def ak8963Whoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
@@ -333,6 +369,13 @@ class MPU9250(object):
      
     return devAccel, devGyro   
 
+  def calibrateGyroAccel(self):
+    """ Calibration function for gyroscope and accelerometer """
+    
+    biasGyro  = [0] * 3
+    biasAccel = [0] * 3
+
+ 
   def readRegister(self, addr, n_bytes=1):
     """ Reads the value in the given register, or if the optional parameter 
         'n_bytes' is greater than 1 returns n_bytes register values starting 
