@@ -456,7 +456,10 @@ class MPU9250(object):
     biasGyro[2]  /=  packetCount
    
 
-    print "\n packetCount: %d" %d packetCount 
+    print "\n packetCount: %d" % packetCount 
+    print "\n ACCEL BIAS: %f %f %f\n GYRO BIAS: %f %f %f " % (biasAccel[0], biasAccel[1], biasAccel[2], biasGyro[0], biasGyro[1], biasGyro[2])
+
+
     if(biasAccel[2] > 0.0):
     # Remove Gravity from readings
       biasAccel[2] -=  accelsensitivity  #    -1 G
