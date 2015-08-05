@@ -387,8 +387,24 @@ class MPU9250(object):
     biasGyro  = [0] * 3
     biasAccel = [0] * 3
     out = [0] * 6
+
+
+    # Read configs for restoration
+    oldSampleDiv    = self.readRegister(self.REG_SMPLRT_DIV, 1)[0]
+    oldRegConf      = self.readRegister(self.REG_CONFIG, 1)[0]
+    oldGyroConf     = self.readRegister(self.REG_GYRO_CONFIG, 1)[0]
+    oldAccelConf1   = self.readRegister(self.REG_ACCEL_CONFIG1, 1)[0]
+    oldAccelConf2   = self.readRegister(self.REG_ACCEL_CONFIG2, 1)[0]
+    oldI2CControl   = self.readRegister(self.REG_I2C_MST_CTRL, 1)[0]
+    oldUserControl  = self.readRegister(self.REG_USER_CTRL, 1)[0]
+
+    time.sleep(1)
+    confData = self.readRegister( 27, 2)
+    print '\n GyroConfig: {:#010b}'.format(confData[0])
+    print '\n AccelConfig: {:#010b}'.format(confData[1])
  
-    self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
+     
+    # self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
     time.sleep(0.2)
     self.writeRegister(self.REG_PWR_MGMT_1, 0x01) # Auto select best clock
     self.writeRegister(self.REG_PWR_MGMT_2, 0x00) # Gyro & Accel ON
@@ -403,10 +419,12 @@ class MPU9250(object):
     self.writeRegister(self.REG_USER_CTRL, 0x0C)    # Reset FIFO and DMP
     time.sleep(0.2)
 
-    self.writeRegister(self.REG_CONFIG, 0x01)     # Set low-pass filter to 188 Hz
+    # self.writeRegister(self.REG_CONFIG, 0x01)     # Set low-pass filter to 188 Hz
     self.writeRegister(self.REG_SMPLRT_DIV, 0x00) # Set sample rate to 1 kHz
-    self.setRangeGyro(self.RANGE_GYRO_250DPS)     # Set gyro full-scale to 250 degrees per second, maximum sensitivity
-    self.setRangeAccel(self.RANGE_ACCEL_2G)       # Set accelerometer full-scale to 2 g, maximum sensitivity
+    # self.setRangeGyro(self.RANGE_GYRO_250DPS)     # Set gyro full-scale to 250 degrees per second, maximum sensitivity
+    # self.setRangeAccel(self.RANGE_ACCEL_2G)       # Set accelerometer full-scale to 2 g, maximum sensitivity
+    self.writeRegister(self.REG_GYRO_CONFIG, 0x00)  # Set gyro full-scale to 250 degrees per second, maximum sensitivity
+    self.writeRegister(self.REG_ACCEL_CONFIG1, 0x00) # Set accelerometer full-scale to 2 g, maximum sensitivity
  
     gyrosensitivity  = 131   # = 131 LSB/degrees/sec
     accelsensitivity = 16384  # = 16384 LSB/g
@@ -428,7 +446,10 @@ class MPU9250(object):
 
       tempAccel = [0] * 3
       tempGyro  = [0] * 3
-      bytes = self.readRegister(self.REG_FIFO_R_W, 12) # read bytes for averaging
+     
+      bytes = [0] * 12 
+      for j in range(12):
+        bytes[j] = self.readRegister(self.REG_FIFO_R_W, 1)[0] # read bytes for averaging
       
       # Form signed 16-bit integer for each sample in FIFO
       tempAccel[0] =  self.fromSigned16(bytes[0:2])   
@@ -457,14 +478,14 @@ class MPU9250(object):
    
 
     print "\n packetCount: %d" % packetCount 
-    print "\n ACCEL BIAS: %f %f %f\n GYRO BIAS: %f %f %f " % (biasAccel[0], biasAccel[1], biasAccel[2], biasGyro[0], biasGyro[1], biasGyro[2])
+    print "\n ACCEL BIAS: %d %d %d\n GYRO BIAS: %d %d %d " % (biasAccel[0], biasAccel[1], biasAccel[2], biasGyro[0], biasGyro[1], biasGyro[2])
 
 
-    if(biasAccel[2] > 0.0):
+    #if(biasAccel[2] > 0):
     # Remove Gravity from readings
-      biasAccel[2] -=  accelsensitivity  #    -1 G
-    else:
-      biasAccel[2] +=  accelsensitivity  # or +1 G
+    #  biasAccel[2] -=  accelsensitivity  #    -1 G
+    #else:
+    #  biasAccel[2] +=  accelsensitivity  # or +1 G
     
     # Construct Gyro biases for push to the hardware gyro bias registers
     # They were reset to zero upon device hardware reset during startup
@@ -475,7 +496,8 @@ class MPU9250(object):
     data[0], data[1] = self.toSigned16( -1 * biasGyro[0])
     data[2], data[3] = self.toSigned16( -1 * biasGyro[1])
     data[4], data[5] = self.toSigned16( -1 * biasGyro[2])
-    
+   
+ 
   # Push gyro biases to hardware registers
     self.writeRegister(self.REG_XG_OFFSET_H, data[0])
     self.writeRegister(self.REG_XG_OFFSET_L, data[1])
@@ -485,9 +507,9 @@ class MPU9250(object):
     self.writeRegister(self.REG_ZG_OFFSET_L, data[5])
     
   # Output scaled gyro biases for display in the main program
-    out[3]  =  biasGyro[0]/ gyrosensitivity  
-    out[4]  =  biasGyro[1]/ gyrosensitivity
-    out[5]  =  biasGyro[2]/ gyrosensitivity
+    out[0]  =  float(biasGyro[0]) / gyrosensitivity  
+    out[1]  =  float(biasGyro[1]) / gyrosensitivity
+    out[2]  =  float(biasGyro[2]) / gyrosensitivity
 
 
 
@@ -499,10 +521,18 @@ class MPU9250(object):
 
     biasAccelReg = [0] * 3 #  Hold the factory accelerometer trim biases
     # Read factory accelerometer trim values (!15 bit!)
-    bytes = self.readRegister(self.REG_XA_OFFSET_H, 6) 
+    # THEY ARE NOT IN AN ADDRESS SEQUENCE OF 6 BYTES!!!    
+    # Not this -> bytes = self.readRegister(self.REG_XA_OFFSET_H, 6) 
+    # Addresses:
+    # XA_H|XA_L = 0x77|0x78; YA_H|YA_L = 0x7A|0x7B; ZA_H|ZA_L   = 0x7D|0x7E
+    bytes = [0] * 6
+    bytes[0], bytes[1] = self.readRegister(self.REG_XA_OFFSET_H, 2) 
+    bytes[2], bytes[3] = self.readRegister(self.REG_YA_OFFSET_H, 2) 
+    bytes[4], bytes[5] = self.readRegister(self.REG_ZA_OFFSET_H, 2) 
+    print "\n accel OFFSET : %s" % bytes
     biasAccelReg[0] = self.fromSigned16( bytes[0:2]) / 2 
-    biasAccelReg[0] = self.fromSigned16( bytes[2:4]) / 2 
-    biasAccelReg[0] = self.fromSigned16( bytes[4:6]) / 2
+    biasAccelReg[1] = self.fromSigned16( bytes[2:4]) / 2 
+    biasAccelReg[2] = self.fromSigned16( bytes[4:6]) / 2
     # Since we're interested in the top 15 bits, we devide by 2 for the 16bit
     # signed number. Conveniently this also ignores bit 0 completely
 
@@ -520,13 +550,15 @@ class MPU9250(object):
     biasAccelReg[1] -= (biasAccel[1]/16)
     biasAccelReg[2] -= (biasAccel[2]/16)
     
-    data[0], data[1] = self.toSigned16(biasAccel[0] * 2) # equal to shift left
-    data[2], data[3] = self.toSigned16(biasAccel[1] * 2)
-    data[4], data[5] = self.toSigned16(biasAccel[2] * 2)
+    data[0], data[1] = self.toSigned16(biasAccelReg[0] * 2) 
+    data[2], data[3] = self.toSigned16(biasAccelReg[1] * 2)
+    data[4], data[5] = self.toSigned16(biasAccelReg[2] * 2)
+      # Multiply by 2 equals to shift left
     data[1] = data[1] | bitMask[0]   # preserve reserved bit
     data[3] = data[3] | bitMask[1] 
     data[5] = data[5] | bitMask[2]
 
+    print "\n accel OFFSET out : %s" % data
    
     #Apparently this is not working for the acceleration biases in the MPU-9250
     #Are we handling the temperature correction bit properly?
@@ -539,12 +571,29 @@ class MPU9250(object):
     self.writeRegister(self.REG_ZA_OFFSET_H, data[4])
     self.writeRegister(self.REG_ZA_OFFSET_L, data[5])
 
+    time.sleep(0.2)
+    bytes[0], bytes[1] = self.readRegister(self.REG_XA_OFFSET_H, 2) 
+    bytes[2], bytes[3] = self.readRegister(self.REG_YA_OFFSET_H, 2) 
+    bytes[4], bytes[5] = self.readRegister(self.REG_ZA_OFFSET_H, 2) 
+    print "\n accel OFFSET OUT! : %s" % bytes
+
     #Output scaled accelerometer biases for display in the main program
-    out[3] = biasAccel[0]/accelsensitivity 
-    out[4] = biasAccel[1]/accelsensitivity
-    out[5] = biasAccel[2]/accelsensitivity
+    out[3] = float(biasAccel[0]) / accelsensitivity 
+    out[4] = float(biasAccel[1]) / accelsensitivity
+    out[5] = float(biasAccel[2]) / accelsensitivity
     
-    
+ 
+    # Restore old configuration registers
+    self.writeRegister(self.REG_SMPLRT_DIV, oldSampleDiv)
+    self.writeRegister(self.REG_I2C_MST_CTRL, oldI2CControl)
+    self.writeRegister(self.REG_USER_CTRL, oldUserControl)
+    self.writeRegister(self.REG_CONFIG, oldRegConf)
+    self.writeRegister(self.REG_GYRO_CONFIG, oldGyroConf)
+    self.writeRegister(self.REG_ACCEL_CONFIG1, oldAccelConf1)
+    self.writeRegister(self.REG_ACCEL_CONFIG2, oldAccelConf2)
+   
+    # Set scale properly
+ 
     return out
               
   
