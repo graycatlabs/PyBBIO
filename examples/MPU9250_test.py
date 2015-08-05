@@ -33,6 +33,7 @@ def setup():
 
 	# Change it back to maximum
 	mpu.setRangeGyro(mpu.RANGE_GYRO_2000DPS)
+	# Can we mess it up?
 	mpu.setRangeGyro(27)
 	
 	delay(1000)
@@ -49,19 +50,35 @@ def setup():
 	print "\n\t GYRO: %f %f %f" % (devGyro[0], devGyro[1], devGyro[2])
 	
 
-	# mpu.calibrateGyroAccel()
+	data = mpu.calibrateGyroAccel()
+
+	print "\n GRYO BIAS: %f %f %f\n ACCEL BIAS: %f %f %f " % (data[0],data[1],data[2],data[3],data[4],data[5])
+	
 
 	delay(1000)
 	confData = mpu.readRegister( 27, 2)
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
 	delay(1000)
-		
+
+			
+	accelOffsetData = mpu.readRegister( 119, 2)
+	print '\n AccelX_H: {:#010b}'.format(accelOffsetData[0])
+	print '\n AccelX_L: {:#010b}'.format(accelOffsetData[1])
+	
+	scale = mpu.currentRangeAccel
+	print "\n ACCEL RANGE = %d" % mpu.SCALE_ACCEL[scale]
+
+	mpu.currentRangeAccel = 3
+	mpu.currentRangeGyro = 3
 
 def loop():
 
 	# mpu.calibrateGyroAccel()
 
+	confData = mpu.readRegister( 27, 2)
+	print '\n GyroConfig: {:#010b}'.format(confData[0])
+	print '\n AccelConfig: {:#010b}'.format(confData[1])
 
 	# Get data
 	accelX, accelY, accelZ = mpu.getAccel()
