@@ -26,7 +26,7 @@ def setup():
 	# Change gyro range for fun
 	mpu.setRangeGyro(mpu.RANGE_GYRO_500DPS)
 	
-	delay(1000)
+	delay(500)
 	confData = mpu.readRegister( 27, 2)
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
@@ -36,11 +36,10 @@ def setup():
 	# Can we mess it up?
 	mpu.setRangeGyro(27)
 	
-	delay(1000)
+	delay(500)
 	confData = mpu.readRegister( 27, 2)
 	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
-	
 
 	# Do a selftest before we start
 	devAccel, devGyro = mpu.runSelfTest()
@@ -49,17 +48,19 @@ def setup():
 	print "\n\t ACCEL: %f %f %f" % (devAccel[0], devAccel[1], devAccel[2])
 	print "\n\t GYRO: %f %f %f" % (devGyro[0], devGyro[1], devGyro[2])
 	
+	# Calibrate Gyro & Accelerometer sensors
+	data = mpu.calibrateAccelGyro()
 
-	data = mpu.calibrateGyroAccel()
-
-	print "\n GRYO BIAS: %f %f %f\n ACCEL BIAS: %f %f %f " % (data[0],data[1],data[2],data[3],data[4],data[5])
+	print "\n Sensor offset (bias) values:"
+	print "\n\t ACCEL BIAS: %f %f %f\n\n\t GYRO BIAS: %f %f %f " % (data[0],data[1],data[2],data[3],data[4],data[5])
 	
-
-	delay(1000)
+	
+	# Did we fix everything when we're out of the calibration
+	delay(500)
 	confData = mpu.readRegister( 27, 2)
-	print '\n GyroConfig: {:#010b}'.format(confData[0])
 	print '\n AccelConfig: {:#010b}'.format(confData[1])
-	delay(1000)
+	print '\n GyroConfig: {:#010b}'.format(confData[0])
+	delay(500)
 
 			
 	accelOffsetData = mpu.readRegister( 119, 2)
@@ -73,12 +74,6 @@ def setup():
 	mpu.currentRangeGyro = 3
 
 def loop():
-
-	# mpu.calibrateGyroAccel()
-
-	confData = mpu.readRegister( 27, 2)
-	print '\n GyroConfig: {:#010b}'.format(confData[0])
-	print '\n AccelConfig: {:#010b}'.format(confData[1])
 
 	# Get data
 	accelX, accelY, accelZ = mpu.getAccel()
