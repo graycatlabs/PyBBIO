@@ -317,8 +317,9 @@ class MPU9250(object):
     self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C)
     self.writeRegister(self.REG_I2C_SLV0_REG, 0x03)
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x87) # read 7
-    msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2 = self.readRegister(73,7)
-    
+    # We must read stat2, so that the mag puts out new data( it's a read flag)
+    msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2  \
+      = self.readRegister(self.REG_EXT_SENS_DATA_00, 7)
     scaling = self.currentRangeMag     
     valX = self.fromSigned16([msbX, lsbX]) / 32768.0 * scaling
     valY = self.fromSigned16([msbY, lsbY]) / 32768.0 * scaling
@@ -690,7 +691,40 @@ class MPU9250(object):
   def writeRegister(self, addr, value):
     """ Writes the given value to the given register. """
     self.spi.write(self.cs, [addr & 0x7f, value & 0xff])
+  
+  # Convenience function for communicating with the magnetometer via SPI
+  # or any SLV0 for that matter, just change hardcoded SLV0_ADDR 
+  def readRegisterSLV0(self, addr, n_bytes=1):
+    """ Read n_bytes from addr address on SLV0, by putting data 
+        in REG_EXT_SENS_DATA_00 and reading from there
+        returns read byte(s)
+    """
+    SLV0_ADDR = 0x0C  # That's for the AK8963 Magnetometer  
+    SLV0_ADDR |= 0x80 # It's a read transfer
 
+    CTRL_HEX = 0x80   # We have to put bytes it on REG_EXT_SENS_DATA_00
+    CTRL_HEX |= (n_bytes & 0xF) # How many bytes from addr?
+                               # Maximum is 15 (way more than enough)
+    
+    self.writeRegister(self.REG_I2C_SLV0_ADDR, SLV0_ADDR)
+    self.writeRegister(self.REG_I2C_SLV0_REG, addr) # From which reg to read? 
+    self.writeRegister(self.REG_I2C_SLV0_CTRL, CTRL_HEX)
+    # Wait a bit for the write
+    time.sleep(0.01)
+    return self.readRegister(self.REG_EXT_SENS_DATA_00, n_bytes)
+  
+  def writeRegisterSLV0(self, addr, value):
+    """ Writes the given value to the SLV0 register on address addr
+        SPI talks to the MPU9250, the MPU9250 writes via slave I2C
+    """
+    SLV0_ADDR = 0x0C  # That's for the AK8963 Magnetometer  
+    SLV0_ADDR |= 0x00 # It's a write transfer
+    
+    self.writeRegister(self.REG_I2C_SLV0_ADDR, SLV0_ADDR) 
+    self.writeRegister(self.REG_I2C_SLV0_REG, addr)
+    self.writeRegister(self.REG_I2C_SLV0_DO, value)
+    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81) # do the write
+   
 
   def fromUnsigned16(self, bytes):
     """ Convert register values as unsigned short int """
@@ -713,6 +747,5 @@ class MPU9250(object):
     return self.toUnsigned16(int) 
 
 
-  # def readRegisterSLV0(self, addr, n_bytes=1)
 
 

@@ -26,14 +26,28 @@ def setup():
 	# Set mag rate to 100Hz (default = 8hz)
 	#mpu.setRateMag(mpu.RATE_MAG_100HZ);
 
+	delay(200)
 	# check mag CNTL1 reg
-	mpu.writeRegister(mpu.REG_I2C_SLV0_ADDR, 0x8C) 
-	mpu.writeRegister(mpu.REG_I2C_SLV0_REG, mpu.AK8963_CNTL1)
-	mpu.writeRegister(mpu.REG_I2C_SLV0_CTRL, 0x81)
-	AKCTRL1 = mpu.readRegister(73, 1)[0]
-	#print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
-	#assert whoami_ak[0] == 0x48, ""
+	#mpu.writeRegister(mpu.REG_I2C_SLV0_ADDR, 0x8C) 
+	#mpu.writeRegister(mpu.REG_I2C_SLV0_REG, mpu.AK8963_CNTL1)
+	#mpu.writeRegister(mpu.REG_I2C_SLV0_CTRL, 0x81)
+	#AKCTRL1 = mpu.readRegister(73, 1)[0]
+	AKCTRL1 = mpu.readRegisterSLV0(mpu.AK8963_CNTL1, 1)[0]
 	print '\n AK893_CNTL1 = {:#010b}'.format(AKCTRL1)
+
+	# Read first 15 bytes from mag and print
+	datamag = mpu.readRegisterSLV0(0x00, 14)
+	print '\n\t %s' % datamag
+
+	# Test read and write to mag
+	mpu.writeRegisterSLV0(mpu.AK8963_CNTL1, 0x02) #set 14 bit 8Hz continous
+	readReg = mpu.readRegisterSLV0(mpu.AK8963_CNTL1, 1)[0]
+	print '\n AK893_CNTL1 changed to  = {:#010b}'.format(readReg)
+
+	# fix to 100Hz 16 bit
+	mpu.writeRegisterSLV0(mpu.AK8963_CNTL1, 0x16) #set 16 bit 100Hz cont
+	readReg = mpu.readRegisterSLV0(mpu.AK8963_CNTL1, 1)[0]
+	print '\n AK893_CNTL1 changed to  = {:#010b}'.format(readReg)
 
 	# Change gyro range for fun
 	mpu.setRangeGyro(mpu.RANGE_GYRO_500DPS)
