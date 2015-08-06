@@ -43,9 +43,6 @@ class MPU9250(object):
   REG_PWR_MGMT_1    = 0x6B # Device defaults to the SLEEP mode
   REG_PWR_MGMT_2    = 0x6C 
   
-  AK8963_CNTL1 = 0x0A  
-  AK8963_CNTL2 = 0x0B  
-
   REG_TEMP_OUT_H    = 0x41
   REG_TEMP_OUT_L    = 0x42
 
@@ -80,6 +77,11 @@ class MPU9250(object):
   RATE_MAG_8HZ    = 0x2
   RATE_MAG_100HZ  = 0x6
 
+  # AK8963 magnetometer register addresses
+  AK8963_WHOAMI = 0x00
+  AK8963_CNTL1  = 0x0A  
+  AK8963_CNTL2  = 0x0B  
+
 
   REG_ID         = 0x75 # WHOAMI REG
   MPU9250_ID_VALUE = 0x71  	# precoded identification string in WHOAMI REG
@@ -96,8 +98,8 @@ class MPU9250(object):
     # print "\nGot WHOAMI = 0x%02x" %id_val
     assert id_val == self.MPU9250_ID_VALUE, "MPU9250 not detected on SPI bus"
 
-    # @TODO Fix mysterious periodic hang of magnetometer ? 
-    self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
+    # @TODO Fix mysterious periodic hang of magnetometer when full reset? 
+    # self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
     time.sleep(0.2)
     self.writeRegister(self.REG_PWR_MGMT_1, 0x01) # Auto select best clock source 
     self.writeRegister(self.REG_PWR_MGMT_2, 0x00) # Gyro & Accel ON
@@ -143,42 +145,33 @@ class MPU9250(object):
         MODE1 = 8 Hz countinous polling
     """ 
     # Soft Reset
-    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C)
-    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL2)
-    self.writeRegister(self.REG_I2C_SLV0_DO, 0x01)
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81) 
+    self.writeRegisterSLV0(self.AK8963_CNTL2, 0x01)
     time.sleep(0.2) # Stabilize
 
     # Set 16-bit output & continuous MODE1 
-    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
-    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-    self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x12)
     time.sleep(0.2) # Stabilize
-
-    
  
     # Check status
-    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-    AKCTRL1 = self.readRegister(73, 1)[0]
-    #print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
-    #assert whoami_ak[0] == 0x48, ""
-    print '\n AK893_CNTL1 = {:#010b}'.format(AKCTRL1)
+    AKCTNL1 = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
+    #print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak 
+    #assert whoami_ak == 0x48, ""
+    print '\n AK893_CNTL1 = {:#010b}'.format(AKCTNL1)
 
      
     print "\nMagnetometer initialization complete."
 
   def magWhoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
-    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-    # READ Flag + 0x0C is AK slave addr
-    self.writeRegister(self.REG_I2C_SLV0_REG, 0x00)
-    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-    whoami_ak = self.readRegister(73, 1)
-    print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
-    assert whoami_ak[0] == 0x48, "AK8963 not detected on internal I2C bus"
+#    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+#    # READ Flag + 0x0C is AK slave addr
+#    self.writeRegister(self.REG_I2C_SLV0_REG, 0x00)
+#    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+#    whoami_ak = self.readRegister(73, 1)
+
+    whoami_ak = self.readRegisterSLV0(self.AK8963_WHOAMI, 1)[0]
+    print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak
+    assert whoami_ak == 0x48, "AK8963 not detected on internal I2C bus"
 
   def setRateMag(self, rateVal):
     """ Sets the polling rate for the AK8963 magnetometer 
@@ -192,32 +185,14 @@ class MPU9250(object):
       return -1
     else:
       # Preserve previous REG bits
-      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-      #regOld = self.readRegister(73, 1)[0]
-      
       regOld = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
-      
       regOld &= ~(0xF) # Clear [0:4] MODE bits 
         # Combine regOld and rateVal to set mode
       regVal = regOld | (rateVal)
-  
+      # Push new values
       self.writeRegisterSLV0(self.AK8963_CNTL1, regVal)
-
-      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
-      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      #self.writeRegister(self.REG_I2C_SLV0_DO, regVal)
-      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-   
-
-      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-      #magConf = self.readRegister(73, 1)[0]
-      
-      magConf = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
-      
+ 
+      magConf = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]      
       # test if we did it right??
       if (regVal == magConf):
         # Update Current range variable
