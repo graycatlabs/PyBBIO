@@ -192,25 +192,31 @@ class MPU9250(object):
       return -1
     else:
       # Preserve previous REG bits
-      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-      regOld = self.readRegister(73, 1)[0]
+      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+      #regOld = self.readRegister(73, 1)[0]
+      
+      regOld = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
       
       regOld &= ~(0xF) # Clear [0:4] MODE bits 
         # Combine regOld and rateVal to set mode
       regVal = regOld | (rateVal)
   
-      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
-      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      self.writeRegister(self.REG_I2C_SLV0_DO, regVal)
-      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+      self.writeRegisterSLV0(self.AK8963_CNTL1, regVal)
+
+      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
+      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      #self.writeRegister(self.REG_I2C_SLV0_DO, regVal)
+      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
    
 
-      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
-      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-      magConf = self.readRegister(73, 1)[0]
+      #self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+      #self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      #self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+      #magConf = self.readRegister(73, 1)[0]
+      
+      magConf = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
       
       # test if we did it right??
       if (regVal == magConf):

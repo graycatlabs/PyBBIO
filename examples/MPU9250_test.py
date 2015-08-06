@@ -24,16 +24,12 @@ def setup():
 	mpu.magWhoami() # Do we have a line to the AK8963?
 
 	# Set mag rate to 100Hz (default = 8hz)
-	#mpu.setRateMag(mpu.RATE_MAG_100HZ);
+	mpu.setRateMag(mpu.RATE_MAG_100HZ);
 
 	delay(200)
 	# check mag CNTL1 reg
-	#mpu.writeRegister(mpu.REG_I2C_SLV0_ADDR, 0x8C) 
-	#mpu.writeRegister(mpu.REG_I2C_SLV0_REG, mpu.AK8963_CNTL1)
-	#mpu.writeRegister(mpu.REG_I2C_SLV0_CTRL, 0x81)
-	#AKCTRL1 = mpu.readRegister(73, 1)[0]
 	AKCTRL1 = mpu.readRegisterSLV0(mpu.AK8963_CNTL1, 1)[0]
-	print '\n AK893_CNTL1 = {:#010b}'.format(AKCTRL1)
+	print '\n rate to 100Hz; AK893_CNTL1 = {:#010b}'.format(AKCTRL1)
 
 	# Read first 15 bytes from mag and print
 	datamag = mpu.readRegisterSLV0(0x00, 14)
