@@ -1,6 +1,8 @@
 PyBBIO
 ======
 
+[![Join the chat at https://gitter.im/graycatlabs/PyBBIO](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graycatlabs/PyBBIO?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 http://github.com/graycatlabs/PyBBIO
 
 Copyright (c) 2012-2015 - Alexander Hiam <alex@graycat.io>
