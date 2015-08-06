@@ -37,7 +37,7 @@ class MPU9250(object):
   REG_I2C_SLV0_ADDR = 0x25
   REG_I2C_SLV0_REG  = 0x26
   REG_I2C_SLV0_CTRL = 0x27
-  REG_I2C_SLV0_DO   = 0x63
+  REG_I2C_SLV0_DO   = 0x63 # only for writing to SLV0; DO = DATA OUT
   
   REG_USER_CTRL     = 0x6A
   REG_PWR_MGMT_1    = 0x6B # Device defaults to the SLEEP mode
@@ -48,6 +48,8 @@ class MPU9250(object):
 
   REG_TEMP_OUT_H    = 0x41
   REG_TEMP_OUT_L    = 0x42
+
+  REG_EXT_SENS_DATA_00 = 0x49
 
   REG_FIFO_COUNTH   = 0x72
   REG_FIFO_COUNTL   = 0x73
@@ -73,6 +75,11 @@ class MPU9250(object):
   # Same as above, used for scaling
   SCALE_GYRO  = 250, 500, 1000, 2000
   SCALE_ACCEL = 2, 4, 8, 16
+
+  # Set Rate
+  RATE_MAG_8HZ    = 0x2
+  RATE_MAG_100HZ  = 0x6
+
 
   REG_ID         = 0x75 # WHOAMI REG
   MPU9250_ID_VALUE = 0x71  	# precoded identification string in WHOAMI REG
@@ -108,7 +115,7 @@ class MPU9250(object):
     self.writeRegister(self.REG_USER_CTRL, 0x32) #
     time.sleep(0.2) 
 
-	  # Init magnetometer 
+    # Init magnetometer 
     self.initMag()
 
     # Reset gyro and accel configs
@@ -129,23 +136,41 @@ class MPU9250(object):
     
     # Done with init() 
 
+
   def initMag(self):
-    """ Initalize on-die AK8963 magnetometer & get offset""" 
+    """ Initalize on-die AK8963 magnetometer & get offset
+        Defauts: 
+        MODE1 = 8 Hz countinous polling
+    """ 
     # Soft Reset
     self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C)
     self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL2)
     self.writeRegister(self.REG_I2C_SLV0_DO, 0x01)
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81) 
-    time.sleep(0.1) # Stabilize
+    time.sleep(0.2) # Stabilize
 
     # Set 16-bit output & continuous MODE1 
+    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
     self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
     self.writeRegister(self.REG_I2C_SLV0_DO, 0x12 )
     self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+    time.sleep(0.2) # Stabilize
+
     
+ 
+    # Check status
+    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+    self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+    AKCTRL1 = self.readRegister(73, 1)[0]
+    #print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
+    #assert whoami_ak[0] == 0x48, ""
+    print '\n AK893_CNTL1 = {:#010b}'.format(AKCTRL1)
 
+     
+    print "\nMagnetometer initialization complete."
 
-  def ak8963Whoami(self):
+  def magWhoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
     self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
     # READ Flag + 0x0C is AK slave addr
@@ -155,6 +180,52 @@ class MPU9250(object):
     print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak[0] 
     assert whoami_ak[0] == 0x48, "AK8963 not detected on internal I2C bus"
 
+  def setRateMag(self, rateVal):
+    """ Sets the polling rate for the AK8963 magnetometer 
+    Possible Values;
+    rangeVal == self.RATE_MAG_\8HZ\100HZ (All caps!)
+    """
+    # We only accept rateVal = 0x2 (0010 = 8 Hz) or 0x6 (0110 = 100Hz)
+    if (rateVal != 0x2 and rateVal != 0x6 ):
+      print "\n Invalid RATE_MAG value! Rate not changed"
+      # @TODO Error handling
+      return -1
+    else:
+      # Preserve previous REG bits
+      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+      regOld = self.readRegister(73, 1)[0]
+      
+      regOld &= ~(0xF) # Clear [0:4] MODE bits 
+        # Combine regOld and rateVal to set mode
+      regVal = regOld | (rateVal)
+  
+      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x0C) 
+      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      self.writeRegister(self.REG_I2C_SLV0_DO, regVal)
+      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+   
+
+      self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
+      self.writeRegister(self.REG_I2C_SLV0_REG, self.AK8963_CNTL1)
+      self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
+      magConf = self.readRegister(73, 1)[0]
+      
+      # test if we did it right??
+      if (regVal == magConf):
+        # Update Current range variable
+        self.currentRateMag = rateVal
+        return 0
+      else:
+        print "\n WARNING! FAILED TO SET magnetometer rate!"
+        print "\n\tI've set AK8963_CNTL1 to %d, wanted to set to %d" % (
+          magConf, regVal)
+        return -2
+        # @TODO Add proper error log
+
+
+  
   def setRangeGyro(self, rangeVal):
     """ Sets the readout range for the gyroscope
     Possible values
@@ -162,7 +233,7 @@ class MPU9250(object):
     """
     # We only accept rangeVal = 0 to 3
     if (rangeVal < 0 or rangeVal > 3):
-      print "\n Invalid RANGE value! Range not changed"
+      print "\n Invalid RANGE_GRYO value! Range not changed"
       # @TODO Error handling
       return -1
     else:
@@ -194,7 +265,7 @@ class MPU9250(object):
     """
     # We only accept rangeVal = 0 to 3
     if (rangeVal < 0 or rangeVal > 3):
-      print "\n Invalid RANGE value! Range not changed"
+      print "\n Invalid RANGE_ACCEL value! Range not changed"
       # @TODO Error handling
       return -1
     else: 
@@ -640,4 +711,8 @@ class MPU9250(object):
     """ Convert signed short int to register values"""
     if int < 0: return self.toUnsigned16(65536 + int ) # int is negative
     return self.toUnsigned16(int) 
+
+
+  # def readRegisterSLV0(self, addr, n_bytes=1)
+
 
