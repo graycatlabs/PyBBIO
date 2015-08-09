@@ -81,10 +81,10 @@ class MPU9250(object):
   AK8963_WHOAMI = 0x00
   AK8963_CNTL1  = 0x0A  
   AK8963_CNTL2  = 0x0B  
+  AK8963_ASAX   = 0x10
 
-
-  REG_ID         = 0x75 # WHOAMI REG
-  MPU9250_ID_VALUE = 0x71  	# precoded identification string in WHOAMI REG
+  REG_ID            = 0x75 # WHOAMI REG
+  MPU9250_ID_VALUE  = 0x71 # precoded identification string in WHOAMI REG
   
   def __init__(self, spi, cs=0):
     self.spi = spi
@@ -98,22 +98,20 @@ class MPU9250(object):
     # print "\nGot WHOAMI = 0x%02x" %id_val
     assert id_val == self.MPU9250_ID_VALUE, "MPU9250 not detected on SPI bus"
 
+    # Power down mag
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x00)
+    time.sleep(0.1)
+
     # @TODO Fix mysterious periodic hang of magnetometer when full reset? 
-    # self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
+    #self.writeRegister(self.REG_PWR_MGMT_1, 0x80) # Reset internal registers
     time.sleep(0.2)
     self.writeRegister(self.REG_PWR_MGMT_1, 0x01) # Auto select best clock source 
     self.writeRegister(self.REG_PWR_MGMT_2, 0x00) # Gyro & Accel ON
-    time.sleep(0.2)  
+    #time.sleep(0.2)  
 
-                        
-    accelOffsetData = self.readRegister( self.REG_XA_OFFSET_H, 2)
-    print '\n AccelX_H: {:#010b}'.format(accelOffsetData[0])
-    print '\n AccelX_L: {:#010b}'.format(accelOffsetData[1])
-
-
-   
     #This part is to set up the magnetometer, due to it being a separate device
     self.writeRegister(self.REG_I2C_MST_CTRL, 0x0D) # I2C speed 400 Khz 
+    time.sleep(0.3)  
     self.writeRegister(self.REG_USER_CTRL, 0x32) #
     time.sleep(0.2) 
 
@@ -144,6 +142,29 @@ class MPU9250(object):
         Defauts: 
         MODE1 = 8 Hz countinous polling
     """ 
+    # Power down mag
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x00)
+    time.sleep(0.1)
+
+    # enter Fuse ROM access mode
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x0F)
+    time.sleep(0.1)
+    # read mag sensor factory sensitivity adjustments values
+    ASAX, ASAY, ASAZ = self.readRegisterSLV0(self.AK8963_ASAX, 3)
+    #print  "X,Y,Z: %f %f %f " %  (ASAX, ASAY, ASAZ)
+
+    # Compute mag sensor adjust factors, formulas from AK8963 datasheet
+    self.magAdjustX = ((ASAX - 128) * 0.5) / 128 + 1
+    self.magAdjustY = ((ASAY - 128) * 0.5) / 128 + 1
+    self.magAdjustZ = ((ASAZ - 128) * 0.5) / 128 + 1
+
+    #print "Adjust  X,Y,Z: %f %f %f " %  (self.magAdjustX, self.magAdjustY, self.magAdjustZ)
+
+ 
+    # Power down mag
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x00)
+    time.sleep(0.1)
+ 
     # Soft Reset
     self.writeRegisterSLV0(self.AK8963_CNTL2, 0x01)
     time.sleep(0.2) # Stabilize
@@ -157,18 +178,11 @@ class MPU9250(object):
     #print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak 
     #assert whoami_ak == 0x48, ""
     print '\n AK893_CNTL1 = {:#010b}'.format(AKCTNL1)
-
      
     print "\nMagnetometer initialization complete."
 
   def magWhoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
-#    self.writeRegister(self.REG_I2C_SLV0_ADDR, 0x8C) 
-#    # READ Flag + 0x0C is AK slave addr
-#    self.writeRegister(self.REG_I2C_SLV0_REG, 0x00)
-#    self.writeRegister(self.REG_I2C_SLV0_CTRL, 0x81)
-#    whoami_ak = self.readRegister(73, 1)
-
     whoami_ak = self.readRegisterSLV0(self.AK8963_WHOAMI, 1)[0]
     print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak
     assert whoami_ak == 0x48, "AK8963 not detected on internal I2C bus"
@@ -301,10 +315,11 @@ class MPU9250(object):
     # We must read stat2, so that the mag puts out new data( it's a read flag)
     msbX, lsbX, msbY, lsbY, msbZ, lsbZ, stat2  \
       = self.readRegister(self.REG_EXT_SENS_DATA_00, 7)
+    # scaling for data reads and magnetometer adjustment factors (factory set)
     scaling = self.currentRangeMag     
-    valX = self.fromSigned16([msbX, lsbX]) / 32768.0 * scaling
-    valY = self.fromSigned16([msbY, lsbY]) / 32768.0 * scaling
-    valZ = self.fromSigned16([msbZ, lsbZ]) / 32768.0 * scaling
+    valX = self.fromSigned16([msbX, lsbX])/ 32768.0 * scaling * self.magAdjustX
+    valY = self.fromSigned16([msbY, lsbY])/ 32768.0 * scaling * self.magAdjustY
+    valZ = self.fromSigned16([msbZ, lsbZ])/ 32768.0 * scaling * self.magAdjustZ
     return [valX, valY, valZ]
   
   def getTemp(self):
@@ -335,6 +350,9 @@ class MPU9250(object):
     STSumAccel = [0] * 200
     STSumGyro = [0] * 200
 
+    # Read ranges for accel and gyro
+    oldRangeAccel =  self.currentRangeAccel
+    oldRangeGyro = self.currentRangeGyro
 
     # Read configs for restoration
     oldRegConf      = self.readRegister(self.REG_CONFIG, 1)[0]
@@ -433,6 +451,11 @@ class MPU9250(object):
     self.writeRegister(self.REG_ACCEL_CONFIG1, oldAccelConf1)
     self.writeRegister(self.REG_ACCEL_CONFIG2, oldAccelConf2)
 
+    # Restore ranges properly
+    self.currentRangeAccel  = oldRangeAccel
+    self.currentRangeGyro   = oldRangeGyro
+
+
      
     return devAccel, devGyro   
 
@@ -445,6 +468,9 @@ class MPU9250(object):
     biasAccel = [0] * 3
     out = [0] * 6
 
+    # Read ranges for accel and gyro
+    oldRangeAccel =  self.currentRangeAccel
+    oldRangeGyro = self.currentRangeGyro
 
     # Read configs for restoration
     oldSampleDiv    = self.readRegister(self.REG_SMPLRT_DIV, 1)[0]
@@ -472,8 +498,6 @@ class MPU9250(object):
 
     self.writeRegister(self.REG_CONFIG, 0x01)     # Set low-pass filter to 188 Hz
     self.writeRegister(self.REG_SMPLRT_DIV, 0x00) # Set sample rate to 1 kHz
-    # self.setRangeGyro(self.RANGE_GYRO_250DPS)     # Set gyro full-scale to 250 degrees per second, maximum sensitivity
-    # self.setRangeAccel(self.RANGE_ACCEL_2G)       # Set accelerometer full-scale to 2 g, maximum sensitivity
     self.writeRegister(self.REG_GYRO_CONFIG, 0x00)  # Set gyro full-scale to 250 degrees per second, maximum sensitivity
     self.writeRegister(self.REG_ACCEL_CONFIG1, 0x00) # Set accelerometer full-scale to 2 g, maximum sensitivity
  
@@ -493,7 +517,6 @@ class MPU9250(object):
     fifoCount =  fifoData[0]<<8 | fifoData[1]
     packetCount = fifoCount/12  # How many sets of full gyro and accelerometer data for averaging
 
-    # print " EXTRAS: %d" % (fifoCount % 12) 
     # ALIGN FIFO: Read extra bits in buffer (and remove them)!!!
     for j in range(fifoCount % 12):
       self.readRegister(self.REG_FIFO_R_W, 1)[0]
@@ -655,8 +678,10 @@ class MPU9250(object):
     self.writeRegister(self.REG_ACCEL_CONFIG1, oldAccelConf1)
     self.writeRegister(self.REG_ACCEL_CONFIG2, oldAccelConf2)
    
-    # Set scale properly
-    
+    # Restore ranges properly
+    self.currentRangeAccel  = oldRangeAccel
+    self.currentRangeGyro   = oldRangeGyro
+
     return out
   
 
