@@ -85,18 +85,24 @@ class MPU9250(object):
 
   REG_ID            = 0x75 # WHOAMI REG
   MPU9250_ID_VALUE  = 0x71 # precoded identification string in WHOAMI REG
+
   
   def __init__(self, spi, cs=0):
+
+    self.sensorOnline = 0
+    
     self.spi = spi
     self.cs = cs
     spi.begin()
     spi.setClockMode(0, 0)
     spi.setMaxFrequency(0, 1000000)
     
+
     # Am I talking to an MPU9250?
     id_val = self.readRegister(self.REG_ID)[0]
     # print "\nGot WHOAMI = 0x%02x" %id_val
     assert id_val == self.MPU9250_ID_VALUE, "MPU9250 not detected on SPI bus"
+        
 
     # Power down mag
     self.writeRegisterSLV0(self.AK8963_CNTL1, 0x00)
@@ -134,8 +140,9 @@ class MPU9250(object):
     #self.CurrentRangeGyro   = self.RANGE_GYRO_2000DPS
     #self.CurrentRangeAccel  = self.RANGE_ACCEL_16G
     
+    self.sensorOnline = 1  # If we passed all setup procedures, we're good 
     # Done with init() 
-
+    
 
   def initMag(self):
     """ Initalize on-die AK8963 magnetometer & get offset
@@ -159,7 +166,6 @@ class MPU9250(object):
     self.magAdjustZ = ((ASAZ - 128) * 0.5) / 128 + 1
 
     #print "Adjust  X,Y,Z: %f %f %f " %  (self.magAdjustX, self.magAdjustY, self.magAdjustZ)
-
  
     # Power down mag
     self.writeRegisterSLV0(self.AK8963_CNTL1, 0x00)
