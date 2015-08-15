@@ -24,7 +24,7 @@ class I2CBus(i2cdev.I2CDev):
     """
     if self.bus_num == 1 and not cape_manager.isLoaded("BB-I2C1"):
       # I2C2 is already enabled for reading cape EEPROMs, 
-      # so only need to load overlay for I2C2
+      # so only need to load overlay for I2C1
       cape_manager.load("BB-I2C1", auto_unload=False)
       bbio.common.delay(10)
       # Make sure it initialized correctly:
