@@ -1,6 +1,6 @@
 """
  SafeProcess - v0.1
- Copyright 2012 - Alexander Hiam <hiamalexander@gmail.com>
+ Copyright 2012 - Alexander Hiam <alex@graycat.io>
  MIT license
 
  Provides a wrapper for Python's mutliprocessing.Process class

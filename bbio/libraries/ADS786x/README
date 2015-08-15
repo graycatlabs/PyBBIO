@@ -1,7 +1,6 @@
 ADS786x - v0.1
 
-Copyright 2012 Alexander Hiam
-hiamalexander@gmail.com
+Copyright 2012 Alexander Hiam <alex@graycat.io>
 
 ADS786x is a library for PyBBIO to interface with TI's ADS786x1 series
 analog-to-digital converters (ADS7866-12bit, ADS7867-10bit, ADS7868-8bit).

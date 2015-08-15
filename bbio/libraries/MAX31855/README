@@ -1,7 +1,6 @@
 MAX31855 - v0.2
 
-Copyright 2012 Alexander Hiam
-hiamalexander@gmail.com
+Copyright 2012 Alexander Hiam <alex@graycat.io>
 
 MAX31855 is a library for PyBBIO to interface with Maxim's MAX31855 
 thermocouple amplifier.

@@ -1,7 +1,6 @@
 Servo - v0.1
 
-Copyright 2012 Alexander Hiam
-hiamalexander@gmail.com
+Copyright 2012 Alexander Hiam <alex@graycat.io>
 
 Library for controlling servo motors with the BeagleBone's PWM pins.
 
