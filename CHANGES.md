@@ -1,6 +1,11 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.5.2
+ * Fixed incorrect I2C bus initialization (which caused I2C2 not to work)
+ * Updated to Contributor Covenant Code of Conduct 1.2.0
+ * Added requests package to dependencies
+
 #### version 0.9.5.1
  * Install examples to /usr/local/lib/PyBBIO/examples/
  * Implemented proper bus number detection for SPI and I2C
