@@ -1,10 +1,4 @@
-
-try:
-  import requests
-except ImportError:
-  exit("\The IoT library requires the 'requests' package:\n"+\
-       "  # pip install requests\n")
-
+# __init__.py file for IoT PyBBIO library
 import thingspeak, phant
 
 __all__ = [

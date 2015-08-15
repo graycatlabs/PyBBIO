@@ -28,7 +28,8 @@ print "Installing PyBBIO..."
 from setuptools import setup, Extension, find_packages
 
 install_requires = [
-  'pyserial'
+  'pyserial',
+  'requests'
 ]
 
 extensions = [
