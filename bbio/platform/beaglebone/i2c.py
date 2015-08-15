@@ -12,7 +12,6 @@ from config import I2C_BASE_ADDRESSES
 class I2CBus(i2cdev.I2CDev):
   def __init__(self, bus):
     assert 1<= bus <= 2, 'Only I2C buses 1 and 2 are available'
-
     # Run i2cdev.I2CDev initializtion:
     super(I2CBus, self).__init__(bus)
 
@@ -23,14 +22,20 @@ class I2CBus(i2cdev.I2CDev):
         If use_10bit_address=True the bus will use 10-bit slave addresses
         instead of 7-bit addresses. 
     """
-    if not os.path.exists('/dev/i2c-%i' % self.bus_num):
-      cape_manager.load('BB-I2C%i' % self.hw_bus, auto_unload=False)
+    if self.bus_num == 1 and not cape_manager.isLoaded("BB-I2C1"):
+      # I2C2 is already enabled for reading cape EEPROMs, 
+      # so only need to load overlay for I2C2
+      cape_manager.load("BB-I2C1", auto_unload=False)
       bbio.common.delay(10)
       # Make sure it initialized correctly:
-      assert os.path.exists('/dev/i2c-%i' % self.bus_num), \
-        'could not enable I2C bus %i' % self.hw_bus
+      if not cape_manager.isLoaded("BB-I2C1"):
+        raise IOError("could not enable I2C1")
 
     # Detect bus number:
+    # (since I2C2 is always enabled at boot, it's kernel assigned 
+    # bus number will always be the same, and I2C1 will always be
+    # the next consecutive bus number, so this isn't actually 
+    # required)
     for i in glob.glob("/sys/bus/i2c/devices/i2c-*"):
       path = os.path.realpath(i)
       module_addr = int(path.split("/")[4].split(".")[0], 16)
