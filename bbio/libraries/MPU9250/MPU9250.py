@@ -183,9 +183,9 @@ class MPU9250(object):
     AKCTNL1 = self.readRegisterSLV0(self.AK8963_CNTL1, 1)[0]
     #print "\nGot WHOAMI for AK8963 = 0x%02x (0x48?) " % whoami_ak 
     #assert whoami_ak == 0x48, ""
-    print '\n AK893_CNTL1 = {:#010b}'.format(AKCTNL1)
+    #print '\n AK893_CNTL1 = {:#010b}'.format(AKCTNL1)
      
-    print "\nMagnetometer initialization complete."
+    print "\nMagnetometer initialization complete.\n"
 
   def magWhoami(self):
     """ I2C WhoAmI check for the AK8963 in-built magnetometer """
