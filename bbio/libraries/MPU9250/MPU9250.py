@@ -175,8 +175,8 @@ class MPU9250(object):
     self.writeRegisterSLV0(self.AK8963_CNTL2, 0x01)
     time.sleep(0.2) # Stabilize
 
-    # Set 16-bit output & continuous MODE1 
-    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x12)
+    # Set 16-bit output & continuous MODE2 (100 Hz 
+    self.writeRegisterSLV0(self.AK8963_CNTL1, 0x16)
     time.sleep(0.2) # Stabilize
  
     # Check status
