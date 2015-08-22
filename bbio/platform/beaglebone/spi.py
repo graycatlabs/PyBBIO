@@ -8,7 +8,13 @@ from bbio.platform.util import spidev
 from config import SPI_BASE_ADDRESSES
 
 class SPIBus(spidev.SPIDev):
+  def __init__(self, bus):
+    super(SPIBus, self).__init__(bus)
+    self._is_open = False
+
   def open(self):
+    if self._is_open: return
+
     overlay = "BB-SPIDEV%i" % (self.bus)
     cape_manager.load(overlay, auto_unload=False)
     bbio.common.delay(250) # Give driver time to load
@@ -26,6 +32,8 @@ class SPIBus(spidev.SPIDev):
     self.setBitsPerWord(0, 8)
     self.setMaxFrequency(0, 8000000)
     self.setClockMode(0, 0)
+    
+    self._is_open = True
 
   def begin(self):
     self.open()

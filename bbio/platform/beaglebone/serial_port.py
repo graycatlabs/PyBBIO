@@ -47,6 +47,7 @@ class _UART_PORT(object):
         as any other given keyword arguments will be passed to the PySerial 
         Serial class' __init__() method, see the PySerial docs for more info. 
     """
+    if self.open: return
     if not uartInit(self.config):
       print "*Could not open serial port defined by: %s" % self.config
       self.ser_port = None

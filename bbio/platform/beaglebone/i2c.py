@@ -14,6 +14,7 @@ class I2CBus(i2cdev.I2CDev):
     assert 1<= bus <= 2, 'Only I2C buses 1 and 2 are available'
     # Run i2cdev.I2CDev initializtion:
     super(I2CBus, self).__init__(bus)
+    self._is_open = False
 
   def open(self, use_10bit_address=False):
     """ I2CDev.open(use_10bit_address=False) -> None
@@ -22,6 +23,7 @@ class I2CBus(i2cdev.I2CDev):
         If use_10bit_address=True the bus will use 10-bit slave addresses
         instead of 7-bit addresses. 
     """
+    if self._is_open: return
     if self.bus_num == 1 and not cape_manager.isLoaded("BB-I2C1"):
       # I2C2 is already enabled for reading cape EEPROMs, 
       # so only need to load overlay for I2C1
@@ -44,6 +46,7 @@ class I2CBus(i2cdev.I2CDev):
         break
 
     super(I2CBus, self).open(use_10bit_address=use_10bit_address)
+    self._is_open = True
 
   def begin(self, use_10bit_address=False):
     """ Same as I2CBus.open() """
