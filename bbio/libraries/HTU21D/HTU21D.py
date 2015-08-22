@@ -26,8 +26,6 @@ class HTU21D(object):
     if i2c == -1:
       # Testing mode, don't try to open an I2C interface
       return
-    i2c.begin()
-    bbio.delay(15)
     i2c.write(self.I2C_ADDRESS, [self.CMD_RESET])
     bbio.delay(15)
     usr_reg = i2c.readTransaction(self.I2C_ADDRESS, self.CMD_USER_REG_READ, 1)

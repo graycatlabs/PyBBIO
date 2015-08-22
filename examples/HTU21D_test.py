@@ -12,6 +12,8 @@ from bbio import *
 # Import the HTU21D class from the HTU21D library:
 from bbio.libraries.HTU21D import HTU21D
 
+# Initialize I2C bus:
+I2C2.open() 
 # Create a new instance of the HTU21D class using the I2C2 I2C bus
 htu = HTU21D(I2C2)
 
