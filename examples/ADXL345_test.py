@@ -1,5 +1,5 @@
 """
- HTU21D_test.py 
+ ADXL345_test.py 
  Alexander Hiam <alex@graycat.io> 
  
  An example to demonstrate the use of the ADXL345 library included 
