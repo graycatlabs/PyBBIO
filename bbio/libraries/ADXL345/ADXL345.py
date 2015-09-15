@@ -127,16 +127,26 @@ class ADXL345(object):
 
     self.writeReg(self.REG_INT_MAP, int_map)
     
-    # Enable the interrupt
+    # Read current register value:
     int_enable = self.readReg(self.REG_INT_ENABLE)[0]
 
+    # First disable interrupt and ensure any pending interrupts are cleared:
     int_enable &= ~interrupt # 0 to enable interrupt
     self.writeReg(self.REG_INT_ENABLE, int_enable)
-
-    # Ensure any pending interrupts are cleared:
     self.getInterrupts()
 
     int_enable |= interrupt # 1 to enable interrupt
+    self.writeReg(self.REG_INT_ENABLE, int_enable)
+
+  def disableInterrupt(self, interrupt):
+    """ Disables the given interrupt, either ADXL345.INT_SINGLE_TAP or 
+        ADXL345.INT_DOUBLE_TAP.
+    """
+    if interrupt != self.INT_DOUBLE_TAP and interrupt != self.INT_SINGLE_TAP:
+      raise ValueError("interrupt must be one of ADXL345.INT_SINGLE_TAP or ADXL345.INT_DOUBLE_TAP")
+
+    int_enable = self.readReg(self.REG_INT_ENABLE)[0]
+    int_enable &= ~interrupt # 0 to enable interrupt
     self.writeReg(self.REG_INT_ENABLE, int_enable)
 
   def enableTapDetection(self, threshold_g=3, duration_ms=20, 
