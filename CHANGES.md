@@ -1,6 +1,11 @@
 ###Changelog for PyBBIO  
 http://github.com/alexanderhiam/PyBBIO   
 
+#### version 0.9.5.3
+ * Added ADXL345 3-axis accelerometer library and example
+ * Only allow I2C, SPI and UART initialization one time
+ * Better error handling in interrupt routines
+
 #### version 0.9.5.2
  * Fixed incorrect I2C bus initialization (which caused I2C2 not to work)
  * Updated to Contributor Covenant Code of Conduct 1.2.0
