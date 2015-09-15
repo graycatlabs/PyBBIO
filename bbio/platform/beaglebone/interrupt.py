@@ -60,7 +60,10 @@ class EpollListener(threading.Thread):
       self.first_interrupt_registered = True
     
   def unregister(self, gpio_pin):
-    fileno = INTERRUPT_VALUE_FILES[gpio_pin].fileno()
+    f = INTERRUPT_VALUE_FILES.get(gpio_pin)
+    if f == None:
+      return
+    fileno = f.fileno()
     self.epoll.unregister(fileno)
     INTERRUPT_VALUE_FILES[gpio_pin].close()
     del INTERRUPT_VALUE_FILES[gpio_pin]
@@ -80,14 +83,19 @@ def attachInterrupt(gpio_pin, callback, mode=BOTH):
   # Start the listener thread
   _start_epoll_listener()
   gpio_num = GPIO[gpio_pin]['gpio_num']
+  gpio_file = os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value')
+  if not os.path.exists(gpio_file):
+    raise IOError('GPIO pin {} must be set to input with pinMode before calling attachInterrupt'.format(gpio_pin))
   INTERRUPT_VALUE_FILES[gpio_pin] = open(
-    os.path.join(GPIO_FILE_BASE, 'gpio%i' % gpio_num, 'value'), 'r')
+    gpio_file, 'r')
   _edge(gpio_pin, mode)
   EPOLL_LISTENER.register(gpio_pin, callback)
 
 def detachInterrupt(gpio_pin):
   """ Detaches the interrupt from the given pin if set. """
   gpio_num = GPIO[gpio_pin]['gpio_num']
+  if EPOLL_LISTENER == None:
+    return
   EPOLL_LISTENER.unregister(gpio_pin)
   
 def _edge(gpio_pin, mode):
