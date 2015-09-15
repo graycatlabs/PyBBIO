@@ -129,6 +129,13 @@ class ADXL345(object):
     
     # Enable the interrupt
     int_enable = self.readReg(self.REG_INT_ENABLE)[0]
+
+    int_enable &= ~interrupt # 0 to enable interrupt
+    self.writeReg(self.REG_INT_ENABLE, int_enable)
+
+    # Ensure any pending interrupts are cleared:
+    self.getInterrupts()
+
     int_enable |= interrupt # 1 to enable interrupt
     self.writeReg(self.REG_INT_ENABLE, int_enable)
 
@@ -139,6 +146,7 @@ class ADXL345(object):
         methods). The default values should work fairly well when tapping on
         the PCB on which the ADXL345 is mounted.
     """
+    self.writeReg(self.REG_TAP_AXES, 0)
     enable = self.TAP_AXES_X_EN | self.TAP_AXES_Y_EN | self.TAP_AXES_Z_EN
     self.writeReg(self.REG_TAP_AXES, enable)
     self.setTapThreshold(threshold_g) # threshold in g
