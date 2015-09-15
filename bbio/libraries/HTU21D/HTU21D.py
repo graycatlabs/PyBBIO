@@ -72,7 +72,7 @@ class HTU21D(object):
     Received value is checked against a CRC and an AssertionError is thrown if 
     it is invalid.
     """
-    tempC = self.readTemp()
+    tempC = self.getTemp()
     return tempC * 9./5 + 32
 
   def calculateDewPoint(self, rh, temp):
