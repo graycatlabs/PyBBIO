@@ -310,7 +310,9 @@ static PyObject *SPIDev_transfer(SPIDev *self, PyObject *args, PyObject *kwds) {
       word = 0;
       break;
     }
-    PyList_Append(rxdata, PyInt_FromLong(word));
+    word_obj = PyInt_FromLong(word);
+    PyList_Append(rxdata, word_obj);
+    Py_DECREF(word_obj);
   }
   free(txbuf);
   free(rxbuf);
