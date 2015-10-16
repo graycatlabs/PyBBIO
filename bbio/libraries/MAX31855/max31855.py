@@ -34,7 +34,7 @@ class MAX31855(object):
     """ Reads and returns the temperature in Celsius, or returns None
         if error detected. """
     value = self.read()
-    if not value: return None
+    if value == None: return None
     # Extract 14-bit signed temperature value:
     temp = (value >> 18) & 0x3fff
     # Convert 2's complement:
@@ -44,19 +44,16 @@ class MAX31855(object):
   def readTempInternal(self):
     """ Reads and returns the MAX31855 reference junction temperature 
         in Celsius, or returns None if error detected. """
-    value = self.read()
-    if not value: return None
-    # Extract 12-bit signed temperature value:
-    temp = (value >> 4) & 0xfff
-    sign = temp & (1<<12)
-    if sign: temp = -(~temp+1 & 0x7ff)
-    return temp*0.0625
+    temp_c= self.readTempC()
+    if value == None: return None
+    return temp_c*0.0625
 
   def read(self):
     """ Receives and returns full 32-bit map from MAX31855, or sets
         self.error and returns None if fault detected. """
     self.error = None
 
+    # Configure SPI bus as required by the MAX31855:
     self.spi_bus.setClockMode(self.spi_cs, self.SPI_CLOCK_MODE)
     self.spi_bus.setMaxFrequency(self.spi_cs, self.SPI_FREQUENCY)
     self.spi_bus.setBitsPerWord(self.spi_cs, self.SPI_N_BITS)
@@ -66,6 +63,7 @@ class MAX31855(object):
     value = self.spi_bus.read(self.spi_cs, 1)[0]
 
     if (value & (1<<16)):
+      # Fault bit set, save error code and return None:
       self.error = value & 0b111
       return None
 
