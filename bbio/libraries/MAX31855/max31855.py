@@ -1,25 +1,28 @@
 """
- MAX31855 - v0.2
- Copyright 2012 Alexander Hiam
- A library for PyBBIO to interface with Maxim's MAX31855 
- thermocouple amplifier.
+ MAX31855
+ Copyright 2015 - Alexander Hiam <alex@graycat.io>
+
+ A library for PyBBIO to interface with Maxim's MAX31855 thermocouple amplifier.
+
+ MAX31855 is released as part of PyBBIO under its MIT license.
+ See PyBBIO/LICENSE.txt
 """
 
-from bbio import *
-
-
 class MAX31855(object):
-  def __init__(self, data_pin, clk_pin, cs_pin, offset=0):
-    self._data = data_pin
-    self._clk = clk_pin
-    self._cs = cs_pin
-    self.offset = offset
-    pinMode(self._data, INPUT)
-    for i in (self._cs, self._clk): pinMode(i, OUTPUT)
-    self.error = None
+  SPI_CLOCK_MODE = 1
+  SPI_FREQUENCY  = 4000000
+  SPI_N_BITS     = 32
 
-    # Idle state for clock and cs (data doesn't matter):
-    for i in (self._cs, self._clk): digitalWrite(i, HIGH)
+  OPEN_CIRCUIT   = 1
+  SHORT_TO_GND   = 2
+  SHORT_TO_VCC   = 4
+
+
+  def __init__(self, spi_bus, spi_cs=0, offset=0):
+    self.spi_bus = spi_bus
+    self.spi_cs = spi_cs
+    self.offset = offset
+    self.error = None
 
   def readTempF(self):
     """ Reads temperature, converts to Fahrenheit and returns, or 
@@ -34,8 +37,8 @@ class MAX31855(object):
     if not value: return None
     # Extract 14-bit signed temperature value:
     temp = (value >> 18) & 0x3fff
-    sign = temp & (1<<14)
-    if sign: temp = -(~temp+1 & 0x1fff)
+    # Convert 2's complement:
+    if temp >= 2**13: temp -= 2**14 
     return temp*0.25 + self.offset
     
   def readTempInternal(self):
@@ -53,18 +56,17 @@ class MAX31855(object):
     """ Receives and returns full 32-bit map from MAX31855, or sets
         self.error and returns None if fault detected. """
     self.error = None
-    digitalWrite(self._cs, LOW)
-    value = shiftIn(self._data, self._clk, MSBFIRST, n_bits=32)
-    digitalWrite(self._cs, HIGH)
+
+    self.spi_bus.setClockMode(self.spi_cs, self.SPI_CLOCK_MODE)
+    self.spi_bus.setMaxFrequency(self.spi_cs, self.SPI_FREQUENCY)
+    self.spi_bus.setBitsPerWord(self.spi_cs, self.SPI_N_BITS)
+    self.spi_bus.setMSBFirst(self.spi_cs)
+    self.spi_bus.setCSActiveLow(self.spi_cs)
+
+    value = self.spi_bus.read(self.spi_cs, 1)[0]
 
     if (value & (1<<16)):
-      # Fault detected, check error bits:
-      if (value & (1<<2)):
-        self.error = "*Thermocouple shorted to Vcc*"
-      elif (value & (1<<1)):
-        self.error = "*Thermocouple shorted to GND*"
-      else:
-        self.error = "*Thermocouple not connected*"
+      self.error = value & 0b111
       return None
 
     return value
