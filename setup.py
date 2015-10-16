@@ -57,7 +57,7 @@ data_files = [
 ]
 
 setup(name='PyBBIO',
-      version='0.9.5.3',
+      version='0.10',
       description='A Python library for Arduino-style hardware IO support on the BeagleBone and BeagleBone Black',
       long_description=open('README.md').read(),
       author='Alexander Hiam',

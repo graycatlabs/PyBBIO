@@ -1,5 +1,11 @@
 ###Changelog for PyBBIO  
-http://github.com/alexanderhiam/PyBBIO   
+http://github.com/graycatlabs/PyBBIO   
+
+#### version 0.10
+ * Added library and exampes for Panasonic Grid-EYE 8x8 thermal sensor array
+ * Updated MAX31855 library to use SPI module instead of soft SPI
+ * Switched to using separate [serbus](https://github.com/graycatlabs/serbus) package for SPI and I2C
+ * Standardized [version numbering](https://github.com/graycatlabs/PyBBIO/wiki#version-numbering)
 
 #### version 0.9.5.3
  * Added ADXL345 3-axis accelerometer library and example
