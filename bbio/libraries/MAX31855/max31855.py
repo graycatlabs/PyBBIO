@@ -44,9 +44,12 @@ class MAX31855(object):
   def readTempInternal(self):
     """ Reads and returns the MAX31855 reference junction temperature 
         in Celsius, or returns None if error detected. """
-    temp_c= self.readTempC()
+    value = self.read()
     if value == None: return None
-    return temp_c*0.0625
+    temp = (value >> 4) & 0xfff
+    # Convert 2's complement:
+    if temp >= 2**11: temp -= 2**12 
+    return temp*0.0625
 
   def read(self):
     """ Receives and returns full 32-bit map from MAX31855, or sets
