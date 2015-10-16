@@ -29,18 +29,11 @@ from setuptools import setup, Extension, find_packages
 
 install_requires = [
   'pyserial',
-  'requests'
+  'requests', 
+  'serbus'
 ]
 
 extensions = [
-  Extension('bbio.platform.util.spidev',
-            ['bbio/platform/util/pyspidev.c',
-             'bbio/platform/util/spidriver.c'],
-            include_dirs=['bbio/platform/util']),
-  Extension('bbio.platform.util.i2cdev',
-            ['bbio/platform/util/pyi2cdev.c',
-             'bbio/platform/util/i2cdriver.c'],
-            include_dirs=['bbio/platform/util']),
   Extension('bbio.platform.util.sysfs',
             ['bbio/platform/util/sysfs.c']),  
   Extension('bbio.platform.beaglebone.gpio',

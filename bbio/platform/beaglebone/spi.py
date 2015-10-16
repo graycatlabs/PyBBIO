@@ -3,11 +3,10 @@
 # github.com/graycatlabs/PyBBIO
 # MIT License
 
-import cape_manager, bbio, os, glob
-from bbio.platform.util import spidev
+import cape_manager, bbio, os, glob, serbus
 from config import SPI_BASE_ADDRESSES
 
-class SPIBus(spidev.SPIDev):
+class SPIBus(serbus.SPIDev):
   def __init__(self, bus):
     super(SPIBus, self).__init__(bus)
     self._is_open = False

@@ -5,14 +5,13 @@
 # 
 # Beaglebone i2c driver
 
-import bbio, cape_manager, os, glob
-from bbio.platform.util import i2cdev
+import bbio, cape_manager, os, glob, serbus
 from config import I2C_BASE_ADDRESSES
 
-class I2CBus(i2cdev.I2CDev):
+class I2CBus(serbus.I2CDev):
   def __init__(self, bus):
     assert 1<= bus <= 2, 'Only I2C buses 1 and 2 are available'
-    # Run i2cdev.I2CDev initializtion:
+    # Run serbus.I2CDev initializtion:
     super(I2CBus, self).__init__(bus)
     self._is_open = False
 
