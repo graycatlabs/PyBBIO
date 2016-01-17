@@ -105,7 +105,7 @@ class BMP183(object):
     x1 = (self.cal_B2 * (b6*b6 / 4096)) / 2048
     x2 = self.cal_AC2 * b6 / 2048
     x3 = x1+x2
-    b3 = ((self.cal_AC1*4+x3) << oversampling + 2) / 4
+    b3 = (((self.cal_AC1*4+x3) << oversampling) + 2) / 4
     x1 = self.cal_AC3 * b6 / 8192
     x2 = (self.cal_B1 * (b6*b6 / 4096)) / 65536
     x3 = ((x1 + x2) + 2) / 4
