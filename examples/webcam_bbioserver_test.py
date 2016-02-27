@@ -9,7 +9,7 @@
 from bbio import *
 from bbio.libraries.WebCam import WebCam
 
-from BBIOServer import *
+from bbio.libraries.BBIOServer import *
 
 cam = WebCam()
 delay(10000)
