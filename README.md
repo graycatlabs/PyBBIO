@@ -1,6 +1,5 @@
 PyBBIO
 ======
-[![Build Status](https://ci.graycat.io/buildStatus/icon?job=PyBBIO)](https://ci.graycat.io/job/PyBBIO/)
 
 **Note**: I haven't had any time to maintain this library in recent years - if anyone's interested in taking it over hit me up: <alex@graycat.io>
 
