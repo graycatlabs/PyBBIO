@@ -1,7 +1,8 @@
 PyBBIO
 ======
+[![Build Status](https://ci.graycat.io/buildStatus/icon?job=PyBBIO)](https://ci.graycat.io/job/PyBBIO/)
 
-[![Join the chat at https://gitter.im/graycatlabs/PyBBIO](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/graycatlabs/PyBBIO?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Build Status](https://ci.graycat.io/buildStatus/icon?job=PyBBIO)](https://ci.graycat.io/job/PyBBIO/)
+**Note**: I haven't had any time to maintain this library in recent years - if anyone's interested in taking it over hit me up: <alex@graycat.io>
 
 http://github.com/graycatlabs/PyBBIO
 
