@@ -1,0 +1,16 @@
+Servo - v0.1
+
+Copyright 2014 Alaa Agwa
+agwatic@gmail.com
+
+Library for controlling servo motors with the BeagleBone's PWM pins.
+
+
+As well as the included example programs:
+ PyBBIO/examples/tmp36-lm35.py
+
+
+
+Servo is released as part of PyBBIO under its Apache 2.0 license.
+See PyBBIO/LICENSE.txt
+
