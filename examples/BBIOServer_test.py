@@ -35,7 +35,7 @@ def print_entry(text):
   print "Text entered: \n  '%s'" % text
 
 def setup():
-  # Set the LEDs we'll be ontrolling as outputs:
+  # Set the LEDs we'll be controlling as outputs:
   pinMode(USR2, OUTPUT)
   pinMode(USR3, OUTPUT)
 
