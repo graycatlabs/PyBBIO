@@ -80,4 +80,4 @@ def loop():
 
 run(setup, loop)
 # As soon as ctrl-c is pressed the event loop process will be 
-# automatically termintated and the program wil exit happily.
+# automatically terminated and the program wil exit happily.

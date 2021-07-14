@@ -163,7 +163,7 @@ class BBIOServer():
       with open(path, 'w') as f:
         f.write(str(page) % links)
 
-    # Start srver in a daemon thread:
+    # Start server in a daemon thread:
     server_thread = threading.Thread(target=self._server.serve_forever)
     server_thread.daemon = True
     server_thread.start()

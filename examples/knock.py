@@ -1,6 +1,6 @@
 """
  knock.py - Alexander Hiam - 3/21/2012
- Adapted from the Ardiuno knock.pde example skecth for use
+ Adapted from the Ardiuno knock.pde example sketch for use
  with PyBBIO - https://github.com/alexanderhiam/PyBBIO
 
  Uses a Piezo element to detect knocks. If a knock is detected
